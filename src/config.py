@@ -1,3 +1,7 @@
+# FILE CONSTANTS
+DATA_DIR = "data"
 
-DATA_DIR = "../data"
-DATASET_FILE = f"{DATA_DIR}/hand_coded_text_segments.csv"
+DATASET_FILENAME = "hand_coded_text_segments.csv"
+DATASET_FILE = f"{DATA_DIR}/{DATASET_FILENAME}"
+CLEANED_DATASET_FILENAME = "text_segments_cleaned.csv"
+CLEANED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_DATASET_FILENAME}"
