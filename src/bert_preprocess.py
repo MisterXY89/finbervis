@@ -5,10 +5,11 @@
 Description of bert_preprocess.py
 """
 
-from config import *
-from tqdm import tqdm
 import pandas as pd
+from tqdm import tqdm
 from transformers import BertTokenizer
+
+from config import CLEANED_DATASET_FILE
 
 df = pd.read_csv(CLEANED_DATASET_FILE)
 
