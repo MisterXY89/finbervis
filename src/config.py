@@ -9,9 +9,10 @@ import pandas as pd
 
 # FILE CONSTANTS
 WORKING_DIR = os.getcwd()
-BASE_DIR = WORKING_DIR if not "src" in WORKING_DIR else WORKING_DIR.split("/src")[0]
+BASE_DIR = WORKING_DIR
+if "src" in WORKING_DIR:
+    BASE_DIR = WORKING_DIR.split("/src")[0]
 DATA_DIR = BASE_DIR + "/data"
-
 
 DATASET_FILENAME = "hand_coded_text_segments.csv"
 DATASET_FILE = f"{DATA_DIR}/{DATASET_FILENAME}"
