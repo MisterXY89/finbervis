@@ -1,40 +1,65 @@
+"""
+@version:
+@author: 
+---
+lorem ipsu sorola soam ae e wef weeq wlwei fwf
+"""
 
 from config import *
-from pandas import pandas as pd
+import pandas as pd
 
 
-def reduceDF(df):
-	return df[["Segment", "sentiment"]]
-
-def getDistribution(df):
-	values = ["positive", "neutral", "negative"]
-
-	for value in values:
-		length = len(df.query(f"sentiment == '{value}'"))
-		print(f"amount({value}) = { length}")
+def reduce_df(df):
+    return df[["segment", "sentiment"]]
 
 
-data_frame = pd.read_csv(DATASET_FILE)
-data_frame_slim = reduceDF(data_frame)
+def get_distribution(df):
+    """
+	print value distribution for quick check
+	"""
+    values = ["positive", "neutral", "negative"]
+    for value in values:
+        length = len(df.query(f"sentiment == '{value}'"))
+        print(f"amount({value}) = {length}")
 
 
-getDistribution(data_frame_slim)
+def clean_dataset(df):
+    """
+	expected: df is smaller & now new line can be found
+	"""
+    df = df.rename({'Segment': 'segment'}, axis=1)
+    df_slim = reduce_df(df)
+    # getting rid of newlines and multiple spaces
+    df_slim = df_slim.replace('(\r|\n)', ' ', regex=True)
+    df_slim = df_slim.replace('\s+', ' ', regex=True)
+    return df_slim
 
-# getting rid of newlines and multiple spaces
-data_frame_slim = data_frame_slim.replace('(\r|\n)',' ', regex=True) 
-data_frame_slim = data_frame_slim.replace('\s+',' ', regex=True) 
 
-print(data_frame_slim)
+def flag_sentences(df):
+    """
+	there are matches in col, ther may be a wrong sentence up front or at the end
+	"""
+    sentence_regex = "[A-Z]+[a-zA-Z|\s|,|0-9]+[?|\!|.]+"
+    df["isSentence"] = df.segment.str.contains(sentence_regex,
+                                               regex=True,
+                                               na=False)
+    return df
 
-# there are matches in col, ther may be a wrong sentence up front or at the end
-sentence_regex = "[A-Z]+[a-zA-Z|\s|,|0-9]+[?|\!|.]+"
-data_frame_slim["isSentence"] = data_frame_slim.Segment.str.contains(sentence_regex, regex= True, na=False)
-print(data_frame_slim)
 
-data_frame_slim_clean = data_frame_slim.query(f"isSentence == True")
-data_frame_slim_clean = reduceDF(data_frame_slim_clean)
-print(len(data_frame_slim_clean))
-getDistribution(data_frame_slim_clean)
+def cleanSentences(df):
+    df = df.query(f"isSentence == True")
 
-data_frame_slim_clean.to_csv(f"{DATA_DIR}/text_segments_cleaned.csv", index=False)
 
+# basic loading & cleaning
+df = pd.read_csv(DATASET_FILE)
+df_slim = clean_dataset(df)
+getDistribution(df_slim)
+df_slim = flag_sentences(df_slim)
+
+print(30 * "-")
+
+# cut of isSentence flag & store cleaned df
+df_slim_clean = df_slim.query(f"isSentence == True")
+df_slim_clean = reduce_df(df_slim_clean)
+getDistribution(df_slim_clean)
+df_slim_clean.to_csv(CLEANED_DATASET_FILE, index=False)
