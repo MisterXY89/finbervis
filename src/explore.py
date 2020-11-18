@@ -36,7 +36,7 @@ def get_distribution(distr_df):
 
 def clean_dataset(to_be_cleaned_df):
     """
-	expected: df is smaller & now new line can be found
+	expected: df is smaller & no new line can be found
 	"""
     df_reduced = reduce_df(to_be_cleaned_df)
     # getting rid of newlines and multiple spaces
@@ -45,32 +45,21 @@ def clean_dataset(to_be_cleaned_df):
     return df_slim
 
 
-# def flag_sentences(sent_df):
-#     """
-# 	adds flag where ever a sentece is detected - the regex finds a match
-# 	"""    
-#     sent_df["isSentence"] = sent_df.segment.str.contains(sentence_regex,
-#                                                regex=True,
-#                                                na=False)
-#     return sent_df
-
-
-def flag_sentences(to_be_cleaned_sent_df):
+def parse_sentences(to_be_cleaned_sent_df):
     """
-    there are matches in col, ther may be a wrong sentence up front or at the end
-    this func cleanes this up
+    uses spacy & regex to get all valid sentences and add them to df seperatly
     """
-    # sentences_df = to_be_cleaned_sent_df.query("isSentence == True")
     print("Flagging sentences...")
-    for index, row in tqdm(to_be_cleaned_sent_df.iterrows()):
-        # test = re.search(sentence_regex, row.segment)
-        # print(re.compile(sentence_regex).groups)
+    for index, row in tqdm(to_be_cleaned_sent_df.iterrows(), desc='Progress', total=11796):
         seg = str(row.segment)
         doc = nlp(seg)
         sentences_in_segment = [str(el) for el in list(doc.sents) if re.match(sentence_regex, str(el)) != None]
 
         if len(sentences_in_segment) > 0:
-            to_be_cleaned_sent_df.at[index,'segment'] = "~".join(sentences_in_segment)            
+            to_be_cleaned_sent_df.at[index,'segment'] = sentences_in_segment[0]
+            if len(sentences_in_segment) > 1:
+                for sentence in sentences_in_segment:
+                    to_be_cleaned_sent_df.loc[len(to_be_cleaned_sent_df.index)] = [sentence, to_be_cleaned_sent_df.at[index,'sentiment'], True]
             to_be_cleaned_sent_df.at[index,'isSentence'] = True
         else:
             to_be_cleaned_sent_df.at[index,'isSentence'] = False
@@ -81,18 +70,10 @@ def flag_sentences(to_be_cleaned_sent_df):
 # basic loading & cleaning
 data_frame = pd.read_csv(DATASET_FILE)
 df_clean = clean_dataset(data_frame)
-get_distribution(df_clean)
-df_clean = flag_sentences(df_clean)
 
-print(30 * "-")
-
-# df_sent_clean = clean_sentences(df_clean)
+# parse all sentences & save reduced df
+df_clean = parse_sentences(df_clean)
 df_clean = df_clean.query("isSentence == True")
-df_clean.to_csv(CLEANED_DATASET_FILE, index=False)
+df_clean_slim = reduce_df(df_clean)
+df_clean.to_csv(CLEANED_DATASET_FILE)
 get_distribution(df_clean)
-
-# cut of isSentence flag & store cleaned data_frame
-# df_slim_clean = df_clean.query("isSentence == True")
-# df_slim_clean = reduce_df(df_slim_clean)
-# get_distribution(df_slim_clean)
-# df_slim_clean.to_csv(CLEANED_DATASET_FILE, index=False)
