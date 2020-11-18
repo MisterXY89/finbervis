@@ -12,8 +12,15 @@ format:
 	@yapf --in-place --recursive --style="{indent_width: 4}" src/*.py
 	@echo "Adding Version numbers..."
 	@./version_add.sh
-	@echo "Done!"
+
 
 lint:
 	@echo "Running linter..."
 	@pylint src/*.py
+
+
+pre-commit:	
+	make test
+	make format
+	make lint
+	make clean
