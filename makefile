@@ -19,8 +19,8 @@ lint:
 	@pylint src/*.py
 
 
-pre-commit:	
-	make test
-	make format
-	make lint
-	make clean
+pre-commit:
+	@make test
+	@make format
+	@make lint
+	@make clean
