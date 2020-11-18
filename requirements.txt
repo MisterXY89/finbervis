@@ -4,3 +4,5 @@ TensorFlow
 numpy==1.18.5
 tqdm
 pytest
+en_core_web_sm
+spacy
