@@ -22,6 +22,7 @@ def get_distribution(df):
     for value in values:
         length = len(df.query(f"sentiment == '{value}'"))
         print(f"amount({value}) = {length}")
+    return True
 
 
 def clean_dataset(df):
