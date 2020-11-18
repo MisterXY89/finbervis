@@ -1,6 +1,7 @@
 pandas
 transformers
 TensorFlow
+keras
 numpy==1.18.5
 tqdm
 pytest
