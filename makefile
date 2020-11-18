@@ -16,3 +16,4 @@ format:
 
 lint:
 	@echo "Running linter..."
+	@pylint src/*.py
