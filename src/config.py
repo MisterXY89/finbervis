@@ -1,3 +1,10 @@
+"""
+@author: Tilman Kerl
+@version: 2020.11.18
+---
+specifying constants and som general config
+"""
+
 # FILE CONSTANTS
 DATA_DIR = "data"
 

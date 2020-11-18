@@ -1,8 +1,8 @@
 """
-@version:
-@author: 
+@author: Tilman Kerl
+@version: 2020.11.18
 ---
-lorem ipsu sorola soam ae e wef weeq wlwei fwf
+Descripton of explore.py
 """
 
 from config import *
