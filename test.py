@@ -6,7 +6,7 @@ import pandas as pd
 sys.path.insert(0, './src')
 
 from config import test_df
-from explore import reduce_df, clean_dataset, flag_sentences, get_distribution
+from explore import reduce_df, clean_dataset, parse_sentences, get_distribution
 
 
 
@@ -21,9 +21,9 @@ def test_clean_dataset():
     df = clean_dataset(test_df)
     assert '\n' not in df.values and "\r" not in df.values
 
-def test_flag_dataset():
+def test_parse_sentences():
     df = clean_dataset(test_df)
-    df = flag_sentences(df)
+    df = parse_sentences(df)
     assert "isSentence" in df
 
 def test_get_distribution():
