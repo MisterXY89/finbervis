@@ -1,2 +1,2 @@
 # Fine-tuning of a pre-trained BERT transformer Model
-Fine tuning BERT transformer model with hand labeld text segements for sentiment analysis.
+Fine tuning a pre-trained BERT transformer model with hand labeld text segements for sentiment analysis.
