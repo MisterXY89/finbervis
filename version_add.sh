@@ -15,10 +15,10 @@ for file in *.py; do
         sed -i '/@version/d' "$file"
         sed -i '/@author/d' "$file"
         sed -e "2i\@author: $author\n@version: $date" "$file" > "v.$file"
-    else 
-        sed -e "1i\\\"\"\"\n@author: $author\n@version: $date \n---\nDescription of $file\n\"\"\"\n" "$file" > "v.$file"        
-    fi    
-    # add author and correct version    
+    else
+        sed -e "1i\\\"\"\"\n@author: $author\n@version: $date \n---\nDescription of $file\n\"\"\"\n" "$file" > "v.$file"
+    fi
+		# del old & renaming new file
     rm "$file"
     mv "v.$file" "$file"
 done
