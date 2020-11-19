@@ -6,3 +6,5 @@ numpy==1.18.5
 tqdm
 pytest
 spacy
+sklearn
+torch
