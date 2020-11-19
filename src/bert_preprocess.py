@@ -1,6 +1,6 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.18
+@version: 2020.11.19
 ---
 Description of bert_preprocess.py
 """
@@ -40,7 +40,6 @@ print('Max sentence length: ', max([len(segment) for segment in input_ids]))
 print('Original: ', segments[0])
 print('Token IDs:', input_ids[0])
 
-
 # Set the maximum sequence length.
 # I've chosen 64 somewhat arbitrarily. It's slightly larger than the
 # maximum training sentence length of 153...
@@ -52,21 +51,23 @@ print(f"Padding token: '{tokenizer.pad_token}', ID: {tokenizer.pad_token_id}")
 # Pad our input tokens with value 0.
 # "post" indicates that we want to pad and truncate at the end of the sequence,
 # as opposed to the beginning.
-input_ids = pad_sequences(input_ids, maxlen=MAX_LEN, dtype="long", 
-                          value=0, truncating="post", padding="post")
+input_ids = pad_sequences(input_ids,
+                          maxlen=MAX_LEN,
+                          dtype="long",
+                          value=0,
+                          truncating="post",
+                          padding="post")
 print('Done.')
-
-
 
 # Create attention masks
 attention_masks = []
 # For each sentence...
 for sentence in input_ids:
-    
+
     # Create the attention mask.
     #   - If a token ID is 0, then it's padding, set the mask to 0.
     #   - If a token ID is > 0, then it's a real token, set the mask to 1.
     att_mask = [int(token_id > 0) for token_id in sentence]
-    
+
     # Store the attention mask for this sentence.
     attention_masks.append(att_mask)
