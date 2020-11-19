@@ -5,69 +5,145 @@
 Description of bert_preprocess.py
 """
 
+import torch
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from transformers import BertTokenizer
+from sklearn.model_selection import train_test_split
 from keras.preprocessing.sequence import pad_sequences
+from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
-from config import CLEANED_DATASET_FILE
+from config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, BATCH_SIZE, MAX_LEN, TEST_SIZE
 
+# data loading & parsing
 data_frame = pd.read_csv(CLEANED_DATASET_FILE)
-
 segments = data_frame.segment.values
-labels = data_frame.sentiment.values
+LABELS = data_frame.sentiment.values
 
-print("Downloading BERT-Tokenizer...")
-# BERT-Base, Uncased: 12-layer, 768-hidden, 12-heads, 110M parameters
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased',
-                                          do_lower_case=True)
+# getting BERT-tokenizer
+tokenizer = get_tokenizer()
 
-# Tokenize all of the sentences and map the tokens to thier word IDs.
-input_ids = []
-print("Tokenizing segments...")
-for segment in tqdm(segments):
-    encoded_segment = tokenizer.encode(
-        segment,
-        add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
-        # max_length = 128,          # Truncate all sentences.
-        # return_tensors = 'pt',     # Return pytorch tensors.
+
+def tokenize_segments_to_id(
+        to_be_tokenized_segments: np.ndarray) -> np.ndarray:
+    """
+	trokenize all of the sentences and map the tokens to thier word IDs.
+	"""
+    input_ids = []
+    print("Tokenizing segments...")
+    for segment in tqdm(to_be_tokenized_segments):
+        encoded_segment = tokenizer.encode(
+            segment,
+            add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
+        )
+
+        input_ids.append(encoded_segment)
+    return input_ids
+
+
+def pad_token_ids(token_ids: list) -> list:
+    """
+	Pad input tokens with value 0 at the end of the sequence (post)
+	"""
+    print(f"Padding/truncating all sentences to {MAX_LEN} values...")
+    print(
+        f"Padding token: '{tokenizer.pad_token}', ID: {tokenizer.pad_token_id}"
     )
+    token_ids = pad_sequences(token_ids,
+                              maxlen=MAX_LEN,
+                              dtype="long",
+                              value=0,
+                              truncating="post",
+                              padding="post")
+    return token_ids
 
-    input_ids.append(encoded_segment)
 
-print('Max sentence length: ', max([len(segment) for segment in input_ids]))
+def create_attention_masks(padding_token_ids: list) -> list:
+    """
+	Create attention masks
+	"""
+    attention_masks = []
+    for sentence in padding_token_ids:
+        # Create the attention mask.
+        #   - If a token ID is 0, then it's padding, set the mask to 0.
+        #   - If a token ID is > 0, then it's a real token, set the mask to 1.
+        att_mask = [int(token_id > 0) for token_id in sentence]
 
-print('Original: ', segments[0])
-print('Token IDs:', input_ids[0])
+        # Store the attention mask for this sentence.
+        attention_masks.append(att_mask)
 
-# Set the maximum sequence length.
-# I've chosen 64 somewhat arbitrarily. It's slightly larger than the
-# maximum training sentence length of 153...
-MAX_LEN = 180
+    return attention_masks
 
-print(f"Padding/truncating all sentences to {MAX_LEN} values...")
-print(f"Padding token: '{tokenizer.pad_token}', ID: {tokenizer.pad_token_id}")
 
-# Pad our input tokens with value 0.
-# "post" indicates that we want to pad and truncate at the end of the sequence,
-# as opposed to the beginning.
-input_ids = pad_sequences(input_ids,
-                          maxlen=MAX_LEN,
-                          dtype="long",
-                          value=0,
-                          truncating="post",
-                          padding="post")
-print('Done.')
+def train_valid_split(processed_ids):
+    """
+	Use 90% for training and 10% for validation
+	"""
+    return train_test_split(processed_ids,
+                            LABELS,
+                            random_state=2020,
+                            test_size=TEST_SIZE)
 
-# Create attention masks
-attention_masks = []
-# For each sentence...
-for sentence in input_ids:
 
-    # Create the attention mask.
-    #   - If a token ID is 0, then it's padding, set the mask to 0.
-    #   - If a token ID is > 0, then it's a real token, set the mask to 1.
-    att_mask = [int(token_id > 0) for token_id in sentence]
+def preprocess():
+    """
+	method to call from other files
+	"""
+    pass
 
-    # Store the attention mask for this sentence.
-    attention_masks.append(att_mask)
+
+def train_valid_to_tensor(all_train_valid_lists: list) -> torch.tensor:
+    """
+	Convert all inputs and labels into torch tensors
+	"""
+    for to_be_converted in all_train_valid_lists:
+        yield torch.tensor(to_be_converted)
+
+
+def convert_labels_to_int(label_list: list) -> list:
+    """
+	Convert an element from LABEL_VALUES to int
+	"""
+    return [LABEL_VALUES.index(el) for el in label_list]
+
+
+input_ids = tokenize_segments_to_id(segments)
+padding_token_ids = pad_token_ids(input_ids)
+attention_masks = create_attention_masks(padding_token_ids)
+
+#------------------------------------------------------------------------------#
+
+# preparing training & test data
+train_inputs, valid_inputs, train_labels, valid_labels = train_valid_split(
+    padding_token_ids)
+train_masks, valid_masks, _, _ = train_valid_split(attention_masks)
+
+train_labels = convert_labels_to_int(train_labels)
+valid_labels = convert_labels_to_int(valid_labels)
+
+# Convert all inputs and labels into torch tensors,
+# the required datatype for our model.
+tensor_convert = train_valid_to_tensor([
+    train_inputs, valid_inputs, train_labels, valid_labels, train_masks,
+    valid_masks
+])
+train_inputs = next(tensor_convert)
+valid_inputs = next(tensor_convert)
+train_labels = next(tensor_convert)
+valid_labels = next(tensor_convert)
+train_masks = next(tensor_convert)
+valid_masks = next(tensor_convert)
+
+# Create the DataLoader for our training set.
+train_data = TensorDataset(train_inputs, train_masks, train_labels)
+train_sampler = RandomSampler(train_data)
+train_dataloader = DataLoader(train_data,
+                              sampler=train_sampler,
+                              batch_size=BATCH_SIZE)
+
+# Create the DataLoader for our valid set.
+valid_data = TensorDataset(valid_inputs, valid_masks, valid_labels)
+valid_sampler = SequentialSampler(valid_data)
+valid_dataloader = DataLoader(valid_data,
+                              sampler=valid_sampler,
+                              batch_size=BATCH_SIZE)
