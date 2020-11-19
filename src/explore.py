@@ -1,6 +1,6 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.18
+@version: 2020.11.19
 ---
 Descripton of explore.py
 """
@@ -9,7 +9,7 @@ import re
 import spacy
 import pandas as pd
 from tqdm import tqdm
-from config import DATASET_FILE, CLEANED_DATASET_FILE
+from config import DATASET_FILE, CLEANED_DATASET_FILE, LABEL_VALUES
 
 SENTENCE_REGEX = r"^[A-Z][A-Za-z,;'\"\s&%0-9-():‘“]+[.?!]"
 nlp = spacy.load("en_core_web_sm")
@@ -27,8 +27,7 @@ def get_distribution(distr_df):
     """
 	print value distribution for quick check
 	"""
-    values = ["positive", "neutral", "negative"]
-    for value in values:
+    for value in LABEL_VALUES:
         length = len(distr_df.query(f"sentiment == '{value}'"))
         print(f"amount({value}) = {length}")
     return True
