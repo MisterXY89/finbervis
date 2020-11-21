@@ -10,7 +10,7 @@ import random
 import torch
 import time
 
-from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler
+from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler, plot_loss
 import bert_preprocess as bp
 from config import load_bert
 
@@ -85,6 +85,8 @@ class Trainer(object):
             self._validate()
 
         print("Training complete!")
+        plot_loss(self.loss_values)
+
 
     def _validate(self):
         """
