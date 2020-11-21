@@ -52,8 +52,7 @@ def parse_sentences(to_be_cleaned_sent_df: pd.DataFrame) -> pd.DataFrame:
     print("Flagging sentences...")
     for index, row in tqdm(to_be_cleaned_sent_df.iterrows(),
                            desc='Progress',
-                           total=len(
-	                           to_be_cleaned_sent_df.index)):
+                           total=len(to_be_cleaned_sent_df.index)):
         seg = str(row.segment)
         doc = nlp(seg)
         sentences_in_segment = [
