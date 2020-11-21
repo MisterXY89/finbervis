@@ -25,6 +25,7 @@ class Trainer(object):
     """
     def __init__(self):
         self.model = load_bert()
+        self.model.cuda()
         # Number of training epochs (authors recommend between 2 and 4)
         self.EPOCHS = 4
         # Total number of training steps is number of batches * number of epochs.
