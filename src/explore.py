@@ -15,7 +15,7 @@ SENTENCE_REGEX = r"^[A-Z][A-Za-z,;'\"\s&%0-9-():‘“]+[.?!]"
 nlp = spacy.load("en_core_web_sm")
 
 
-def reduce_df(to_be_reduced_df):
+def reduce_df(to_be_reduced_df: pd.DataFrame) -> pd.DataFrame:
     """
     reduce the df to the needed dims & lowers column header
     """
@@ -23,7 +23,7 @@ def reduce_df(to_be_reduced_df):
     return reduced_df[["segment", "sentiment"]]
 
 
-def get_distribution(distr_df):
+def get_distribution(distr_df: pd.DataFrame) -> pd.DataFrame:
     """
 	print value distribution for quick check
 	"""
@@ -33,7 +33,7 @@ def get_distribution(distr_df):
     return True
 
 
-def clean_dataset(to_be_cleaned_df):
+def clean_dataset(to_be_cleaned_df: pd.DataFrame) -> pd.DataFrame:
     """
 	expected: df is smaller & no new line can be found
 	"""
@@ -45,14 +45,15 @@ def clean_dataset(to_be_cleaned_df):
     return df_slim
 
 
-def parse_sentences(to_be_cleaned_sent_df):
+def parse_sentences(to_be_cleaned_sent_df: pd.DataFrame) -> pd.DataFrame:
     """
     uses spacy & regex to get all valid sentences and add them to df seperatly
     """
     print("Flagging sentences...")
     for index, row in tqdm(to_be_cleaned_sent_df.iterrows(),
                            desc='Progress',
-                           total=11796):
+                           total=len(
+	                           to_be_cleaned_sent_df.index)):
         seg = str(row.segment)
         doc = nlp(seg)
         sentences_in_segment = [
@@ -76,13 +77,13 @@ def parse_sentences(to_be_cleaned_sent_df):
     return to_be_cleaned_sent_df
 
 
-# basic loading & cleaning
-data_frame = pd.read_csv(DATASET_FILE)
-df_clean = clean_dataset(data_frame)
-
-# parse all sentences & save reduced df
-df_clean = parse_sentences(df_clean)
-df_clean = df_clean.query("isSentence == True")
-df_clean_slim = reduce_df(df_clean)
-df_clean.to_csv(CLEANED_DATASET_FILE)
-get_distribution(df_clean)
+# # basic loading & cleaning
+# data_frame = pd.read_csv(DATASET_FILE)
+# df_clean = clean_dataset(data_frame)
+#
+# # parse all sentences & save reduced df
+# df_clean = parse_sentences(df_clean)
+# df_clean = df_clean.query("isSentence == True")
+# df_clean_slim = reduce_df(df_clean)
+# df_clean.to_csv(CLEANED_DATASET_FILE, index=False)
+# get_distribution(df_clean)
