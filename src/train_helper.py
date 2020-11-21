@@ -1,5 +1,8 @@
+
 import time
 import datetime
+import pandas as pd
+import plotly.express as px
 from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
 
@@ -57,3 +60,13 @@ def format_time(elapsed):
 	elapsed_rounded = int(round((elapsed)))
     # Format as hh:mm:ss
 	return str(datetime.timedelta(seconds=elapsed_rounded))
+
+
+def plot_loss(loss_values):
+	f = pd.DataFrame(loss_values)
+	f.columns=['Loss']
+	fig = px.line(f, x=f.index, y=f.Loss)
+	fig.update_layout(title='Training loss of the Model',
+	                   xaxis_title='Epoch',
+	                   yaxis_title='Loss')
+	fig.show()
