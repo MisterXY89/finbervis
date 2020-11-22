@@ -157,7 +157,7 @@ class Trainer(object):
         for step, batch in enumerate(bp.train_dataloader):
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
-                self._report_progress(step, batch)
+                self._report_progress(step)
 
             # Unpack training batch from dataloader and copy each tensor
             # to the GPU using the `to` method.
