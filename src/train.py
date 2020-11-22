@@ -102,7 +102,7 @@ class Trainer(object):
         # Tracking variables
         eval_loss, eval_accuracy = 0, 0
         nb_eval_steps, nb_eval_examples = 0, 0
-        for batch in bp.validation_dataloader:
+        for batch in bp.valid_dataloader:
 
             # Add batch to GPU
             batch = tuple(t.to(self.device) for t in batch)
