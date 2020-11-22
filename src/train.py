@@ -141,7 +141,7 @@ class Trainer(object):
 
         self._validate_report(eval_accuracy, nb_eval_steps, t0)
 
-    def _report_progress(self, step):
+    def _report_progress(self, step, t0):
         """
         Report progress, via the elapsed time in minutes
         """
@@ -157,7 +157,7 @@ class Trainer(object):
         for step, batch in enumerate(bp.train_dataloader):
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
-                self._report_progress(step)
+                self._report_progress(step, t0)
 
             # Unpack training batch from dataloader and copy each tensor
             # to the GPU using the `to` method.
@@ -179,7 +179,7 @@ class Trainer(object):
             # This will return the loss (rather than the model output) because we
             # have provided the `labels`.
             # The documentation for this `model` function is here:
-            # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification            
+            # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
             outputs = self.model(torch.tensor(b_input_ids).to(self.device).long(),
                             token_type_ids=None,
                             attention_mask=b_input_mask,
