@@ -25,7 +25,7 @@ class Trainer(object):
     """
     def __init__(self):
         self.model = load_bert()
-        self.model.cuda()
+        # self.model.cuda()
         # Number of training epochs (authors recommend between 2 and 4)
         self.EPOCHS = 4
         # Total number of training steps is number of batches * number of epochs.
@@ -40,14 +40,14 @@ class Trainer(object):
         self.loss_values = []
         self.total_loss = 0
         # If there's a GPU available...
-        if torch.cuda.is_available():
-            # Tell PyTorch to use the GPU.
-            self.device = torch.device("cuda")
-            print('There are %d GPU(s) available.' % torch.cuda.device_count())
-            print('We will use the GPU:', torch.cuda.get_device_name(0))
-        else:
-            print('No GPU available, using the CPU instead.')
-            self.device = torch.device("cpu")
+        # if torch.cuda.is_available():
+        # Tell PyTorch to use the GPU.
+        #    self.device = torch.device("cuda")
+        #    print('There are %d GPU(s) available.' % torch.cuda.device_count())
+        #    print('We will use the GPU:', torch.cuda.get_device_name(0))
+        #else:
+        #    print('No GPU available, using the CPU instead.')
+        self.device = torch.device("cpu")
 
     def _set_seed_value(self):
         random.seed(self.seed_value)
@@ -179,8 +179,8 @@ class Trainer(object):
             # This will return the loss (rather than the model output) because we
             # have provided the `labels`.
             # The documentation for this `model` function is here:
-            # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-            outputs = self.model(b_input_ids,
+            # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification            
+            outputs = self.model(torch.tensor(b_input_ids).to(self.device).long(),
                             token_type_ids=None,
                             attention_mask=b_input_mask,
                             labels=b_labels)
