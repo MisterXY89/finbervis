@@ -1,0 +1,75 @@
+2020-11-23 13:12:53.782448: W tensorflow/stream_executor/platform/default/dso_loader.cc:59] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No such file or directory
+2020-11-23 13:12:53.782541: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+/home/dragonfly/Documents/Uni/WS201/project/env/lib/python3.8/site-packages/torch/cuda/__init__.py:52: UserWarning: CUDA initialization: Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx (Triggered internally at  /pytorch/c10/cuda/CUDAFunctions.cpp:100.)
+  return torch._C._cuda_getDeviceCount() > 0
+Downloading BERT-Tokenizer...
+Tokenizing segments...
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 6630/6630 [00:03<00:00, 2051.78it/s]
+Padding/truncating all sentences to 180 values...
+Padding token: '[PAD]', ID: 0
+Loading BERT Model for sequence classification
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+
+======== Epoch 1 / 4 ========
+Training...
+src/train.py:183: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  outputs = self.model(torch.tensor(b_input_ids).to(self.device).long(),
+  Batch    40  of    187.    Elapsed: 0:16:08.
+    
+  Batch    80  of    187.    Elapsed: 0:32:32.
+  Batch   120  of    187.    Elapsed: 0:54:25.
+  Batch   160  of    187.    Elapsed: 1:18:20.
+  
+  Average training loss: 0.70
+  Training epoch took: 1:34:00
+
+Running Validation...
+  Accuracy: 0.79
+  Validation took: 0:04:08
+
+======== Epoch 2 / 4 ========
+Training...
+  Batch    40  of    187.    Elapsed: 0:21:54.
+  Batch    80  of    187.    Elapsed: 0:54:58.
+  Batch   120  of    187.    Elapsed: 1:23:51.
+  Batch   160  of    187.    Elapsed: 1:54:53.
+
+  Average training loss: 0.43
+  Training epoch took: 2:05:48
+
+Running Validation...
+  Accuracy: 0.81
+  Validation took: 0:02:48
+
+======== Epoch 3 / 4 ========
+Training...
+  Batch    40  of    187.    Elapsed: 0:16:33.
+  Batch    80  of    187.    Elapsed: 0:32:59.
+  Batch   120  of    187.    Elapsed: 0:49:26.
+  Batch   160  of    187.    Elapsed: 1:05:53.
+
+  Average training loss: 0.30
+  Training epoch took: 1:16:45
+
+Running Validation...
+  Accuracy: 0.82
+  Validation took: 0:02:47
+
+======== Epoch 4 / 4 ========
+Training...
+  Batch    40  of    187.    Elapsed: 0:16:33.
+  Batch    80  of    187.    Elapsed: 0:33:58.
+  Batch   120  of    187.    Elapsed: 0:56:15.
+  Batch   160  of    187.    Elapsed: 1:20:11.
+
+  Average training loss: 0.22
+  Training epoch took: 1:36:07
+
+Running Validation...
+  Accuracy: 0.84
+  Validation took: 0:04:01
+Training complete!
