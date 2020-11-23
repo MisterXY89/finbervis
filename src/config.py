@@ -1,6 +1,6 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.19
+@version: 2020.11.23
 ---
 specifying constants and som general config
 """
@@ -38,9 +38,20 @@ CLEANED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_DATASET_FILENAME}"
 CLEANED_PROCESSED_DATASET_FILENAME = "text_segments_cleaned_processed.csv"
 CLEANED_PROCESSED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_PROCESSED_DATASET_FILENAME}"
 
-model_version = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M")
-MODEL_FILENAME = f"fine-tuned-model_{model_version}.pt"
-MODEL_PATH = f"{MODEL_DIR}/{MODEL_FILENAME}"
+
+def get_model_filename():
+    """
+    use current date as verison for possible multiple different models
+    """
+    model_version = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M")
+    return f"fine-tuned-model_{model_version}.pt"
+
+def get_model_path():
+    """
+    use a function in order to set the version-time to the time of
+    finished execution of training
+    """
+    return f"{MODEL_DIR}/{get_model_filename()}"
 
 # TESTING DATA
 test_df = pd.read_csv(DATASET_FILE)
