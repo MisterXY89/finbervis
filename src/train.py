@@ -87,6 +87,7 @@ class Trainer(object):
 
         print("Training complete!")
         plot_loss(self.loss_values)
+        save_model(self.model)
 
 
     def _validate(self):

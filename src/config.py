@@ -5,6 +5,7 @@
 specifying constants and som general config
 """
 import os
+import datetime
 import pandas as pd
 from transformers import BertTokenizer, BertForSequenceClassification
 
@@ -28,6 +29,7 @@ BASE_DIR = WORKING_DIR
 if "src" in WORKING_DIR:
     BASE_DIR = WORKING_DIR.split("/src")[0]
 DATA_DIR = BASE_DIR + "/data"
+MODEL_DIR = BASE_DIR + "/model"
 
 DATASET_FILENAME = "hand_coded_text_segments.csv"
 DATASET_FILE = f"{DATA_DIR}/{DATASET_FILENAME}"
@@ -35,6 +37,10 @@ CLEANED_DATASET_FILENAME = "text_segments_cleaned.csv"
 CLEANED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_DATASET_FILENAME}"
 CLEANED_PROCESSED_DATASET_FILENAME = "text_segments_cleaned_processed.csv"
 CLEANED_PROCESSED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_PROCESSED_DATASET_FILENAME}"
+
+model_version = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M")
+MODEL_FILENAME = f"fine-tuned-model_{model_version}.pt"
+MODEL_PATH = f"{MODEL_DIR}/{MODEL_FILENAME}"
 
 # TESTING DATA
 test_df = pd.read_csv(DATASET_FILE)

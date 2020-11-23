@@ -1,11 +1,14 @@
 
 import time
+import torch
 import datetime
 import numpy as np
 import pandas as pd
 import plotly.express as px
 from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
+
+from config import MODEL_PATH
 
 def get_bert_parameters(model) -> bool:
 	"""
@@ -71,3 +74,7 @@ def plot_loss(loss_values):
 	                   xaxis_title='Epoch',
 	                   yaxis_title='Loss')
 	fig.show()
+
+
+def save_model(model):
+	torch.save(model, MODEL_PATH)
