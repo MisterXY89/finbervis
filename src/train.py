@@ -1,8 +1,9 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.19
+@version: 2020.11.23
 ---
-Description of train.py
+Hold the Trainer class, which handles training & validation of the model with
+the preprocessd data from bert_preprocess
 """
 
 import numpy as np

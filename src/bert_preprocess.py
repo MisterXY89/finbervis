@@ -1,8 +1,14 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.19
+@version: 2020.11.23
 ---
-Description of bert_preprocess.py
+Prepare the given data to use it in the Trainer class (train.py):
+tokenize the segments and encode them to an id, pad the padding_token_ids
+to a fixed length, create the attention masks, split the data in training and
+validation data, some small convertion functions:
+train_valid_to_tensor, convert_labels_to_int
+And finaly preparing training & test(validation) data and the
+coresponding DataLoader.
 """
 
 import torch
@@ -83,13 +89,6 @@ def train_valid_split(processed_ids):
                             LABELS,
                             random_state=2020,
                             test_size=TEST_SIZE)
-
-
-def preprocess():
-    """
-	method to call from other files
-	"""
-    pass
 
 
 def train_valid_to_tensor(all_train_valid_lists: list) -> torch.tensor:

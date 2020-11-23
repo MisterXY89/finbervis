@@ -1,3 +1,9 @@
+"""
+@author: Tilman Kerl
+@version: 2020.11.23
+---
+Helper for the training & validation of the model
+"""
 
 import time
 import torch
@@ -8,7 +14,7 @@ import plotly.express as px
 from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
 
-from config import MODEL_PATH
+from config import get_model_path, MODEL_DIR
 
 def get_bert_parameters(model) -> bool:
 	"""
@@ -67,6 +73,9 @@ def format_time(elapsed):
 
 
 def plot_loss(loss_values):
+	"""
+	takes loss_values after training is finished and plots it
+	"""
 	f = pd.DataFrame(loss_values)
 	f.columns=['Loss']
 	fig = px.line(f, x=f.index, y=f.Loss)
@@ -77,4 +86,27 @@ def plot_loss(loss_values):
 
 
 def save_model(model):
-	torch.save(model, MODEL_PATH)
+	"""
+	Saves the model, from the doc [trying two different approaches]
+	----
+	This save/load process uses the most intuitive syntax and involves the
+	least amount of code. Saving a model in this way will save the entire
+	module using Python’s pickle module. The disadvantage of this approach
+	is that the serialized data is bound to the specific classes and the
+	exact directory structure used when the model is saved. The reason
+	for this is because pickle does not save the model class itself.
+	Rather, it saves a path to the file containing the class,
+	which is used during load time. Because of this, your code can
+	break in various ways when used in other projects or after refactors.
+	"""
+	try:
+		torch.save(model, get_model_path())
+	except Exception as e1:
+		print(e1)
+		print(40*"-")
+	try:
+		# They can then be reloaded using `from_pretrained()`
+		model_to_save = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
+		model_to_save.save_pretrained(MODEL_DIR)
+	except Exception as e2:
+		print(e2)

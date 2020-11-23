@@ -1,8 +1,8 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.19
+@version: 2020.11.23
 ---
-Descripton of explore.py
+Explore the dataset and clean the set for later ussage in bert_preprocess
 """
 
 import re

@@ -1,3 +1,10 @@
+"""
+@author: Tilman Kerl
+@version: 2020.11.23
+---
+Test some functions
+"""
+
 import os
 import sys
 import pytest
