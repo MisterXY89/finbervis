@@ -35,6 +35,9 @@ def tokenize_segments_to_id(
     """
 	trokenize all of the sentences and map the tokens to thier word IDs.
 	"""
+    if not isinstance(to_be_tokenized_segments, np.ndarray):
+        to_be_tokenized_segments = np.array(
+                                to_be_tokenized_segments, dtype=object)
     input_ids = []
     print("Tokenizing segments...")
     for segment in tqdm(to_be_tokenized_segments):
