@@ -109,6 +109,16 @@ def convert_labels_to_int(label_list: list) -> list:
     return [LABEL_VALUES.index(el) for el in label_list]
 
 
+# TODO: make this a class for easier imports (time relevant)
+
+class BertPreprocessor(object):
+    """
+    docstring for BertPreprocessor.
+    """
+
+    def __init__(self):
+        pass
+
 input_ids = tokenize_segments_to_id(segments)
 padding_token_ids = pad_token_ids(input_ids)
 attention_masks = create_attention_masks(padding_token_ids)
