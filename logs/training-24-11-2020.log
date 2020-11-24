@@ -1,0 +1,75 @@
+2020-11-24 10:26:38.344920: W tensorflow/stream_executor/platform/default/dso_loader.cc:59] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No such file or directory
+2020-11-24 10:26:38.344949: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+/home/dragonfly/Documents/Uni/WS201/project/env/lib/python3.8/site-packages/torch/cuda/__init__.py:52: UserWarning: CUDA initialization: Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx (Triggered internally at  /pytorch/c10/cuda/CUDAFunctions.cpp:100.)
+  return torch._C._cuda_getDeviceCount() > 0
+Downloading BERT-Tokenizer...
+Tokenizing segments...
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 6630/6630 [00:08<00:00, 808.37it/s]
+Padding/truncating all sentences to 180 values...
+Padding token: '[PAD]', ID: 0
+Loading BERT Model for sequence classification
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+
+======== Epoch 1 / 4 ========
+Training...
+src/train.py:185: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  outputs = self.model(torch.tensor(b_input_ids).to(self.device).long(),
+  Batch    40  of    187.    Elapsed: 0:37:51.
+  Batch    80  of    187.    Elapsed: 1:12:16.
+  Batch   120  of    187.    Elapsed: 1:43:27.
+  Batch   160  of    187.    Elapsed: 2:01:09.
+
+  Average training loss: 0.70
+  Training epoch took: 2:37:22
+
+Running Validation...
+  Accuracy: 0.77
+  Validation took: 0:04:25
+
+======== Epoch 2 / 4 ========
+Training...
+  Batch    40  of    187.    Elapsed: 0:41:32.
+  Batch    80  of    187.    Elapsed: 1:29:40.
+  Batch   120  of    187.    Elapsed: 2:00:32.
+  Batch   160  of    187.    Elapsed: 2:17:57.
+
+  Average training loss: 0.42
+  Training epoch took: 2:29:01
+
+Running Validation...
+  Accuracy: 0.81
+  Validation took: 0:02:49
+
+======== Epoch 3 / 4 ========
+Training...
+  Batch    40  of    187.    Elapsed: 0:16:35.
+  Batch    80  of    187.    Elapsed: 0:33:11.
+  Batch   120  of    187.    Elapsed: 0:49:49.
+  Batch   160  of    187.    Elapsed: 1:06:22.
+
+  Average training loss: 0.28
+  Training epoch took: 1:17:22
+
+Running Validation...
+  Accuracy: 0.83
+  Validation took: 0:02:54
+
+======== Epoch 4 / 4 ========
+Training...
+  Batch    40  of    187.    Elapsed: 0:27:37.
+  Batch    80  of    187.    Elapsed: 0:49:30.
+  Batch   120  of    187.    Elapsed: 1:11:37.
+  Batch   160  of    187.    Elapsed: 1:40:00.
+
+  Average training loss: 0.20
+  Training epoch took: 2:03:00
+
+Running Validation...
+  Accuracy: 0.84
+  Validation took: 0:03:02
+Training complete!
+
