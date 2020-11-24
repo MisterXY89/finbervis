@@ -11,7 +11,7 @@ import random
 import torch
 import time
 
-from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler, plot_loss
+from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler, plot_loss, save_model
 import bert_preprocess as bp
 from config import load_bert
 
