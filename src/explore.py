@@ -14,6 +14,8 @@ from config import DATASET_FILE, CLEANED_DATASET_FILE, LABEL_VALUES
 SENTENCE_REGEX = r"^[A-Z][A-Za-z,;'\"\s&%0-9-():‘“]+[.?!]"
 nlp = spacy.load("en_core_web_sm")
 
+print(DATASET_FILE)
+print(CLEANED_DATASET_FILE)
 
 def reduce_df(to_be_reduced_df: pd.DataFrame) -> pd.DataFrame:
     """

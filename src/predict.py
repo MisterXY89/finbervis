@@ -11,7 +11,7 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 from transformers import BertForSequenceClassification
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
+from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
 from bert_preprocess import BertPreprocessor
 from config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES
@@ -61,13 +61,15 @@ class SentimentPredictor:
 
     def _get_probabilies(self, dataloader):
         """
-        Perform a forward pass on the trained BERT model to predict probabilities
-        on the set.
-        The probabilities for one element come as a 3-list where the index of the
-        probability-list corresponds to the index of the label of the
+        Perform a forward pass on the trained BERT model to predict
+        probabilities on the set.
+        The probabilities for one element come as a 3-list where
+        the index of the probability-list corresponds to the index of
+        the label of the
         LABEL_VALUES = ["positive", "neutral", "negative"]
         """
-        # Put the model into the evaluation mode, the dropout layers are disabled.
+        # Put the model into the evaluation mode,
+        # the dropout layers are disabled.
         self.model.eval()
 
         all_logits = []
@@ -114,8 +116,8 @@ class SentimentPredictor:
         pretty prints by default.
         shorten does only effect the output if pretty=True
         """
-        dataloader = self._make_predictable(test_segments)
-        if self.model == None:
+        dataloader = self._make_predictable(segment_list)
+        if self.model is None:
             self.load_model()
         probabilities = self._get_probabilies(dataloader)
         if pretty:
@@ -124,14 +126,20 @@ class SentimentPredictor:
 
 
 # positive
-s1 = "Surgical strike by the Indian government was openly supported by all the political parties."
+SENTENCE_1 = "Surgical strike by the Indian government was openly supported by all the political parties."
 # positive
-s2 = "Considering The threat of terrorism, it was a very practical decision by the Government."
+SENTENCE_2 = "Considering The threat of terrorism, it was a very practical decision by the Government."
 # negative
-s3 = "This is very bad."
+SENTENCE_3 = "This is very bad."
 # negative
-s4 = "However, there was limited funding at the design stage which reduced opportunities for stakeholder consultation and involvement."
-test_segments = [s1, s2, s3, s4]
+SENTENCE_4 = "However, there was limited funding at the design stage which reduced opportunities for stakeholder consultation and involvement."
+
+test_segments = [
+    SENTENCE_1,
+    SENTENCE_2,
+    SENTENCE_3,
+    SENTENCE_4
+]
 
 sp = SentimentPredictor()
 # sp.load_model()
