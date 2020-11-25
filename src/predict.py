@@ -1,85 +1,127 @@
+"""
+@author: Tilman Kerl
+@version: 2020.11.25
+---
+Use the fine-tunded model to predict sentiment of segments
+"""
 
+import os
+import glob
 import torch
 import numpy as np
 import torch.nn.functional as F
-
 from transformers import BertForSequenceClassification
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
+from bert_preprocess import BertPreprocessor
 from config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES
-from bert_preprocess import tokenize_segments_to_id, pad_token_ids, create_attention_masks, train_valid_split, train_valid_to_tensor, convert_labels_to_int
-
-device = torch.device("cpu")
 
 
-
-def prettify_probabilities(probabilities:list) -> list:
+class SentimentPredictor:
     """
-    get the index with the highest prob and return corresponding label
+    Interface for interacting with the fine-tunded model
     """
-    return [LABEL_VALUES[prob_list.argmax()] for prob_list in probabilities]
+    def __init__(self):
+        """
+        set device, init BertPreprocessor and get latest model
+        """
+        self.device = torch.device("cpu")
+        self.bp = BertPreprocessor()
+        self.latest_model_filename = self._get_latest_model_filename()
+        # init model for fallback
+        self.model = None
 
+    def _get_latest_model_filename(self):
+        """
+        get the latest file with an .pt ending
+        """
+        list_of_files = glob.glob(f"{MODEL_DIR}/*.pt")
+        return max(list_of_files, key=os.path.getctime)
 
-def predict(model, dataloader, pretty=False):
-    """
-    Perform a forward pass on the trained BERT model to predict probabilities
-    on the set.
-    The probabilities for one element come as a 3-list where the index of the
-    probability-list corresponds to the index of the label of the
-    LABEL_VALUES = ["positive", "neutral", "negative"]
-    """
-    # Put the model into the evaluation mode, the dropout layers are disabled.
-    model.eval()
+    def load_model(self):
+        """
+        load the latest model for later usage
+        """
+        print("Loading model...")
+        self.model = torch.load(self.latest_model_filename)
 
-    all_logits = []
-    # For each batch in our test set...
-    for batch in dataloader:
-        # Load batch to GPU
-        b_input_ids, b_attn_mask = tuple(t.to(device) for t in batch)[:2]
+    def _prettify_probabilities(self,
+                                probabilities: list,
+                                shorten=False) -> list:
+        """
+        get the index with the highest prob and return corresponding label
+        """
+        cut_index = len(LABEL_VALUES[np.argmax(LABEL_VALUES)])
+        if shorten:
+            cut_index = 3
+        return [
+            LABEL_VALUES[prob_list.argmax()][:cut_index]
+            for prob_list in probabilities
+        ]
 
-        # Compute logits
-        with torch.no_grad():
-            logits = model(b_input_ids, b_attn_mask)
-        all_logits.append(logits)
+    def _get_probabilies(self, dataloader):
+        """
+        Perform a forward pass on the trained BERT model to predict probabilities
+        on the set.
+        The probabilities for one element come as a 3-list where the index of the
+        probability-list corresponds to the index of the label of the
+        LABEL_VALUES = ["positive", "neutral", "negative"]
+        """
+        # Put the model into the evaluation mode, the dropout layers are disabled.
+        self.model.eval()
 
+        all_logits = []
+        # For each batch in our test set...
+        for batch in dataloader:
+            # Load batch to device(CPU)
+            b_input_ids, b_attn_mask = tuple(t.to(self.device)
+                                             for t in batch)[:2]
 
-    all_logits = all_logits[0]
+            # Compute logits
+            with torch.no_grad():
+                logits = self.model(b_input_ids, b_attn_mask)
+            all_logits.append(logits)
 
-    # Concatenate logits from each batch
-    all_logits = torch.cat(all_logits, dim=0)
+        all_logits = all_logits[0]
 
-    # Apply softmax to calculate probabilities
-    probs = F.softmax(all_logits, dim=1).cpu().numpy()
+        # Concatenate logits from each batch
+        all_logits = torch.cat(all_logits, dim=0)
 
-    if pretty:
-        return prettify_probabilities(probs)
-    return probs
+        # Apply softmax to calculate probabilities
+        probs = F.softmax(all_logits, dim=1).cpu().numpy()
 
+        return probs
 
-def make_predictable(segment_list:list) -> DataLoader:
-    """
-    takes list of segments and returns a dataloader which has to be
-    used for the predict function
-    """
-    # from bert_preprocess
-    input_ids = tokenize_segments_to_id(segment_list)
-    padding_token_ids = pad_token_ids(input_ids)
-    attention_masks = create_attention_masks(padding_token_ids)
+    def _make_predictable(self, segment_list: list) -> DataLoader:
+        """
+        takes list of segments and returns a dataloader which has to be
+        used for the predict function
+        """
+        # from bert_preprocess
+        _, padding_token_ids, attention_masks = self.bp.preprocess(
+            slim=True, segments=segment_list)
 
-    data = TensorDataset(torch.tensor(padding_token_ids),
-                        torch.tensor(attention_masks))
+        data = TensorDataset(torch.tensor(padding_token_ids),
+                             torch.tensor(attention_masks))
 
-    dataloader = DataLoader(data,
-                        sampler=SequentialSampler(data),
-                        batch_size=BATCH_SIZE)
+        return DataLoader(data,
+                          sampler=SequentialSampler(data),
+                          batch_size=BATCH_SIZE)
 
-    return dataloader
+    def predict(self, segment_list: list, pretty=True, shorten=False) -> list:
+        """
+        predict the sentiment of each element in segment_list
+        pretty prints by default.
+        shorten does only effect the output if pretty=True
+        """
+        dataloader = self._make_predictable(test_segments)
+        if self.model == None:
+            self.load_model()
+        probabilities = self._get_probabilies(dataloader)
+        if pretty:
+            return self._prettify_probabilities(probabilities, shorten=shorten)
+        return probabilities
 
-
-
-
-latest_model_filename = MODEL_DIR + "/fine-tuned-model_24-11-2020_19-07.pt"
-model = torch.load(latest_model_filename)
 
 # positive
 s1 = "Surgical strike by the Indian government was openly supported by all the political parties."
@@ -91,7 +133,8 @@ s3 = "This is very bad."
 s4 = "However, there was limited funding at the design stage which reduced opportunities for stakeholder consultation and involvement."
 test_segments = [s1, s2, s3, s4]
 
+sp = SentimentPredictor()
+# sp.load_model()
+predictions = sp.predict(test_segments, shorten=False)
 
-dataloader = make_predictable(test_segments)
-props = predict(model, dataloader, pretty=True)
-print(props)
+print(predictions)
