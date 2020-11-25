@@ -9,3 +9,4 @@ spacy
 sklearn
 torch
 plotly
+pylint
