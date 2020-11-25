@@ -1,3 +1,10 @@
+"""
+@author: Tilman Kerl
+@version: 2020.11.25 
+---
+Description of cluster.py
+"""
+
 import re
 import sys
 import spacy
