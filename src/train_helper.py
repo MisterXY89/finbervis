@@ -5,16 +5,16 @@
 Helper for the training & validation of the model
 """
 
-import time
-import torch
 import datetime
+
+import torch
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from transformers import AdamW, BertConfig
+from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 
-from config import get_model_path, MODEL_DIR
+from config import get_model_path
 
 
 def get_bert_parameters(model) -> bool:
@@ -26,14 +26,14 @@ def get_bert_parameters(model) -> bool:
     print('The BERT model has {:} different named parameters.\n'.format(
         len(params)))
     print('==== Embedding Layer ====\n')
-    for p in params[0:5]:
-        print("{:<55} {:>12}".format(p[0], str(tuple(p[1].size()))))
+    for param in params[0:5]:
+        print("{:<55} {:>12}".format(param[0], str(tuple(param[1].size()))))
     print('\n==== First Transformer ====\n')
-    for p in params[5:21]:
-        print("{:<55} {:>12}".format(p[0], str(tuple(p[1].size()))))
+    for param in params[5:21]:
+        print("{:<55} {:>12}".format(param[0], str(tuple(param[1].size()))))
     print('\n==== Output Layer ====\n')
-    for p in params[-4:]:
-        print("{:<55} {:>12}".format(p[0], str(tuple(p[1].size()))))
+    for param in params[-4:]:
+        print("{:<55} {:>12}".format(param[0], str(tuple(param[1].size()))))
 
 
 def get_optimizer(model):
@@ -78,9 +78,9 @@ def plot_loss(loss_values):
     """
 	takes loss_values after training is finished and plots it
 	"""
-    f = pd.DataFrame(loss_values)
-    f.columns = ['Loss']
-    fig = px.line(f, x=f.index, y=f.Loss)
+    data_frame = pd.DataFrame(loss_values)
+    data_frame.columns = ['Loss']
+    fig = px.line(data_frame, x=data_frame.index, y=data_frame.Loss)
     fig.update_layout(title='Training loss of the Model',
                       xaxis_title='Epoch',
                       yaxis_title='Loss')
@@ -101,16 +101,13 @@ def save_model(model):
 	which is used during load time. Because of this, your code can
 	break in various ways when used in other projects or after refactors.
 	"""
-    try:
-        torch.save(model, get_model_path())
-    except Exception as e1:
-        print(e1)
-        print(40 * "-")
-    try:
-        # They can then be reloaded using `from_pretrained()`
-        model_to_save = model.module if hasattr(
-            model,
-            'module') else model  # Take care of distributed/parallel training
-        model_to_save.save_pretrained(MODEL_DIR)
-    except Exception as e2:
-        print(e2)
+
+    torch.save(model, get_model_path())
+    # try:
+    #     # They can then be reloaded using `from_pretrained()`
+    #     model_to_save = model.module if hasattr(
+    #         model,
+    #         'module') else model  # Take care of distributed/parallel training
+    #     model_to_save.save_pretrained(MODEL_DIR)
+    # except Exception as e2:
+    #     print(e2)
