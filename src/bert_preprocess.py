@@ -17,9 +17,11 @@ import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.sequence import pad_sequences
-from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
+from torch.utils.data import TensorDataset, DataLoader, \
+                                RandomSampler, SequentialSampler
 
-from config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, BATCH_SIZE, MAX_LEN, TEST_SIZE
+from config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, \
+                    BATCH_SIZE, MAX_LEN, TEST_SIZE
 
 
 class BertPreprocessor():
@@ -59,7 +61,8 @@ class BertPreprocessor():
     	"""
         print(f"Padding/truncating all sentences to {maxlen} values...")
         print(
-            f"Padding token: '{self.tokenizer.pad_token}', ID: {self.tokenizer.pad_token_id}"
+            f"Padding token: '{self.tokenizer.pad_token}',"\
+            "ID: {self.tokenizer.pad_token_id}"
         )
         token_ids = pad_sequences(token_ids,
                                   maxlen=maxlen,
@@ -67,7 +70,7 @@ class BertPreprocessor():
                                   value=0,
                                   truncating="post",
                                   padding="post")
-        # self.token_ids = token_ids
+
         return token_ids
 
     def create_attention_masks(self, padding_token_ids: list) -> list:
@@ -77,14 +80,13 @@ class BertPreprocessor():
         attention_masks = []
         for sentence in padding_token_ids:
             # Create the attention mask.
-            #   - If a token ID is 0, then it's padding, set the mask to 0.
-            #   - If a token ID is > 0, then it's a real token, set the mask to 1.
+            #   - If a token ID is 0, => padding, set the mask to 0.
+            #   - If a token ID is > 0, => real token, set the mask to 1.
             att_mask = [int(token_id > 0) for token_id in sentence]
 
             # Store the attention mask for this sentence.
             attention_masks.append(att_mask)
 
-        # self.attention_masks = attention_masks
         return attention_masks
 
     def train_valid_split(self, processed_ids):
@@ -134,13 +136,13 @@ class BertPreprocessor():
         if slim:
             return input_ids, padding_token_ids, attention_masks
 
-        #------------------------------------------------------------------------------#
+        #---------------------------------------------------#
 
         # preparing training & test data
-        train_inputs, valid_inputs, train_labels, valid_labels = self.train_valid_split(
-            padding_token_ids)
-        train_masks, valid_masks, _, _ = self.train_valid_split(
-            attention_masks)
+        train_inputs, valid_inputs, train_labels, valid_labels = \
+                        self.train_valid_split(padding_token_ids)
+        train_masks, valid_masks, _, _ = \
+                        self.train_valid_split(attention_masks)
 
         train_labels = self.convert_labels_to_int(train_labels)
         valid_labels = self.convert_labels_to_int(valid_labels)

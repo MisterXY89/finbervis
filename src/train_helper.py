@@ -107,7 +107,7 @@ def save_model(model):
     #     # They can then be reloaded using `from_pretrained()`
     #     model_to_save = model.module if hasattr(
     #         model,
-    #         'module') else model  # Take care of distributed/parallel training
+    #         'module') else model
     #     model_to_save.save_pretrained(MODEL_DIR)
     # except Exception as e2:
     #     print(e2)
