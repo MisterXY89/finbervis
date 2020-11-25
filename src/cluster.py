@@ -1,19 +1,19 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.25 
+@version: 2020.11.25
 ---
 Description of cluster.py
 """
 
-import re
 import sys
-import spacy
 import os.path
+from collections import Counter
+
+import spacy
 import pandas as pd
 from tqdm import tqdm
 import seaborn as sns
 import matplotlib.pyplot as plt
-from collections import Counter
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.feature_extraction.text import CountVectorizer
@@ -74,11 +74,11 @@ else:
 
 file, cluster_number, sample_size, do_annotate = sys.argv
 
-sample_size = 100 if sample_size == "_" else int(sample_size)
-cluster_number = 3 if cluster_number == "_" else int(cluster_number)
-do_annotate = True if do_annotate == "True" else False
+SAMPLE_SIZE = 100 if sample_size == "_" else int(sample_size)
+CLUSTER_NUMBER = 3 if cluster_number == "_" else int(cluster_number)
+DO_ANNOTATE = True if do_annotate == "True" else False
 
-# data = sample(data, n=sample_size)
+# data = sample(data, n=SAMPLE_SIZE)
 segments = data["segment"]
 
 print("Vectorizing segments...")
@@ -87,7 +87,7 @@ vectorizer = CountVectorizer(analyzer='word',
                              stop_words='english')
 vectorized_docs = vectorizer.fit_transform(segments)
 
-kmeans = KMeans(n_clusters=cluster_number,
+kmeans = KMeans(n_clusters=CLUSTER_NUMBER,
                 init='k-means++',
                 max_iter=100,
                 n_init=1,
@@ -110,7 +110,7 @@ fig, ax = plt.subplots(figsize=(20, 10))
 
 ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
 
-if do_annotate:
+if DO_ANNOTATE:
     for i, txt in enumerate(segments):
         ax.annotate(data.iloc[i]["sentiment"][:3], (x_axis[i], y_axis[i]))
 

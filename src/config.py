@@ -46,12 +46,14 @@ def get_model_filename():
     model_version = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M")
     return f"fine-tuned-model_{model_version}.pt"
 
+
 def get_model_path():
     """
     use a function in order to set the version-time to the time of
     finished execution of training
     """
     return f"{MODEL_DIR}/{get_model_filename()}"
+
 
 # TESTING DATA
 test_df = pd.read_csv(DATASET_FILE)
