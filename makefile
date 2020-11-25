@@ -16,7 +16,7 @@ format:
 
 lint:
 	@echo "Running linter..."
-	@pylint src/*.py
+	@pylint src/*.py --disable R0201,R0903
 
 
 pre-commit:
