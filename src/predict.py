@@ -124,20 +124,26 @@ class SentimentPredictor:
         return probabilities
 
 
-# positive
+# positive -> positive
 SENTENCE_1 = "Surgical strike by the Indian government was openly supported by all the political parties."
-# positive
+# positive -> positive
 SENTENCE_2 = "Considering The threat of terrorism, it was a very practical decision by the Government."
-# negative
-SENTENCE_3 = "This is very bad."
-# negative
+# negative -> neutral
+SENTENCE_3 = "Limited funding is no excuse for this solution, which is not applicable at all."
+# negative -> negative
 SENTENCE_4 = "However, there was limited funding at the design stage which reduced opportunities for stakeholder consultation and involvement."
+# negative -> negative
+SENTENCE_5 = "The government could have done more to prevent this from happening."
+# negative -> neutral
+SENTENCE_5a = "The government could have done more."
 
 test_segments = [
     SENTENCE_1,
     SENTENCE_2,
     SENTENCE_3,
-    SENTENCE_4
+    SENTENCE_4,
+    SENTENCE_5,
+    SENTENCE_5a
 ]
 
 sp = SentimentPredictor()
