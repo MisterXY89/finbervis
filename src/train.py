@@ -1,6 +1,6 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.23
+@version: 2020.11.25
 ---
 Hold the Trainer class, which handles training & validation of the model with
 the preprocessd data from bert_preprocess
@@ -12,7 +12,7 @@ import torch
 import time
 
 from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler, plot_loss, save_model
-import bert_preprocess as bp
+from bert_preprocess import BertPreprocessor
 from config import load_bert
 
 # Tell pytorch to run this model on the GPU.
@@ -26,11 +26,13 @@ class Trainer(object):
     """
     def __init__(self):
         self.model = load_bert()
+        self.bp = BertPreprocessor()
+        self.bp.preprocess()
         # self.model.cuda()
         # Number of training epochs (authors recommend between 2 and 4)
         self.EPOCHS = 4
         # Total number of training steps is number of batches * number of epochs.
-        self.TOTAL_TRAINING_STEPS = len(bp.train_dataloader) * self.EPOCHS
+        self.TOTAL_TRAINING_STEPS = len(self.bp.train_dataloader) * self.EPOCHS
         self.optimizer = get_optimizer(self.model)
         self.scheduler = get_scheduler(self.optimizer,
                                        self.TOTAL_TRAINING_STEPS)
@@ -58,7 +60,7 @@ class Trainer(object):
 
     def _loss_values_update(self):
         # Calculate the average loss over the training data.
-        avg_train_loss = self.total_loss / len(bp.train_dataloader)
+        avg_train_loss = self.total_loss / len(self.bp.train_dataloader)
         # Store the loss value for plotting the learning curve.
         self.loss_values.append(avg_train_loss)
         return avg_train_loss
@@ -90,7 +92,6 @@ class Trainer(object):
         plot_loss(self.loss_values)
         save_model(self.model)
 
-
     def _validate(self):
         """
         After the completion of each training epoch, measure our performance on
@@ -104,7 +105,7 @@ class Trainer(object):
         # Tracking variables
         eval_loss, eval_accuracy = 0, 0
         nb_eval_steps, nb_eval_examples = 0, 0
-        for batch in bp.valid_dataloader:
+        for batch in self.bp.valid_dataloader:
 
             # Add batch to GPU
             batch = tuple(t.to(self.device) for t in batch)
@@ -123,8 +124,8 @@ class Trainer(object):
                 # The documentation for this `model` function is here:
                 # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
                 outputs = self.model(b_input_ids,
-                                token_type_ids=None,
-                                attention_mask=b_input_mask)
+                                     token_type_ids=None,
+                                     attention_mask=b_input_mask)
 
             # Get the "logits" output by the model. The "logits" are the output
             # values prior to applying an activation function like the softmax.
@@ -149,14 +150,14 @@ class Trainer(object):
         """
         elapsed = format_time(time.time() - t0)
         print("  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.".format(
-            step, len(bp.train_dataloader), elapsed))
+            step, len(self.bp.train_dataloader), elapsed))
 
     def _train(self):
         self.model.train()
         # Measure how long the training epoch takes.
         t0 = time.time()
         # For each batch of training data...
-        for step, batch in enumerate(bp.train_dataloader):
+        for step, batch in enumerate(self.bp.train_dataloader):
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
                 self._report_progress(step, t0)
@@ -182,10 +183,11 @@ class Trainer(object):
             # have provided the `labels`.
             # The documentation for this `model` function is here:
             # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-            outputs = self.model(torch.tensor(b_input_ids).to(self.device).long(),
-                            token_type_ids=None,
-                            attention_mask=b_input_mask,
-                            labels=b_labels)
+            outputs = self.model(torch.tensor(b_input_ids).to(
+                self.device).long(),
+                                 token_type_ids=None,
+                                 attention_mask=b_input_mask,
+                                 labels=b_labels)
 
             # The call to `model` always returns a tuple, so we need to pull the
             # loss value out of the tuple.
