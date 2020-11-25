@@ -131,7 +131,7 @@ class BertPreprocessor():
         padding_token_ids = self.pad_token_ids(input_ids, maxlen=maxlen)
         attention_masks = self.create_attention_masks(padding_token_ids)
 
-        if not slim:
+        if slim:
             return input_ids, padding_token_ids, attention_masks
 
         #------------------------------------------------------------------------------#
