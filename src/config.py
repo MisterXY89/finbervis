@@ -33,10 +33,16 @@ MODEL_DIR = BASE_DIR + "/model"
 
 DATASET_FILENAME = "hand_coded_text_segments.csv"
 DATASET_FILE = f"{DATA_DIR}/{DATASET_FILENAME}"
+
 CLEANED_DATASET_FILENAME = "text_segments_cleaned.csv"
 CLEANED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_DATASET_FILENAME}"
+
 CLEANED_PROCESSED_DATASET_FILENAME = "text_segments_cleaned_processed.csv"
 CLEANED_PROCESSED_DATASET_FILE = f"{DATA_DIR}/{CLEANED_PROCESSED_DATASET_FILENAME}"
+
+# to be added 
+EVALUATE_DATASET_FILENAME = "evaluate_text_segments_cleaned.csv"
+EVALUATE_DATASET_FILE = f"{DATA_DIR}/{EVALUATE_DATASET_FILENAME}"
 
 
 def get_model_filename():
