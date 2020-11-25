@@ -6,10 +6,11 @@ Hold the Trainer class, which handles training & validation of the model with
 the preprocessd data from bert_preprocess
 """
 
-import numpy as np
-import random
-import torch
 import time
+import random
+
+import numpy as np
+import torch
 
 from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler, plot_loss, save_model
 from bert_preprocess import BertPreprocessor
@@ -19,23 +20,23 @@ from config import load_bert
 # model.cuda()
 
 
-class Trainer(object):
+class Trainer:
     """
     Training code is based on the `run_glue.py` script here:
     https://github.com/huggingface/transformers/blob/5bfcd0485ece086ebcbed2d008813037968a9e58/examples/run_glue.py#L128
     """
     def __init__(self):
         self.model = load_bert()
-        self.bp = BertPreprocessor()
-        self.bp.preprocess()
+        self.bert_processor = BertPreprocessor()
+        self.bert_processor.preprocess()
         # self.model.cuda()
         # Number of training epochs (authors recommend between 2 and 4)
-        self.EPOCHS = 4
+        self.epochs = 4
         # Total number of training steps is number of batches * number of epochs.
-        self.TOTAL_TRAINING_STEPS = len(self.bp.train_dataloader) * self.EPOCHS
+        self.total_training_steps = len(self.bert_processor.train_dataloader) * self.epochs
         self.optimizer = get_optimizer(self.model)
         self.scheduler = get_scheduler(self.optimizer,
-                                       self.TOTAL_TRAINING_STEPS)
+                                       self.total_training_steps)
         # Set the seed value all over the place to make this reproducible.
         self.seed_value = 42
         self._set_seed_value()
@@ -60,7 +61,7 @@ class Trainer(object):
 
     def _loss_values_update(self):
         # Calculate the average loss over the training data.
-        avg_train_loss = self.total_loss / len(self.bp.train_dataloader)
+        avg_train_loss = self.total_loss / len(self.bert_processor.train_dataloader)
         # Store the loss value for plotting the learning curve.
         self.loss_values.append(avg_train_loss)
         return avg_train_loss
@@ -78,9 +79,9 @@ class Trainer(object):
         """
         actual training
         """
-        for epoch_i in range(0, self.EPOCHS):
+        for epoch_i in range(0, self.epochs):
             # Perform one full pass over the training set.
-            print(f"\n======== Epoch {epoch_i+1} / {self.EPOCHS} ========")
+            print(f"\n======== Epoch {epoch_i+1} / {self.epochs} ========")
             print('Training...')
             # Reset the total loss for this epoch.
             self.total_loss = 0
@@ -105,7 +106,7 @@ class Trainer(object):
         # Tracking variables
         eval_loss, eval_accuracy = 0, 0
         nb_eval_steps, nb_eval_examples = 0, 0
-        for batch in self.bp.valid_dataloader:
+        for batch in self.bert_processor.valid_dataloader:
 
             # Add batch to GPU
             batch = tuple(t.to(self.device) for t in batch)
@@ -150,14 +151,14 @@ class Trainer(object):
         """
         elapsed = format_time(time.time() - t0)
         print("  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.".format(
-            step, len(self.bp.train_dataloader), elapsed))
+            step, len(self.bert_processor.train_dataloader), elapsed))
 
     def _train(self):
         self.model.train()
         # Measure how long the training epoch takes.
         t0 = time.time()
         # For each batch of training data...
-        for step, batch in enumerate(self.bp.train_dataloader):
+        for step, batch in enumerate(self.bert_processor.train_dataloader):
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
                 self._report_progress(step, t0)
