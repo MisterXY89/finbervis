@@ -10,7 +10,6 @@ import glob
 import torch
 import numpy as np
 import torch.nn.functional as F
-from transformers import BertForSequenceClassification
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
 from bert_preprocess import BertPreprocessor
