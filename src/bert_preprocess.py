@@ -21,8 +21,6 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler, Sequentia
 
 from config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, BATCH_SIZE, MAX_LEN, TEST_SIZE
 
-# TODO: make this a class for easier imports (time relevant)
-
 
 class BertPreprocessor():
     """
@@ -31,7 +29,7 @@ class BertPreprocessor():
     def __init__(self):
         # data loading & parsing
         self.data_frame = pd.read_csv(CLEANED_DATASET_FILE)
-        self.LABELS = self.data_frame.sentiment.values
+        self.labels = self.data_frame.sentiment.values
         # getting BERT-tokenizer
         self.tokenizer = get_tokenizer()
 
@@ -94,7 +92,7 @@ class BertPreprocessor():
     	Use 90% for training and 10% for validation
     	"""
         return train_test_split(processed_ids,
-                                self.LABELS,
+                                self.labels,
                                 random_state=2020,
                                 test_size=TEST_SIZE)
 
@@ -119,6 +117,10 @@ class BertPreprocessor():
         return np.max([len(el) for el in id_list]) + 5
 
     def preprocess(self, slim=False, segments=False, maxlen=MAX_LEN):
+        """
+        collection of preprocessing steps,
+        + enables calling from other classes in an easier way
+        """
         if not segments:
             self.segments = self.data_frame.segment.values
         else:
@@ -129,7 +131,7 @@ class BertPreprocessor():
         padding_token_ids = self.pad_token_ids(input_ids, maxlen=maxlen)
         attention_masks = self.create_attention_masks(padding_token_ids)
 
-        if slim:
+        if not slim:
             return input_ids, padding_token_ids, attention_masks
 
         #------------------------------------------------------------------------------#
