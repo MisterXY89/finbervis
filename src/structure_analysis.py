@@ -80,10 +80,10 @@ def plot_n_grams(n_grams_series, n_value: int, limit: int) -> None:
     """
     plot a horizonzal bar chart with the given series
     """
-    if isinstance(n_gram_series, pd.DataFrame):
+    if isinstance(n_grams_series, pd.DataFrame):
         n_grams_series.plot.barh(color=["SkyBlue", "IndianRed", "tab:gray"], width=.9, figsize=(12, 8))
     else:
-        n_grams_series.sort_values().plot.barh(color=["SkyBlue"], width=.9, figsize=(12, 8))
+        n_grams_series.sort_values().plot.barh(color="SkyBlue", width=.9, figsize=(12, 8))
     plt.title(f"{limit} Most Frequently Occuring {n_value}grams")
     plt.ylabel(f"{n_value}-grams")
     plt.xlabel("# of Occurances")
