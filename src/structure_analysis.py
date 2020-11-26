@@ -88,14 +88,15 @@ def plot_n_grams(n_grams_series, n_value: int, limit: int) -> None:
     plt.show()
 
 
-# doc = nlp(data_frame.segment[0])
-# displacy.serve(doc, style="dep")
+# doc = nlp(" ".join(list(data_frame.query("sentiment=='positive'").segment)))
+# sentence_spans = list(doc.sents)
+# displacy.serve(sentence_spans, style="dep")
 
-N_GRAM_VALUE = 3
+N_GRAM_VALUE = 1
 LIMIT = 10
 
-n_gram_series = overall_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
-# value_n_gram_series = value_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
+# n_gram_series = overall_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
+value_n_gram_series = value_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
 
-plot_n_grams(n_gram_series, N_GRAM_VALUE, LIMIT)
-# plot_n_grams(value_n_gram_series, N_GRAM_VALUE,LIMIT)
+# plot_n_grams(n_gram_series, N_GRAM_VALUE, LIMIT)
+plot_n_grams(value_n_gram_series, N_GRAM_VALUE,LIMIT)
