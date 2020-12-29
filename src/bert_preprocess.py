@@ -123,7 +123,7 @@ class BertPreprocessor():
         collection of preprocessing steps,
         + enables calling from other classes in an easier way
         """
-        if not segments:
+        if isinstance(segments, bool) and not segments:
             self.segments = self.data_frame.segment.values
         else:
             self.segments = segments
