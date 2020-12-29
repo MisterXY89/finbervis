@@ -37,7 +37,7 @@ def get_pos_tags(segments:list) -> list:
         doc = nlp(segment)
         # doc_tags = []
         for token in doc:
-            pos_tags.append(token.dep_)
+            pos_tags.append(token.pos_)
         # POS_TAGS.append(doc_tags)
     return pos_tags
 
@@ -62,7 +62,7 @@ def value_pos_n_grams(n_value: int, limit: int) -> None:
         n_gram_series_dict[value] = n_grams
         print(f"\n{n_grams}")
     print(40*"-"+"\n")
-    return pd.DataFrame(n_gram_series_dict)
+    return pd.DataFrame(n_gram_series_dict), n_gram_series_dict
 
 def overall_pos_n_grams(n_value: int, limit: int):
     """
@@ -98,7 +98,7 @@ N_GRAM_VALUE = 1
 LIMIT = 10
 
 # n_gram_series = overall_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
-value_n_gram_series = value_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
+# value_n_gram_series = value_pos_n_grams(N_GRAM_VALUE, limit=LIMIT)
 
 # plot_n_grams(n_gram_series, N_GRAM_VALUE, LIMIT)
-plot_n_grams(value_n_gram_series, N_GRAM_VALUE,LIMIT)
+# plot_n_grams(value_n_gram_series, N_GRAM_VALUE,LIMIT)

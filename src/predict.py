@@ -146,8 +146,8 @@ test_segments = [
     SENTENCE_5a
 ]
 
-sent_pred = SentimentPredictor()
-sent_pred.load_model()
-predictions = sent_pred.predict(test_segments, shorten=False)
-
-print(predictions)
+# sent_pred = SentimentPredictor()
+# sent_pred.load_model()
+# predictions = sent_pred.predict(test_segments, shorten=False)
+#
+# print(predictions)
