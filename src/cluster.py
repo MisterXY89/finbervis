@@ -7,20 +7,28 @@ Description of cluster.py
 
 import sys
 import os.path
+import pretty_errors
 from collections import Counter
 
+import torch
 import spacy
 import pandas as pd
 from tqdm import tqdm
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
+from sklearn.datasets import make_classification
+from sklearn.cluster import DBSCAN
+from matplotlib import pyplot
+
+import umap
 
 
 from config import CLEANED_DATASET_FILE, LABEL_VALUES, CLEANED_PROCESSED_DATASET_FILE
 from explore import reduce_df
+from structure_analysis import get_pos_tags, value_pos_n_grams
+from predict import SentimentPredictor
+from bert_preprocess import get_tokenizer
 
 sns.set_theme(style="whitegrid")
 
@@ -36,7 +44,7 @@ def sample(df: pd.DataFrame, n: int = 100) -> pd.DataFrame:
     sampled_df = pd.DataFrame()
     for value in LABEL_VALUES:
         sampled_df = sampled_df.append(
-            df.query(f"sentiment == '{value}'").sample(frac=1))
+            df.query(f"sentiment == '{value}'").sample(frac=1))# n=n))
     return sampled_df
 
 
@@ -60,6 +68,7 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
             token.lemma_ for token in doc
             if not token.is_punct or token.is_stop
         ])
+        # print(processed_segment)
         df.loc[index] = [processed_segment, row.sentiment]
     return df
 
@@ -73,50 +82,58 @@ else:
     data = preprocess(data)
     data.to_csv(CLEANED_PROCESSED_DATASET_FILE, encoding="utf-8")
 
-file, cluster_number, sample_size, do_annotate = sys.argv
 
-SAMPLE_SIZE = 100 if sample_size == "_" else int(sample_size)
-CLUSTER_NUMBER = 3 if cluster_number == "_" else int(cluster_number)
-DO_ANNOTATE = True if do_annotate == "True" else False
+SAMPLE_SIZE = 5    # if sample_size == "_" else int(sample_size)
+CLUSTER_NUMBER = 3  # if cluster_number == "_" else int(cluster_number)
+DO_ANNOTATE = False # if do_annotate == "True" else False
 
-# data = sample(data, n=SAMPLE_SIZE)
-segments = data["segment"]
+data = sample(data, n=SAMPLE_SIZE)
+# print(data)
+# segments = list(map(lambda el: el.split(" "), list(data["segment"])))
+segments = list(data["segment"])
+# print(preprocess(data))
+
+
+sent_pred = SentimentPredictor()
+sent_pred.load_model()
+
+tokenizer = get_tokenizer()
+
+segment_vectors = np.empty((0, 3), float)
+
+for segment in tqdm(segments):
+    input_ids = torch.tensor(tokenizer.encode(segment)).unsqueeze(0)  # Batch size 1
+    outputs = sent_pred.model(input_ids)
+    hs = outputs[0]
+    embedding_arr = hs.detach().numpy()[0]
+    segment_vectors = np.append(segment_vectors, np.array([embedding_arr]), axis=0)
+
+
+# define dataset
+# X, _ = make_classification(n_samples=1000, n_features=2, n_informative=2, n_redundant=0, n_clusters_per_class=1, random_state=4)
+X = segment_vectors
+print("fitting UMAP")
+X = umap.UMAP().fit_transform(X)
+
+print("init DBSCAN model")
+db_model = DBSCAN(eps=.6, min_samples=9)
+
+print("predicting cluster")
+yhat = db_model.fit_predict(X)
+
+# retrieve unique clusters
+clusters = np.unique(yhat)
+
+# create scatter plot for samples from each cluster
+for cluster in clusters:
+	# get row indexes for samples with this cluster
+	row_ix = np.where(yhat == cluster)
+	# create scatter of these samples
+	pyplot.scatter(X[row_ix, 0], X[row_ix, 1])
+
+# show the plot
+pyplot.show()
 
 print("Vectorizing segments...")
-vectorizer = CountVectorizer(analyzer='word',
-                             lowercase=True,
-                             stop_words='english')
-vectorized_docs = vectorizer.fit_transform(segments)
-
-kmeans = KMeans(n_clusters=CLUSTER_NUMBER,
-                init='k-means++',
-                max_iter=100,
-                n_init=1,
-                random_state=0)
-
-print("Fitting Model...")
-kmean_indices = kmeans.fit_predict(vectorized_docs)
-
-print("Creating Visualization...")
-pca = PCA(n_components=2)
-scatter_plot_points = pca.fit_transform(vectorized_docs.toarray())
-
-colors = [
-    'tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple',
-    'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan'
-]
-x_axis = [o[0] for o in scatter_plot_points]
-y_axis = [o[1] for o in scatter_plot_points]
-fig, ax = plt.subplots(figsize=(20, 10))
-
-ax.scatter(x_axis, y_axis, c=[colors[d] for d in kmean_indices])
-
-if DO_ANNOTATE:
-    for i, txt in enumerate(segments):
-        ax.annotate(data.iloc[i]["sentiment"][:3], (x_axis[i], y_axis[i]))
-
-plt.show()
-
-frequency = dict(Counter(kmean_indices.tolist()))
-plt.bar(*zip(*frequency.items()), color=colors)
-plt.show()
+vectors = []
+segments
