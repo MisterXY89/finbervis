@@ -24,7 +24,7 @@ from matplotlib import pyplot
 import umap
 
 
-from config import CLEANED_DATASET_FILE, LABEL_VALUES, CLEANED_PROCESSED_DATASET_FILE
+from config import CLEANED_DATASET_FILE, LABEL_VALUES, CLEANED_PROCESSED_DATASET_FILE, EMBEDDINGS_DATASET_FILE
 from explore import reduce_df
 from structure_analysis import get_pos_tags, value_pos_n_grams
 from predict import SentimentPredictor
@@ -44,7 +44,7 @@ def sample(df: pd.DataFrame, n: int = 100) -> pd.DataFrame:
     sampled_df = pd.DataFrame()
     for value in LABEL_VALUES:
         sampled_df = sampled_df.append(
-            df.query(f"sentiment == '{value}'").sample(frac=1))# n=n))
+            df.query(f"sentiment == '{value}'").sample(frac=0.3))# n=n))
     return sampled_df
 
 
@@ -87,7 +87,7 @@ SAMPLE_SIZE = 5    # if sample_size == "_" else int(sample_size)
 CLUSTER_NUMBER = 3  # if cluster_number == "_" else int(cluster_number)
 DO_ANNOTATE = False # if do_annotate == "True" else False
 
-data = sample(data, n=SAMPLE_SIZE)
+# data = sample(data, n=SAMPLE_SIZE)
 # print(data)
 # segments = list(map(lambda el: el.split(" "), list(data["segment"])))
 segments = list(data["segment"])
@@ -100,13 +100,21 @@ sent_pred.load_model()
 tokenizer = get_tokenizer()
 
 segment_vectors = np.empty((0, 3), float)
+data["embeddings"] = list(range(0, len(data)))
 
-for segment in tqdm(segments):
+for index, segment in tqdm(enumerate(segments)):
     input_ids = torch.tensor(tokenizer.encode(segment)).unsqueeze(0)  # Batch size 1
     outputs = sent_pred.model(input_ids)
     hs = outputs[0]
     embedding_arr = hs.detach().numpy()[0]
+    # add embedding_arr to df
     segment_vectors = np.append(segment_vectors, np.array([embedding_arr]), axis=0)
+    data["embeddings"].loc[index] = ",".join(map(str, list(embedding_arr)))
+
+# data["embedding"] = segment_vectors
+print(data.head())
+
+data.to_csv(EMBEDDINGS_DATASET_FILE, encoding="utf-8", index=False)
 
 
 # define dataset
