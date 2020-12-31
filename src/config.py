@@ -45,6 +45,10 @@ CLEANED_PROCESSED_DATASET_FILE = \
 EVALUATE_DATASET_FILENAME = "evaluate_text_segments_cleaned.csv"
 EVALUATE_DATASET_FILE = f"{DATA_DIR}/{EVALUATE_DATASET_FILENAME}"
 
+EMBEDDINGS_DATASET_FILENAME = "embeddings_text_segments.csv"
+EMBEDDINGS_DATASET_FILE = f"{DATA_DIR}/{EMBEDDINGS_DATASET_FILENAME}"
+
+
 
 def get_model_filename():
     """
@@ -89,7 +93,7 @@ def load_bert():
         # The number of output labels = 3:
         # positive, negative & neutral
         num_labels=3,
-        output_attentions=False,  # return attentions weights?
-        output_hidden_states=False,  # return all hidden-states?
+        output_attentions=True,  # return attentions weights?
+        output_hidden_states=True,  # return all hidden-states?
     )
     return model
