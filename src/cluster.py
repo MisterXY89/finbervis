@@ -24,7 +24,7 @@ from matplotlib import pyplot
 import umap
 
 
-from config import CLEANED_DATASET_FILE, LABEL_VALUES, CLEANED_PROCESSED_DATASET_FILE, EMBEDDINGS_DATASET_FILE
+from config import CLEANED_DATASET_FILE, LABEL_VALUES, CLEANED_PROCESSED_DATASET_FILE, EMBEDDINGS_DATASET_FILE, CLUSTER_DATASET_FILE
 from explore import reduce_df
 from structure_analysis import get_pos_tags, value_pos_n_grams
 from predict import SentimentPredictor
@@ -36,15 +36,15 @@ print("\n----\nLoading spacy <en_core_web_sm> model")
 nlp = spacy.load("en_core_web_sm")
 
 
-def sample(df: pd.DataFrame, n: int = 100) -> pd.DataFrame:
+def sample(df: pd.DataFrame, frac: float = 0.3) -> pd.DataFrame:
     """
 	sample df with equally distributed sentiment classes
 	"""
-    print(f"Sampling data with {n=}")
+    print(f"Sampling data with {frac=}")
     sampled_df = pd.DataFrame()
     for value in LABEL_VALUES:
         sampled_df = sampled_df.append(
-            df.query(f"sentiment == '{value}'").sample(frac=0.3))# n=n))
+            df.query(f"sentiment == '{value}'").sample(frac=frac))# n=n))
     return sampled_df
 
 
@@ -73,52 +73,48 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+segment_vectors = None
+
 # check if preprocessed file exists and load/create respectively
-if os.path.isfile(CLEANED_PROCESSED_DATASET_FILE):
-    print("Loading 'CLEANED_PROCESSED_DATASET'")
-    data = pd.read_csv(CLEANED_PROCESSED_DATASET_FILE)
+if os.path.isfile(EMBEDDINGS_DATASET_FILE):
+    print("Loading 'EMBEDDINGS_DATASET'")
+    data = pd.read_csv(EMBEDDINGS_DATASET_FILE)
 else:
-    data = pd.read_csv(CLEANED_DATASET_FILE)
-    data = preprocess(data)
-    data.to_csv(CLEANED_PROCESSED_DATASET_FILE, encoding="utf-8")
+    # check if preprocessed file exists and load/create respectively
+    if os.path.isfile(CLEANED_PROCESSED_DATASET_FILE):
+        print("Loading 'CLEANED_PROCESSED_DATASET'")
+        data = pd.read_csv(CLEANED_PROCESSED_DATASET_FILE)
+    else:
+        data = pd.read_csv(CLEANED_DATASET_FILE)
+        data = preprocess(data)
+        data.to_csv(CLEANED_PROCESSED_DATASET_FILE, encoding="utf-8")
 
+    segments = list(data["segment"])
 
-SAMPLE_SIZE = 5    # if sample_size == "_" else int(sample_size)
-CLUSTER_NUMBER = 3  # if cluster_number == "_" else int(cluster_number)
-DO_ANNOTATE = False # if do_annotate == "True" else False
+    sent_pred = SentimentPredictor()
+    sent_pred.load_model()
+    tokenizer = get_tokenizer()
 
-# data = sample(data, n=SAMPLE_SIZE)
-# print(data)
-# segments = list(map(lambda el: el.split(" "), list(data["segment"])))
-segments = list(data["segment"])
-# print(preprocess(data))
+    segment_vectors = np.empty((0, 3), float)
+    data["embeddings"] = list(range(0, len(data)))
+    data["embeddings"] = data["embeddings"].astype('object')
+    for index, segment in tqdm(enumerate(segments)):
+        input_ids = torch.tensor(tokenizer.encode(segment)).unsqueeze(0)  # Batch size 1
+        outputs = sent_pred.model(input_ids)
+        hs = outputs[0]
+        embedding_arr = hs.detach().numpy()[0]
+        # add embedding_arr to df
+        segment_vectors = np.append(segment_vectors, np.array([embedding_arr]), axis=0)
+        data["embeddings"].loc[index] = embedding_arr    #",".join(
+    data.to_csv(EMBEDDINGS_DATASET_FILE, encoding="utf-8", index=True)
 
+if not isinstance(segment_vectors, list):
+    # segment_vectors = list(map(list, list(data["embeddings"])))
+    segment_vectors = data["embeddings"]
 
-sent_pred = SentimentPredictor()
-sent_pred.load_model()
-
-tokenizer = get_tokenizer()
-
-segment_vectors = np.empty((0, 3), float)
-data["embeddings"] = list(range(0, len(data)))
-
-for index, segment in tqdm(enumerate(segments)):
-    input_ids = torch.tensor(tokenizer.encode(segment)).unsqueeze(0)  # Batch size 1
-    outputs = sent_pred.model(input_ids)
-    hs = outputs[0]
-    embedding_arr = hs.detach().numpy()[0]
-    # add embedding_arr to df
-    segment_vectors = np.append(segment_vectors, np.array([embedding_arr]), axis=0)
-    data["embeddings"].loc[index] = ",".join(map(str, list(embedding_arr)))
-
-# data["embedding"] = segment_vectors
 print(data.head())
 
-data.to_csv(EMBEDDINGS_DATASET_FILE, encoding="utf-8", index=False)
-
-
 # define dataset
-# X, _ = make_classification(n_samples=1000, n_features=2, n_informative=2, n_redundant=0, n_clusters_per_class=1, random_state=4)
 X = segment_vectors
 print("fitting UMAP")
 X = umap.UMAP().fit_transform(X)
@@ -132,16 +128,25 @@ yhat = db_model.fit_predict(X)
 # retrieve unique clusters
 clusters = np.unique(yhat)
 
+data["cluster"] = list(range(0, len(data)))
+data["x"] = list(range(0, len(data)))
+data["y"] = list(range(0, len(data)))
+
 # create scatter plot for samples from each cluster
 for cluster in clusters:
-	# get row indexes for samples with this cluster
-	row_ix = np.where(yhat == cluster)
-	# create scatter of these samples
-	pyplot.scatter(X[row_ix, 0], X[row_ix, 1])
+    # get row indexes for samples with this cluster
+    row_ix = np.where(yhat == cluster)
+    # getting coords
+    x_coord = X[row_ix, 0]
+    y_coord = X[row_ix, 1]
+    # adding cluster & coords to df
+    data["cluster"].loc[row_ix] = cluster
+    data["x"].loc[row_ix] = x_coord
+    data["y"].loc[row_ix] = y_coord
+    # create scatter of these samples
+    pyplot.scatter(x_coord, y_coord)
+
+data.to_csv(CLUSTER_DATASET_FILE, encoding="utf-8", index=False)
 
 # show the plot
 pyplot.show()
-
-print("Vectorizing segments...")
-vectors = []
-segments
