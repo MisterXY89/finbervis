@@ -11,3 +11,4 @@ torch
 plotly
 pylint
 nltk
+flask
