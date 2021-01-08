@@ -14,11 +14,45 @@
 		<div id="plot"></div>
 	</div>
 	<div class="col">
-		<div class="card" style="width: 18rem;">
+
+		<div class="card" style="">
 		  <div class="card-body">
-		    <h5 class="card-title">Rules</h5>
-		    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-		    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+		    <h5 class="card-title">Split-Rule</h5>
+		    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+		    <p class="card-text">
+					<label>
+						 <!-- for="split-rule"> -->
+						Split the sentence in sub-sentences and plot the embeddings of each sentence
+					</label>
+					<button id="split-rule" name="split-rule" type="button" class="btn btn-outline-primary btn-block">Split</button>
+				</p>
+		  </div>
+		</div>
+
+		<br />
+
+		<div class="card">
+		  <div class="card-body">
+		    <h5 class="card-title">Test-Rule</h5>
+		    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+		    <p class="card-text">
+					<label>
+						 Enter your own sentence, plot it and get the predicted sentiment.
+					</label>
+					<textarea class="form-control" maxlength="150" id="test-rule-segment" name="test-rule-segment" rows="3"/></textarea> <br />
+					<button id="test-rule" name="test-rule" type="button" class="btn btn-outline-primary btn-block">Go</button>
+				</p>
+		  </div>
+		</div>
+
+		<br />
+		<div class="card" style=" min-height: 100px;">
+		  <div class="card-body">
+		    <h5 class="card-title">Datapoint</h5>
+		    <h6 class="card-subtitle mb-2 text-muted">Your current selection</h6>
+		    <p class="card-text" id="point-data">
+
+				</p>
 		  </div>
 		</div>
 	</div>
