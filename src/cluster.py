@@ -105,12 +105,16 @@ else:
         embedding_arr = hs.detach().numpy()[0]
         # add embedding_arr to df
         segment_vectors = np.append(segment_vectors, np.array([embedding_arr]), axis=0)
-        data["embeddings"].loc[index] = embedding_arr    #",".join(
-    data.to_csv(EMBEDDINGS_DATASET_FILE, encoding="utf-8", index=True)
+        data["embeddings"].loc[index] = np.array(embedding_arr)    #",".join(
+    data.to_csv(EMBEDDINGS_DATASET_FILE, encoding="utf-8")
 
-if not isinstance(segment_vectors, list):
+# if not isinstance(segment_vectors, list):
     # segment_vectors = list(map(list, list(data["embeddings"])))
-    segment_vectors = data["embeddings"]
+#     segment_vectors = data["embeddings"]
+
+# segment_vectors = np.array(map(np.array, list(data["embeddings"])))
+# segment_vectors = data["embeddings"]
+# print(segment_vectors[0])
 
 print(data.head())
 
@@ -120,7 +124,7 @@ print("fitting UMAP")
 X = umap.UMAP().fit_transform(X)
 
 print("init DBSCAN model")
-db_model = DBSCAN(eps=.6, min_samples=9)
+db_model = DBSCAN(eps=.55, min_samples=3)
 
 print("predicting cluster")
 yhat = db_model.fit_predict(X)
@@ -146,7 +150,7 @@ for cluster in clusters:
     # create scatter of these samples
     pyplot.scatter(x_coord, y_coord)
 
-data.to_csv(CLUSTER_DATASET_FILE, encoding="utf-8", index=False)
+data.to_csv(CLUSTER_DATASET_FILE, encoding="utf-8")
 
 # show the plot
 pyplot.show()
