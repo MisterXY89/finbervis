@@ -1,7 +1,6 @@
 
 const PLOT_ID:string = "#plot";
-
-
+const SELECT_COLOR:string = "#ce0c0f";
 
 function get_mouse_events(data) {
 
@@ -78,8 +77,8 @@ function get_mouse_events(data) {
 		window.last_target = d3.event.currentTarget
 		window.last_cluster = Number(d.cluster)
 		d3.select(d3.event.currentTarget)
-			.attr("r", 10)
-			.style("fill", "red");
+			.attr("r", 8)
+			.style("fill", SELECT_COLOR).raise();
 	}
 
 	return [

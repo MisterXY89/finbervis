@@ -1,7 +1,9 @@
 "use strict";
 var DATA_DIR = "./data";
 var CLUSTER_FILE = DATA_DIR + "/cluster_segments.csv";
-var COLORS = ["#482878", "#6ece58", "#e8d635"];
+// const COLORS = ["#440154", "#3CBB75", "#DCE319"];
+var COLORS = ['#64abe5', '#9e64e5', '#abe564'];
+// "#336338" = more medium sea blue
 // "#67001F" = dark red
 // "#6ece58" = april green
 // "#440154" = dark purple
@@ -12,7 +14,7 @@ var COLORS = ["#482878", "#6ece58", "#e8d635"];
 // "#482878" = light purple
 // "#424047" = gray
 var SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
-var RADIUS = 3.5;
+var RADIUS = 3;
 function get_color(el) {
     if (typeof el == "string") {
         return COLORS[SENTIMENT_CLASSES.indexOf(el)];

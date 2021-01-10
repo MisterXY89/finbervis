@@ -3,9 +3,11 @@
 const DATA_DIR:string = "./data";
 const CLUSTER_FILE:string = `${DATA_DIR}/cluster_segments.csv`;
 
-const COLORS = ["#482878", "#6ece58", "#e8d635"];
+// const COLORS = ["#440154", "#3CBB75", "#DCE319"];
+const COLORS = ['#64abe5', '#9e64e5', '#abe564'];
 
 
+// "#336338" = more medium sea blue
 // "#67001F" = dark red
 // "#6ece58" = april green
 // "#440154" = dark purple
@@ -19,7 +21,7 @@ const COLORS = ["#482878", "#6ece58", "#e8d635"];
 
 const SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
 
-const RADIUS = 3.5;
+const RADIUS = 3;
 
 function get_color(el: string|number) {
 	if (typeof el == "string") {

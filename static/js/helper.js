@@ -1,5 +1,6 @@
 "use strict";
 var PLOT_ID = "#plot";
+var SELECT_COLOR = "#ce0c0f";
 function get_mouse_events(data) {
     // TOOL-TIP & MOUSE EVENTS
     var SideBar = d3.select("#point-data");
@@ -68,8 +69,8 @@ function get_mouse_events(data) {
         window.last_target = d3.event.currentTarget;
         window.last_cluster = Number(d.cluster);
         d3.select(d3.event.currentTarget)
-            .attr("r", 10)
-            .style("fill", "red");
+            .attr("r", 8)
+            .style("fill", SELECT_COLOR).raise();
     };
     return [
         mouseover,
