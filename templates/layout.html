@@ -9,7 +9,7 @@
 		<!-- BOOTSTRAP -->
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 		<!-- Custom CSS -->
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">		
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 	</head>
 	<body>
 		{% include "includes/nav.html" %}
@@ -17,7 +17,7 @@
 		<header class="container">
 		</header>
 		{% endblock %}
-		<div class="container content">
+		<div class="container-fluid content">
 			{% block content %}
 			{% endblock %}
 		</div>

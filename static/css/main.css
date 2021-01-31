@@ -11,3 +11,66 @@
 	background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
 	margin-left: 50px;
 }
+
+
+#spinning-overlay {
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+#spinner {
+  width: 6em;
+  height: 6em;
+  text-align: center;
+  margin: auto;
+}
+
+#spinner-container {
+  position: fixed;
+  top: 40%;
+  left: 25%;
+  width: 50%;
+}
+
+.spinning-info {
+  font-size: 1.1em;
+  font-family: monospace;
+}
+
+/* .content {
+  width: 100%;
+  padding: 10em;
+} */
+
+.class-neutral {
+  background-color: #64abe5;
+}
+
+.class-negative {
+    background-color: #9e64e5;
+}
+
+.class-positive {
+  background-color: #abe564;
+}
+
+.badge {
+  margin-right: 10px;
+}
+
+.badge-legend {
+  padding-left: 80px;
+}
+
+.container-fluid {
+  padding: 80px;
+  padding-right: 160px;
+  padding-top: 0;
+  padding-bottom: 0;
+}

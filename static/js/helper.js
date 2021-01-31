@@ -1,6 +1,7 @@
 "use strict";
 var PLOT_ID = "#plot";
 var SELECT_COLOR = "#ce0c0f";
+var SELECT_RADIUS = 8;
 function get_mouse_events(data) {
     // TOOL-TIP & MOUSE EVENTS
     var SideBar = d3.select("#point-data");
@@ -36,6 +37,8 @@ function get_mouse_events(data) {
             + '</table>')
             .style("left", d3.event.pageX + 90 - width + "px")
             .style("top", d3.event.pageY - height / 2 + 70 + "px")
+            // .style("left", `${d3.event.pageX+90}px`)
+            // .style("top", `${d3.event.pageY+70}px`)
             // .style('border-color', get_color(d.sentiment))
             .style('border-color', get_color(d.sentiment));
         // .style('border-color', get_color(d.cluster));
@@ -69,7 +72,7 @@ function get_mouse_events(data) {
         window.last_target = d3.event.currentTarget;
         window.last_cluster = Number(d.cluster);
         d3.select(d3.event.currentTarget)
-            .attr("r", 8)
+            .attr("r", SELECT_RADIUS)
             .style("fill", SELECT_COLOR).raise();
     };
     return [

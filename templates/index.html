@@ -1,60 +1,100 @@
 {% extends "layout.html" %}
 {% block header %}
-<div class="jumbotron jumbotron-fluid bg-white">
-  <div class="container">
-    <h1 class="display-4">Bert the vizzard</h1>
-    <p class="lead">A visual debugging tool for fine-tuned transformer models for sequence classification tasks</p>
+<div class="jumbotron jumbotron-fluid bg-white text-center">
+  <div class="container-fluid">
+    <h1 class="display-4">A good title</h1>
+    <p class="lead">A visual debugging tool for fine-tuned transformer models for (mutli-label) sequence classification tasks</p>
   </div>
 </div>
 {% endblock %}
 
 {% block content %}
+
+<div id="spinning-overlay">
+  <div id="spinner-container">
+    <div class="text-center">
+      <div class="spinner-grow text-primary" role="status" id="spinner">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p class="spinning-info">
+        Calculating sentiment and fitting UMAP model ...
+      </p>
+    </div>
+  </div>
+</div>
 <div class="row">
-	<div class="col">
+	<div class="col-md-5">
+    <h2 style="padding-left: 60px;">Projection of sentence embeddings</h2>
+    <div class="row badge-legend">
+      <span class="badge badge-pill class-neutral">
+        neutral
+      </span>
+      <span class="badge badge-pill class-positive">
+        positive
+      </span>
+      <span class="badge badge-pill class-negative">
+        negative
+      </span>
+    </div>
 		<div id="plot"></div>
 	</div>
-	<div class="col">
+  <div class="col-md-3">
+    <div id="attention-heatmap"></div>
+  </div>
+	<div class="col-md-4">
+    <h2>Meta</h2>
+    <div class="card" style=" min-height: 100px;">
+      <div class="card-body">
+        <h5 class="card-title">Datapoint</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Your current selection</h6>
+        <p class="card-text" id="point-data">
 
-		<div class="card" style="">
-		  <div class="card-body">
-		    <h5 class="card-title">Split-Rule</h5>
-		    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
-		    <p class="card-text">
-					<label>
-						 <!-- for="split-rule"> -->
-						Split the sentence in sub-sentences and plot the embeddings of each sentence
-					</label>
-					<button id="split-rule" name="split-rule" type="button" class="btn btn-outline-primary btn-block">Split</button>
-				</p>
-		  </div>
-		</div>
+        </p>
+      </div>
+    </div>
+    <br />
+
+    <div class="row rules">
+
+      <br />
+      <div class="col-md-6 col-sm-12">
+
+        <div class="card" style="">
+          <div class="card-body">
+            <h5 class="card-title">Split-Rule</h5>
+            <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+            <p class="card-text">
+              <label>
+                <!-- for="split-rule"> -->
+                Split the sentence in sub-sentences and plot the embeddings of each sentence
+              </label>
+              <button id="split-rule" name="split-rule" type="button" class="btn btn-outline-primary btn-block">Split</button>
+            </p>
+          </div>
+        </div>
+      </div>
+
+  		<!-- <br /> -->
+
+      <div class="col-md-6 col-sm-12">
+    		<div class="card">
+    		  <div class="card-body">
+    		    <h5 class="card-title">Test-Rule</h5>
+    		    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+    		    <p class="card-text">
+    					<label>
+    						 Enter your own sentence, plot it and get the predicted sentiment.
+    					</label>
+    					<textarea class="form-control" maxlength="150" id="test-rule-segment" name="test-rule-segment" rows="3"/></textarea> <br />
+    					<button id="test-rule" name="test-rule" type="button" class="btn btn-outline-primary btn-block">Go</button>
+    				</p>
+    		  </div>
+    		</div>
+      </div>
+
+    </div>
 
 		<br />
-
-		<div class="card">
-		  <div class="card-body">
-		    <h5 class="card-title">Test-Rule</h5>
-		    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
-		    <p class="card-text">
-					<label>
-						 Enter your own sentence, plot it and get the predicted sentiment.
-					</label>
-					<textarea class="form-control" maxlength="150" id="test-rule-segment" name="test-rule-segment" rows="3"/></textarea> <br />
-					<button id="test-rule" name="test-rule" type="button" class="btn btn-outline-primary btn-block">Go</button>
-				</p>
-		  </div>
-		</div>
-
-		<br />
-		<div class="card" style=" min-height: 100px;">
-		  <div class="card-body">
-		    <h5 class="card-title">Datapoint</h5>
-		    <h6 class="card-subtitle mb-2 text-muted">Your current selection</h6>
-		    <p class="card-text" id="point-data">
-
-				</p>
-		  </div>
-		</div>
 	</div>
 
 </div>

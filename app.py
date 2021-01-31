@@ -2,7 +2,7 @@
 import os
 import time
 import json
-from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory, jsonify, make_response
 
 from src import interface
 
@@ -29,6 +29,30 @@ def send_js(path):
     """
     return send_from_directory('data', path)
 
+@app.route("/split_rule")
+def split_rule():
+	req_data = request.args
+
+@app.route("/get-attention")
+def attention():
+	req_data = request.args
+	if not "layer" in req_data and not "head" in req_data and not "segment" in req_data:
+		return False
+
+	head = int(req_data["head"])
+	layer = int(req_data["layer"])
+	segment = req_data["segment"]
+
+	attention = interface.get_attention_for_segment(segment, layer, head)
+
+	resp = make_response(interface.prep_for_d3_plot(attention, segment))
+	resp.headers["Content-Disposition"] = "attachment; filename=attention-export.csv"
+	resp.headers["Content-Type"] = "text/csv"
+
+	return resp
+
+
+
 @app.route("/test_user_data")
 def test_user_data():
     req_data = request.args
@@ -45,7 +69,9 @@ def test_user_data():
         "embeddings": list(map(lambda x: float(x.view()), list(embs))),
         "x": x,
         "y": y,
-        "sentiment": sentiment
+        "sentiment": sentiment,
+		"segment": segment,
+		"new": True
     }
     print(dict)
     return jsonify(dict)
