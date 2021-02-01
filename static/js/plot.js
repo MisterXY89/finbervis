@@ -158,8 +158,8 @@ function create_heatmap(segment, layer, head) {
         .attr("text-anchor", "left")
         .style("font-size", "14px")
         .style("fill", "grey")
-        .style("max-width", 400)
-        .text("Attention heatmap of of the respective token, in layer " + layer + " and head " + head);
+        .style("max-width", 450)
+        .html("Attention heatmap of the respective token, in layer " + layer + " and head " + head + ".<br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>");
 }
 function create_scatter_plot(data) {
     // d3.select(PLOT_ID).select("svg").remove();

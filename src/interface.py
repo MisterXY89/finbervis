@@ -52,10 +52,18 @@ class Interface:
         print(tokens)
         for y, row in enumerate(attention_list):
             for x, col in enumerate(row):
-                words = segment.split(" ")
-                token_y = tokens[int(y)]
-                token_x = tokens[int(x)]
-                csv_string += f"{token_x},{token_y},{float(attention_list[y][x])}\n"
+                try:
+                    token_y = tokens[int(y)]
+                    token_x = tokens[int(x)]
+                    csv_string += f"{token_x},{token_y},{float(attention_list[y][x])}\n"
+                except:
+                    print("ERROR:")
+                    print(f"{tokens=}")
+                    print(f"{row=}")
+                    print(f"{col=}")
+                    print(f"{y=}")
+                    print(f"{x=}")
+                    continue
 
         return csv_string
 

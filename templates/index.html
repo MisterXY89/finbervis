@@ -48,8 +48,25 @@
         <h5 class="card-title">Datapoint</h5>
         <h6 class="card-subtitle mb-2 text-muted">Your current selection</h6>
         <p class="card-text" id="point-data">
-
+          Select a point to see its data here!
         </p>
+        <hr />
+        <div class="row">
+          <div class="col-6">
+            <label for="segment-attention">Show an attention heatmap for the selected datapoint</label>
+          </div>
+          <div class="col-6">
+            <a class="btn btn-fluid btn-outline-warning" href="#segment-attention" id="segment-attention" name="segment-attention">Show Attention</a> <br />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <label for="explore-neighbours">Show attention heatmaps datapoints near the selected</label>
+          </div>
+          <div class="col-6">
+            <a class="btn btn-outline-warning" href="#explore-neighbours" id="explore-neighbours" name="explore-neighbours">Neighbourhood Attention</a>
+          </div>
+        </div>
       </div>
     </div>
     <br />

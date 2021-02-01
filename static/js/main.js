@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var spinner = d3.select("#spinning-overlay");
     var test_rule_button = d3.select("#test-rule");
     var test_rule_segment_field = d3.select("#test-rule-segment");
+    var segment_attention_button = d3.select("#segment-attention");
+    var explore_neighbours_button = d3.select("#explore-neighbours");
+    var hide_heatmap_button = d3.select("#hide-heatmap");
     test_rule_button.on("click", function () {
         spinner.style("display", "block");
         var segment = test_rule_segment_field.property("value");
@@ -21,5 +24,16 @@ document.addEventListener("DOMContentLoaded", function () {
             scatter_plot(json);
             spinner.style("display", "none");
         });
+    });
+    segment_attention_button.on("click", function () {
+        // show heatmap for selected node
+        create_heatmap(window.segment, 11, 11);
+    });
+    explore_neighbours_button.on("click", function () {
+        // let segment = test_rule_segment_field.property("value");
+        // create_heatmap(window.segment, 11, 11);
+    });
+    hide_heatmap_button.on("click", function () {
+        d3.select("#attention-heatmap").select("svg").remove();
     });
 });

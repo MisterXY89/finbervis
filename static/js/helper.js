@@ -35,9 +35,9 @@ function get_mouse_events(data) {
             + ("<td>" + d.sentiment + "</td>")
             + '</tr>'
             + '</table>')
-            .style("left", d3.event.pageX + 90 - width + "px")
-            .style("top", d3.event.pageY - height / 2 + 70 + "px")
-            // .style("left", `${d3.event.pageX+90}px`)
+            // .style("left", `${d3.event.pageX+90-width}px`)
+            .style("top", d3.event.pageY - height / 2 + "px")
+            .style("left", d3.event.pageX + "px")
             // .style("top", `${d3.event.pageY+70}px`)
             // .style('border-color', get_color(d.sentiment))
             .style('border-color', get_color(d.sentiment));
@@ -64,6 +64,7 @@ function get_mouse_events(data) {
             + '</table>'
             + '<hr />'
             + ("<strong>Segment:</strong><p>" + d.segment + "</p>"));
+        window.segment = d.segment;
         if (window.last_target != undefined) {
             d3.select(window.last_target)
                 .attr("r", RADIUS)

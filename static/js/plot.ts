@@ -197,8 +197,8 @@ function create_heatmap(segment: string, layer: number, head: number) {
 	        .attr("text-anchor", "left")
 	        .style("font-size", "14px")
 	        .style("fill", "grey")
-	        .style("max-width", 400)
-	        .text(`Attention heatmap of of the respective token, in layer ${layer} and head ${head}`);
+	        .style("max-width", 450)
+	        .html(`Attention heatmap of the respective token, in layer ${layer} and head ${head}.<br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>`);
 
 }
 
