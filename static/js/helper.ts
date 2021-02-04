@@ -36,13 +36,13 @@ function get_mouse_events(data) {
 						+ '</tr>'
 						+ '<tr>'
 								+ '<th>Sentiment</th>'
-								+ `<td>${d.sentiment}</td>`
+								+ `<td id='model-sentiment'>${d.sentiment}</td>`
 						+ '</tr>'
 				+ '</table>',
 			)
 			// .style("left", `${d3.event.pageX+90-width}px`)
 			.style("top", `${d3.event.pageY-height/2}px`)
-			.style("left", `${d3.event.pageX}px`)
+			.style("left", `${d3.event.pageX-70}px`)
 			// .style("top", `${d3.event.pageY+70}px`)
 			// .style('border-color', get_color(d.sentiment))
 			.style('border-color', get_color(d.sentiment));
@@ -52,6 +52,9 @@ function get_mouse_events(data) {
 		Tooltip.style("opacity", 0)
 	}
 	var click = (d: any) => {
+		const attention_interaction_group = d3.select("#self-attention-interaction");
+		attention_interaction_group.style("opacity", 1);
+		d3.select("#user-classification").style("display", "block");
 		SideBar
 			.html(
 				`${'<table style="width:100%">'

@@ -74,3 +74,11 @@
   padding-top: 0;
   padding-bottom: 0;
 }
+
+#self-attention-interaction {
+  opacity: 0.3;
+}
+
+#user-classification {
+  display: none;
+}

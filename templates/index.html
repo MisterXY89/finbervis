@@ -39,7 +39,7 @@
 		<div id="plot"></div>
 	</div>
   <div class="col-md-3">
-    <div id="attention-heatmap"></div>
+    <div id="self-attention-heatmap"></div>
   </div>
 	<div class="col-md-4">
     <h2>Meta</h2>
@@ -48,24 +48,70 @@
         <h5 class="card-title">Datapoint</h5>
         <h6 class="card-subtitle mb-2 text-muted">Your current selection</h6>
         <p class="card-text" id="point-data">
-          Select a point to see its data here!
+          Select a point to see its data here and to interact with the self-attention!
         </p>
         <hr />
-        <div class="row">
-          <div class="col-6">
-            <label for="segment-attention">Show an attention heatmap for the selected datapoint</label>
-          </div>
-          <div class="col-6">
-            <a class="btn btn-fluid btn-outline-warning" href="#segment-attention" id="segment-attention" name="segment-attention">Show Attention</a> <br />
+        <!-- ', '#64abe5', '#9e64e5 -->
+        <div id="user-classification">
+          <div class="row">
+            <div class="col-8">
+              <div class="form-group">
+                <label for="sentiment-classes-user-classification">Select the fitting sentiment class, if wrongly classified.</label>
+                <select class="form-control" id="sentiment-classes-user-classification">
+                  <option value="positive">Positive</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="negative">Negative</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-4">
+              <a href="#confirm-user-classification-sentiment" id="confirm-user-classification-sentiment" name="confirm-user-classification-sentiment" class="btn btn-outline-primary">Confirm</a>
+            </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-6">
-            <label for="explore-neighbours">Show attention heatmaps datapoints near the selected</label>
+        <hr />
+        <div id="self-attention-interaction">
+
+          <div class="row">
+            <div class="col-6">
+              <label for="segment-attention">Show an self-attention heatmap for the selected datapoint</label>
+            </div>
+            <div class="col-6">
+              <div class="row">
+                <div class="col-6">
+                  <input class="form-control" type="number" min="1" max="12" id="layer_input" name="layer_input" value="1" aria-describedby="layer_input_help"/>
+                  <small id="layer_input_help" class="form-text text-muted">Layer (1-12)</small>
+                </div>
+                <div class="col-6">
+                  <input class="form-control" type="number" min="1" max="12" id="head_input" name="head_input" value="1" aria-describedby="head_input_help"/>
+                  <small id="head_input_help" class="form-text text-muted">Head (1-12)</small>
+                </div>
+              </div>
+              <br />
+              <a class="btn btn-fluid btn-outline-warning" href="#segment-self-attention" id="segment-attention" name="segment-attention">Show Self-Attention</a> <br />
+            </div>
           </div>
-          <div class="col-6">
-            <a class="btn btn-outline-warning" href="#explore-neighbours" id="explore-neighbours" name="explore-neighbours">Neighbourhood Attention</a>
+          <br />
+          <div class="row">
+            <div class="col-6">
+              <label for="explore-neighbours">Show self-attention heatmaps datapoints near the selected</label>
+            </div>
+            <div class="col-6">
+              <div class="row">
+                <div class="col-6">
+                  <input class="form-control" type="number" min="1" max="12" id="layer_input_neighbours" name="layer_input_neighbours" value="1" aria-describedby="layer_input_neighbours_help"/>
+                  <small id="layer_input_neighbours_help" class="form-text text-muted">Layer (1-12)</small>
+                </div>
+                <div class="col-6">
+                  <input class="form-control" type="number" min="1" max="12" id="head_input_neighbours" name="head_input_neighbours" value="1" aria-describedby="head_input_neighbours_help"/>
+                  <small id="head_input_neighbours_help" class="form-text text-muted">Head (1-12)</small>
+                </div>
+              </div>
+              <br />
+              <a class="btn btn-outline-warning" href="#explore-neighbours" id="explore-neighbours" name="explore-neighbours">Neighbourhood Self-Attention</a>
+            </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -81,7 +81,7 @@ function create_heatmap(segment: string, layer: number, head: number) {
 	  height = 450 - margin.top - margin.bottom;
 
 	// append the svg object to the body of the page
-	var svg = d3.select("#attention-heatmap")
+	var svg = d3.select("#self-attention-heatmap")
 	.append("svg")
 	  .attr("width", width + margin.left + margin.right)
 	  .attr("height", height + margin.top + margin.bottom)
@@ -188,7 +188,7 @@ function create_heatmap(segment: string, layer: number, head: number) {
 	        .attr("y", -50)
 	        .attr("text-anchor", "left")
 	        .style("font-size", "22px")
-	        .text(`Layer ${layer}, head ${head}`);
+	        .text(`Layer ${layer+1}, head ${head+1}`);
 
 	// Add subtitle to graph
 	svg.append("text")
@@ -197,8 +197,9 @@ function create_heatmap(segment: string, layer: number, head: number) {
 	        .attr("text-anchor", "left")
 	        .style("font-size", "14px")
 	        .style("fill", "grey")
-	        .style("max-width", 450)
-	        .html(`Attention heatmap of the respective token, in layer ${layer} and head ${head}.<br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>`);
+	        .style("max-width", 500)
+					.style("min-height", 50)
+	        .html(`Self-Attention heatmap of the respective token, in layer ${layer+1} and head ${head+1}.<br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>`);
 
 }
 
