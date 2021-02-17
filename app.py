@@ -6,6 +6,8 @@ from flask import Flask, render_template, request, redirect, url_for, Response, 
 
 from src import interface
 
+COLLECTED_LABELD_DATA_FILE = "data/COLLECTED_LABELD_DATA.csv"
+
 app = Flask("TransformerViz", static_url_path='')
 app.config['FLASK_SECRET'] = ';Orv=5Wt#pkueb9.'
 
@@ -77,7 +79,23 @@ def test_user_data():
     return jsonify(dict)
 
 
+@app.route("/add_labeled_record", methods=["POST"])
+def add_labeled_record():
+	req_data = json.loads(request.form["json"])
+	print(req_data)
+	segment = req_data["segment"]
+	sentiment = req_data["sentiment"]
+	if not sentiment or not segment:
+		status = False
+	else:
+		data_line = f"{segment},{sentiment}"
+		with open(COLLECTED_LABELD_DATA_FILE, "a") as file:
+			file.write(data_line)
+		status = True
 
+	return jsonify({
+		"status": status
+	})
 
 if __name__ == '__main__':
 	app.run()

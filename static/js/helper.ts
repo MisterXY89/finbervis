@@ -72,7 +72,7 @@ function get_mouse_events(data) {
 						+ '</tr>'
 				+ '</table>'
 				+ '<hr />'
-				+ `<strong>Segment:</strong><p>${d.segment}</p>`,
+				+ `<strong>Segment:</strong><p id='selected-segment'>${d.segment}</p>`,
 			)
 		window.segment = d.segment;
 		if (window.last_target != undefined) {
@@ -93,4 +93,23 @@ function get_mouse_events(data) {
 		mouseleave,
 		click
 	]
+}
+
+
+function add_labeled_record(sentiment: string, segment: string) {
+	let data = new FormData();
+	let json_string: string = JSON.stringify( {sentiment, segment});
+	console.log(json_string);
+	data.append( "json", json_string );
+	fetch("/add_labeled_record", {
+		method: "POST",
+		body: data
+	}).then(resp => resp.json())
+	.then(json => {
+		if(json["status"]) {
+			alert("Entry added");
+			window.added_segment = segment;
+		}
+		// console.log(json);
+	})
 }

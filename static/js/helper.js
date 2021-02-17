@@ -66,7 +66,7 @@ function get_mouse_events(data) {
             + '</tr>'
             + '</table>'
             + '<hr />'
-            + ("<strong>Segment:</strong><p>" + d.segment + "</p>"));
+            + ("<strong>Segment:</strong><p id='selected-segment'>" + d.segment + "</p>"));
         window.segment = d.segment;
         if (window.last_target != undefined) {
             d3.select(window.last_target)
@@ -85,4 +85,21 @@ function get_mouse_events(data) {
         mouseleave,
         click
     ];
+}
+function add_labeled_record(sentiment, segment) {
+    var data = new FormData();
+    var json_string = JSON.stringify({ sentiment: sentiment, segment: segment });
+    console.log(json_string);
+    data.append("json", json_string);
+    fetch("/add_labeled_record", {
+        method: "POST",
+        body: data
+    }).then(function (resp) { return resp.json(); })
+        .then(function (json) {
+        if (json["status"]) {
+            alert("Entry added");
+            window.added_segment = segment;
+        }
+        // console.log(json);
+    });
 }

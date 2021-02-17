@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var layer_input_neighbours = d3.select("#layer_input_neighbours");
     var head_input_neighbours = d3.select("#head_input_neighbours");
     var attention_interaction_group = d3.select("#self-attention-interaction");
-    var user_classification_select = d3.select("#user-classification");
+    var user_classification_select = d3.select("#sentiment-classes-user-classification");
     var confirm_user_classification_sentiment_button = d3.select("#confirm-user-classification-sentiment");
     test_rule_button.on("click", function () {
         attention_interaction_group.style("opacity", 1);
@@ -52,11 +52,17 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("clicked");
         var correct_sentiment = user_classification_select.property("value");
         var model_sentiment = d3.select("#model-sentiment").text();
+        var selected_segement = d3.select("#selected-segment").text();
         console.log(correct_sentiment);
         console.log(model_sentiment);
-        if (correct_sentiment != model_sentiment) {
-            var datapoint_id = "";
-            // add_new_sentiment(correct_sentiment, datapoint_id);
+        if (window.added_segment == selected_segement) {
+            alert("You already added this segment.");
+        }
+        if (correct_sentiment == model_sentiment) {
+            alert("Your choosen sentiment and the predicted sentiment are identical.");
+        }
+        if (correct_sentiment != model_sentiment && window.added_segment != selected_segement) {
+            add_labeled_record(correct_sentiment, selected_segement);
         }
     });
 });
