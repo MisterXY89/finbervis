@@ -46,6 +46,11 @@ class Interface:
         return g_embs[len(g_embs)-1]
 
     def prep_for_d3_plot(self, attention_list, segment):
+        """
+        TODO: check for error
+        (2.4943597316741943,
+         4.123290061950684)
+        """
         csv_string = "token_x,token_y,value\n"
         doc = self.nlp(segment)
         tokens = ["[CLS]"] + [token.text for token in doc] + ["[SEP]"]

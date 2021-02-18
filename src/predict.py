@@ -123,6 +123,8 @@ class SentimentPredictor:
             return self._prettify_probabilities(probabilities, shorten=shorten)
         return probabilities
 
+# TODO: probs + pretty label return for display + further mapping to opacity?
+
 
 # positive -> positive
 SENTENCE_1 = "Surgical strike by the Indian government was openly supported by all the political parties."
