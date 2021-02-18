@@ -87,8 +87,13 @@ function create_heatmap(segment, layer, head) {
             .call(d3.axisLeft(y).tickSize(0))
             .select(".domain").remove();
         // Build color scale
+        // interpolateViridis
+        // interpolateOrRd
+        // interpolateYlOrBr
+        // interpolateYlOrRd
+        // interpolateReds
         var heatmap_get_color = d3.scaleSequential()
-            .interpolator(d3.interpolateInferno)
+            .interpolator(d3.interpolateViridis)
             .domain([0, 1]);
         console.log(heatmap_get_color(0.3));
         // create a tooltip
