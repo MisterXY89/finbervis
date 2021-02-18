@@ -12,3 +12,4 @@ plotly
 pylint
 nltk
 flask
+umap
