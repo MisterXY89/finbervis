@@ -49,10 +49,12 @@ EMBEDDINGS_DATASET_FILENAME = "embeddings_text_segments.csv"
 EMBEDDINGS_DATASET_FILE = f"{DATA_DIR}/{EMBEDDINGS_DATASET_FILENAME}"
 
 # CLUSTER_DATASET_FILENAME = "cluster_segments.csv"
-CLUSTER_DATASET_FILENAME = "projection_with_full_sents.csv"
+# CLUSTER_DATASET_FILENAME = "projection_with_full_sents.csv"
+CLUSTER_DATASET_FILENAME = "projection_with_full_sents_SENT_PROPS.csv"
 CLUSTER_DATASET_FILE = f"{DATA_DIR}/{CLUSTER_DATASET_FILENAME}"
 
-
+DIST_MATRIX_FILENAME = "distances_sents.csv"
+DIST_MATRIX_FILE = f"{DATA_DIR}/{DIST_MATRIX_FILENAME}"
 
 def get_model_filename():
     """

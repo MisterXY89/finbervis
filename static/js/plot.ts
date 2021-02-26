@@ -1,7 +1,7 @@
 
 
 const DATA_DIR:string = "./data";
-const CLUSTER_FILE:string = `${DATA_DIR}/projection_with_full_sents.csv`;
+const CLUSTER_FILE:string = `${DATA_DIR}/projection_with_full_sents_SENT_PROPS.csv`;
 
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 const COLORS = ['#abe564', '#64abe5', '#9e64e5'];
@@ -241,9 +241,11 @@ function create_scatter_plot(data: Iterable<unknown>) {
 			return x(d.x);
 		})
 		.attr("cy", (d: any) => y(d.y))
+		.attr("id", (d: any) => d.id)
 		.attr("r", (d: any) => get_radius(d.new))
+		.style("opacity", (d: any) => get_max_value(d.props, false))
 		.style('fill', (d:any) => {
-			console.log(d.new);
+			// console.log(d.new);
 			return get_color(d.sentiment, d.new);
 		})
 		// .style('fill', (d:any) => get_color(d.cluster))

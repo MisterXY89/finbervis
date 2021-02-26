@@ -1,6 +1,6 @@
 "use strict";
 var DATA_DIR = "./data";
-var CLUSTER_FILE = DATA_DIR + "/projection_with_full_sents.csv";
+var CLUSTER_FILE = DATA_DIR + "/projection_with_full_sents_SENT_PROPS.csv";
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 // "#336338" = more medium sea blue
@@ -87,13 +87,8 @@ function create_heatmap(segment, layer, head) {
             .call(d3.axisLeft(y).tickSize(0))
             .select(".domain").remove();
         // Build color scale
-        // interpolateViridis
-        // interpolateOrRd
-        // interpolateYlOrBr
-        // interpolateYlOrRd
-        // interpolateReds
         var heatmap_get_color = d3.scaleSequential()
-            .interpolator(d3.interpolateViridis)
+            .interpolator(d3.interpolateInferno)
             .domain([0, 1]);
         console.log(heatmap_get_color(0.3));
         // create a tooltip
@@ -199,9 +194,11 @@ function create_scatter_plot(data) {
         return x(d.x);
     })
         .attr("cy", function (d) { return y(d.y); })
+        .attr("id", function (d) { return d.id; })
         .attr("r", function (d) { return get_radius(d.new); })
+        .style("opacity", function (d) { return get_max_value(d.props, false); })
         .style('fill', function (d) {
-        console.log(d.new);
+        // console.log(d.new);
         return get_color(d.sentiment, d.new);
     })
         // .style('fill', (d:any) => get_color(d.cluster))

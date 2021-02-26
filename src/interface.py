@@ -8,6 +8,7 @@ import pandas as pd
 from .predict import SentimentPredictor
 from .bert_preprocess import get_tokenizer
 from .config import EMBEDDINGS_DATASET_FILE
+from .dist import Dist
 
 
 class Interface:
@@ -22,6 +23,7 @@ class Interface:
         self.sent_pred.load_model()
         self.tokenizer = get_tokenizer()
         self.nlp = spacy.load('en')
+        self.dist = Dist()
 
 
     def get_embeddings(self, segment):

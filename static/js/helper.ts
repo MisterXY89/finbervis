@@ -3,7 +3,22 @@ const PLOT_ID:string = "#plot";
 const SELECT_COLOR:string = "#ce0c0f";
 const SELECT_RADIUS:number = 8;
 
+function get_max_value(str_props, pretty) {
+	pretty = pretty == undefined ? false : pretty;
+	if (str_props == "NaN" || str_props == "Na" || str_props == undefined) {
+		console.log(str_props);
+		return (pretty) ? "-" : 0;
+	}
+	let max_val:number|string = Number(d3.max(str_props.slice(1,-1).replace(" ", "").split(",").map(el => Number(el))));
+	if (pretty) {
+			max_val = (""+max_val*100).slice(0,4) + "%";
+	}
+	return max_val;
+}
+
 function get_mouse_events(data) {
+
+	console.log(data[2]);
 
 	// TOOL-TIP & MOUSE EVENTS
 	const SideBar = d3.select("#point-data");
@@ -18,18 +33,19 @@ function get_mouse_events(data) {
 		.style("padding", "5px");
 
 	// Three function that change the tooltip when user hover / move / leave a cell
-	var mouseover = () => {
+	var mouseover = (d: any) => {
+		// console.log(d);
 		Tooltip
 			.style("opacity", 1);
 	}
 	var mousemove = (d: any) => {
 		Tooltip
 			.html(
-				`${'<table style="width:100%">'
-						+ '<tr>'
-								+ '<th>Class</th>'
-								+ '<td>'}${d.cluster}</td>`
-						+ '</tr>'
+				'<table style="width:100%">'
+						// + '<tr>'
+						// 		+ '<th>Class</th>'
+						// 		+ '<td>'}${d.cluster}</td>`
+						// + '</tr>'
 						+ '<tr>'
 								+ '<th>Datapoint</th>'
 								+ `<td>(${d.x},<br>${d.y})</td>`
@@ -57,18 +73,23 @@ function get_mouse_events(data) {
 		d3.select("#user-classification").style("display", "block");
 		SideBar
 			.html(
-				`${'<table style="width:100%">'
-						+ '<tr>'
-								+ '<th>Class</th>'
-								+ '<td>'}${d.cluster}</td>`
-						+ '</tr>'
-						+ '<tr>'
-								+ '<th>Datapoint</th>'
-								+ `<td>(${d.x},<br>${d.y})</td>`
-						+ '</tr>'
+				'<table style="width:100%">'
+						// + '<tr>'
+						// 		+ '<th>Class</th>'
+						// 		+ '<td>'}${d.cluster}</td>`
+						// + '</tr>'
+						// + '<tr>'
+						// 		+ '<th>Datapoint</th>'
+						// 		+ `<td>(${d.x},<br>${d.y})</td>`
+						// + '</tr>'
+						+ `<input type="hidden" value="${d.id}" id="point_id"/>`
 						+ '<tr>'
 								+ '<th>Sentiment</th>'
 								+ `<td>${d.sentiment}</td>`
+						+ '</tr>'
+						+ '<tr>'
+								+ '<th>Probability</th>'
+								+ `<td>${get_max_value(d.props, true)}</td>`
 						+ '</tr>'
 				+ '</table>'
 				+ '<hr />'

@@ -150,6 +150,7 @@ test_segments = [
 
 # sent_pred = SentimentPredictor()
 # sent_pred.load_model()
-# predictions = sent_pred.predict(test_segments, shorten=False)
-#
+# predictions = sent_pred.predict([test_segments[0]], pretty=False, shorten=False)
+
 # print(predictions)
+# print(sent_pred._prettify_probabilities([predictions]))

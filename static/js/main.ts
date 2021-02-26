@@ -21,6 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	const attention_interaction_group = d3.select("#self-attention-interaction");
 	const user_classification_select = d3.select("#sentiment-classes-user-classification");
 	const confirm_user_classification_sentiment_button = d3.select("#confirm-user-classification-sentiment");
+	const similar_sents_display = d3.select("#similar-sents-display");
+	const show_similar_sents_button = d3.select("#show-similar");
+	const prop_slider = d3.select("#prop-slider").node();
+	const prop_slider_output = d3.select('#prop-slider-output').node();
+	prop_slider_output.innerHTML = prop_slider.value;
 
 	test_rule_button.on("click", () => {
 		attention_interaction_group.style("opacity", 1);
@@ -39,6 +44,24 @@ document.addEventListener("DOMContentLoaded", () => {
 			user_classification_select.style("display", "block");
 		});
 
+	});
+
+	show_similar_sents_button.on("click", () => {
+		let id = d3.select("#point_id").property("value");
+		let url: string = `/get_similar_segments?seg_id=${id}&return_sents=True`;
+		console.log(url);
+		fetch(url)
+		.then(resp => resp.json())
+		.then(json => {
+			console.log(json);
+			let sents = json["result"];
+			let sents_html = "<ul>";
+			sents.forEach(sent => {
+					sents_html += `<li>${sent}</li>`;
+			});
+			sents_html += "</ul>";
+			similar_sents_display.html(sents_html);
+		});
 	});
 
 
@@ -76,6 +99,31 @@ document.addEventListener("DOMContentLoaded", () => {
 			add_labeled_record(correct_sentiment, selected_segement);
 		}
 	});
+
+	prop_slider.oninput = function() {
+		let slider_val = this.value;
+    prop_slider_output.innerHTML = slider_val;
+		// console.log(this.value);
+		// let all_els = document.getElementsByTagName("circle");
+		// console.log(all_els):
+    // let all_ids = Array.from(all_els).map(c => c.id);
+		d3.selectAll("circle").transition()
+			 .filter(function() {
+				 // console.log(Number(this.style.opacity));
+				 return Number(this.style.opacity) <= slider_val;
+			 })
+			 .duration(200)
+			 .style("opacity", 0.2);
+
+		 // d3.selectAll("circle").transition()
+ 			//  .filter(function() {
+ 			// 	 // console.log(Number(this.style.opacity));
+ 			// 	 return Number(this.style.opacity) > slider_val;
+ 			//  })
+ 			//  .duration(50)
+ 			//  .style("opacity", 1);
+
+	}
 
 
 });
