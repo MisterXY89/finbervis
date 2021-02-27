@@ -90,3 +90,13 @@
 .entity {
   padding: 4px !important;
 }
+
+#selected-segment-ents,
+#toggle_ents_sim_sents,
+#similar_sents_display_plain {
+  display: none;
+}
+
+.prop-slider-range {
+  z-index: 99;
+}

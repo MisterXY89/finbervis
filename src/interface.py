@@ -89,10 +89,14 @@ class Interface:
         return html
 
     def get_text_by_id(self, id):
-        segment = list(self.dist.df.query(f"id == {id}")["segment"])[0]
-        print(segment)
-        print(type(segment))
-        return str(segment)
+        return list(self.search(seg_id=id)["segment"])[0]
+
+    def search(self, seg_id, q):
+        if id:
+            return self.dist.df.query(f"id == {seg_id}")
+        return self.dist.df.query(f"segment == %{q}%")
+
+
 
 
 # int = Interface()

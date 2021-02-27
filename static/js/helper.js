@@ -64,6 +64,7 @@ function get_mouse_events(data) {
         var attention_interaction_group = d3.select("#self-attention-interaction");
         attention_interaction_group.style("opacity", 1);
         d3.select("#user-classification").style("display", "block");
+        d3.select("#point_id_display").html("#<span id='point_id'>" + d.id + "</span>");
         SideBar
             .html('<table style="width:100%">'
             // + '<tr>'
@@ -74,7 +75,7 @@ function get_mouse_events(data) {
             // 		+ '<th>Datapoint</th>'
             // 		+ `<td>(${d.x},<br>${d.y})</td>`
             // + '</tr>'
-            + ("<input type=\"hidden\" value=\"" + d.id + "\" id=\"point_id\"/>")
+            // + `<input type="hidden" value="${d.id}" id="point_id"/>`
             + '<tr>'
             + '<th>Sentiment</th>'
             + ("<td>" + d.sentiment + "</td>")
@@ -85,7 +86,9 @@ function get_mouse_events(data) {
             + '</tr>'
             + '</table>'
             + '<hr />'
-            + ("<strong>Segment:</strong><p id='selected-segment'>" + d.segment + "</p>"));
+            + "<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span>"
+            + ("<p id='selected-segment'>" + d.segment + "</p>")
+            + "<p id='selected-segment-ents'>Loading</p>");
         window.segment = d.segment;
         if (window.last_target != undefined) {
             d3.select(window.last_target)

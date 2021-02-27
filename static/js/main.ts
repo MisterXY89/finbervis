@@ -1,4 +1,21 @@
 
+function toggle_ents () {
+	console.log("click");
+	let seq_id = d3.select("#point_id").text();
+	let url: string = `/get_entities?seq_id=${seq_id}`;
+	console.log(url);
+	fetch(url)
+	.then(resp => resp.json())
+	.then(json => {
+		console.log(json);
+		// let res = json.result;
+		let ents_html = json.result;
+		d3.select("#selected-segment-ents").html(ents_html);
+		$("#selected-segment-ents").toggle();
+		$("#selected-segment").toggle();
+	});
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -22,11 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
 	const user_classification_select = d3.select("#sentiment-classes-user-classification");
 	const confirm_user_classification_sentiment_button = d3.select("#confirm-user-classification-sentiment");
 	const similar_sents_display = d3.select("#similar-sents-display");
+	const similar_sents_display_plain = d3.select("#similar_sents_display_plain");
 	const show_similar_sents_button = d3.select("#show-similar");
-	// const selected_segement_field = d3.select("#selected-segment");
-	const prop_slider = d3.select("#prop-slider").node();
-	const prop_slider_output = d3.select('#prop-slider-output').node();
-	prop_slider_output.innerHTML = prop_slider.value;
+	const toggle_ents_sim_sents_button = d3.select("#toggle_ents_sim_sents");
+	const toggle_ents = d3.select("#toggle-ents");
+	const search_button = d3.select("#searchButton");
+	const search_input = d3.select("#searchInput");
+
 
 	test_rule_button.on("click", () => {
 		attention_interaction_group.style("opacity", 1);
@@ -48,21 +67,29 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	show_similar_sents_button.on("click", () => {
-		let id = d3.select("#point_id").property("value");
+		let id = d3.select("#point_id").text();
 		let url: string = `/get_similar_segments?seg_id=${id}&return_sents=True`;
 		console.log(url);
 		fetch(url)
 		.then(resp => resp.json())
 		.then(json => {
-			console.log(json);
 			// let res = json.result;
+			let plain_sents = json.result;
 			let sents_html = json.ent_html;
 			let new_origin = json.origin_sent_ent_html;
-			console.log(new_origin);
-			console.log(d3.select("#selected-segment"));
-			d3.select("#selected-segment").html(new_origin);
+			let plain_sents_html = "";
+			plain_sents.forEach((s:string) => plain_sents_html+= `${s}<hr>`);
+			console.log(plain_sents_html);
+			$("#toggle_ents_sim_sents").show();
+			d3.select("#selected-segment-ents").html(new_origin);
 			similar_sents_display.html(sents_html);
+			similar_sents_display_plain.html(plain_sents_html);
 		});
+	});
+
+	toggle_ents_sim_sents_button.on("click", () => {
+		$("#similar-sents-display").toggle();
+		$("#similar_sents_display_plain").toggle();
 	});
 
 
@@ -101,30 +128,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	prop_slider.oninput = function() {
-		let slider_val = this.value;
-    prop_slider_output.innerHTML = slider_val;
-		// console.log(this.value);
-		// let all_els = document.getElementsByTagName("circle");
-		// console.log(all_els):
-    // let all_ids = Array.from(all_els).map(c => c.id);
-		d3.selectAll("circle").transition()
-			 .filter(function() {
-				 // console.log(Number(this.style.opacity));
-				 return Number(this.style.opacity) <= slider_val;
-			 })
-			 .duration(200)
-			 .style("opacity", 0.2);
-
-		 // d3.selectAll("circle").transition()
- 			//  .filter(function() {
- 			// 	 // console.log(Number(this.style.opacity));
- 			// 	 return Number(this.style.opacity) > slider_val;
- 			//  })
- 			//  .duration(50)
- 			//  .style("opacity", 1);
-
-	}
-
+	search_button.on("click", () => {
+		let search_q = search_input.property("value");
+		let params = "";
+		if (search_q[0] == "#") {
+			params = `?seg_id=${search_q.slice(1)}` : "";
+		} else {
+			params = `?q=${search_q}`;
+		}
+		let url = `/search${params}`;
+		fetch(url)
+		.then(resp => resp.json())
+		.then(json => {
+			console.log(json.result);
+		});
+	});
 
 });

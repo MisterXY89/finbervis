@@ -139,6 +139,39 @@ def get_similar_segments():
 		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")])
 	})
 
+@app.route("/get_entities")
+def get_entities():
+	req_data = request.args
+	if not "seq_id" in req_data:
+		status = False
+		result = f"Error: 'seq_id' not in \n{req_data=}"
+	else:
+		seq_id = req_data["seq_id"]
+		result = interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")])
+		status = True
+
+	return jsonify({
+		"status": status,
+		"result": result,
+	})
+
+
+@app.route("/search")
+def search():
+	req_data = request.args
+	if not "seg_id" in req_data and not "q" in req_data:
+		status = False
+		result = f"Error: 'not <seg_id> or <q> in req_data'\n{req_data=}"
+	else:
+		seg_id = int(req_data["seg_id"]) if ("seg_id" in req_data) else None
+		q = req_data["q"] if ("q" in req_data) else None
+		result = interface.search(seg_id=seg_id, q=q).to_json()
+		status = True
+
+	return jsonify({
+		"status": status,
+		"result": result,
+	})
 
 if __name__ == '__main__':
 	app.run()

@@ -1,4 +1,20 @@
 "use strict";
+function toggle_ents() {
+    console.log("click");
+    var seq_id = d3.select("#point_id").text();
+    var url = "/get_entities?seq_id=" + seq_id;
+    console.log(url);
+    fetch(url)
+        .then(function (resp) { return resp.json(); })
+        .then(function (json) {
+        console.log(json);
+        // let res = json.result;
+        var ents_html = json.result;
+        d3.select("#selected-segment-ents").html(ents_html);
+        $("#selected-segment-ents").toggle();
+        $("#selected-segment").toggle();
+    });
+}
 document.addEventListener("DOMContentLoaded", function () {
     scatter_plot({});
     var test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States.";
@@ -18,11 +34,12 @@ document.addEventListener("DOMContentLoaded", function () {
     var user_classification_select = d3.select("#sentiment-classes-user-classification");
     var confirm_user_classification_sentiment_button = d3.select("#confirm-user-classification-sentiment");
     var similar_sents_display = d3.select("#similar-sents-display");
+    var similar_sents_display_plain = d3.select("#similar_sents_display_plain");
     var show_similar_sents_button = d3.select("#show-similar");
-    // const selected_segement_field = d3.select("#selected-segment");
-    var prop_slider = d3.select("#prop-slider").node();
-    var prop_slider_output = d3.select('#prop-slider-output').node();
-    prop_slider_output.innerHTML = prop_slider.value;
+    var toggle_ents_sim_sents_button = d3.select("#toggle_ents_sim_sents");
+    var toggle_ents = d3.select("#toggle-ents");
+    var search_button = d3.select("#searchButton");
+    var search_input = d3.select("#searchInput");
     test_rule_button.on("click", function () {
         attention_interaction_group.style("opacity", 1);
         spinner.style("display", "block");
@@ -41,21 +58,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     show_similar_sents_button.on("click", function () {
-        var id = d3.select("#point_id").property("value");
+        var id = d3.select("#point_id").text();
         var url = "/get_similar_segments?seg_id=" + id + "&return_sents=True";
         console.log(url);
         fetch(url)
             .then(function (resp) { return resp.json(); })
             .then(function (json) {
-            console.log(json);
             // let res = json.result;
+            var plain_sents = json.result;
             var sents_html = json.ent_html;
             var new_origin = json.origin_sent_ent_html;
-            console.log(new_origin);
-            console.log(d3.select("#selected-segment"));
-            d3.select("#selected-segment").html(new_origin);
+            var plain_sents_html = "";
+            plain_sents.forEach(function (s) { return plain_sents_html += s + "<hr>"; });
+            console.log(plain_sents_html);
+            $("#toggle_ents_sim_sents").show();
+            d3.select("#selected-segment-ents").html(new_origin);
             similar_sents_display.html(sents_html);
+            similar_sents_display_plain.html(plain_sents_html);
         });
+    });
+    toggle_ents_sim_sents_button.on("click", function () {
+        $("#similar-sents-display").toggle();
+        $("#similar_sents_display_plain").toggle();
     });
     segment_attention_button.on("click", function () {
         // show heatmap for selected node
@@ -88,26 +112,21 @@ document.addEventListener("DOMContentLoaded", function () {
             add_labeled_record(correct_sentiment, selected_segement);
         }
     });
-    prop_slider.oninput = function () {
-        var slider_val = this.value;
-        prop_slider_output.innerHTML = slider_val;
-        // console.log(this.value);
-        // let all_els = document.getElementsByTagName("circle");
-        // console.log(all_els):
-        // let all_ids = Array.from(all_els).map(c => c.id);
-        d3.selectAll("circle").transition()
-            .filter(function () {
-            // console.log(Number(this.style.opacity));
-            return Number(this.style.opacity) <= slider_val;
-        })
-            .duration(200)
-            .style("opacity", 0.2);
-        // d3.selectAll("circle").transition()
-        //  .filter(function() {
-        // 	 // console.log(Number(this.style.opacity));
-        // 	 return Number(this.style.opacity) > slider_val;
-        //  })
-        //  .duration(50)
-        //  .style("opacity", 1);
-    };
+    search_button.on("click", function () {
+        var search_q = search_input.property("value");
+        var params = "";
+        if (search_q[0] == "#") {
+            params = "?seg_id=" + search_q.slice(1);
+            "";
+        }
+        else {
+            params = "?q=" + search_q;
+        }
+        var url = "/search" + params;
+        fetch(url)
+            .then(function (resp) { return resp.json(); })
+            .then(function (json) {
+            console.log(json.result);
+        });
+    });
 });

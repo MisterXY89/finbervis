@@ -14,7 +14,8 @@ var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 // "#482878" = light purple
 // "#424047" = gray
 var SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
-var RADIUS = 3;
+var RADIUS = 2;
+var ZOOM_RADIUS = 6;
 function get_color(el, new_point) {
     // console.log(new_point);
     if (new_point) {
@@ -33,13 +34,13 @@ function get_radius(new_point) {
 }
 // set the dimensions and margins of the graph
 var margins = {
-    top: 20,
-    right: 0,
-    bottom: 75,
-    left: 75
+    top: 5,
+    right: 5,
+    bottom: 5,
+    left: 5
 };
-var width = 900;
-var height = 800;
+var width = 800;
+var height = 750;
 var visWidth = width - margins.left - margins.right;
 var visHeight = height - margins.top - margins.bottom;
 // append the svg object to the body of the page
@@ -172,17 +173,68 @@ function create_scatter_plot(data) {
         .append("g")
         .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
     // X-AXIS
-    container.append("g")
+    var x_axis = container.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x));
     // Y-AXIS
-    container.append("g")
+    var y_axis = container.append("g")
         .call(d3.axisLeft(y));
     var mouse_events = get_mouse_events(data);
     var mouseover = mouse_events[0];
     var mousemove = mouse_events[1];
     var mouseleave = mouse_events[2];
     var click = mouse_events[3];
+    var brush = d3.brush().extent([[0, 0], [width, height]]).on("end", brushended);
+    var idleTimeout;
+    var idleDelay = 350;
+    // .style('fill', (d:any) => get_color(d.cluster))
+    container.append("g")
+        .attr("class", "brush")
+        .call(brush);
+    function restore() {
+        x.domain([-10, 20]);
+        y.domain([-15, 20]);
+        var t = container.transition().duration(700);
+        container.selectAll("circle").transition(t)
+            .attr("r", 3);
+    }
+    function brushended() {
+        var s = d3.event.selection;
+        if (!s) {
+            if (!idleTimeout)
+                return idleTimeout = setTimeout(idled, idleDelay);
+            // x.domain(d3.extent(data, function (d) { return d.x; }))//.nice();
+            // y.domain(d3.extent(data, function (d) { return d.y; }))//.nice();
+            x.domain([-10, 20]);
+            y.domain([-15, 20]);
+            var t = container.transition().duration(700);
+            container.selectAll("circle").transition(t)
+                .attr("r", 3);
+            // x.domain((d: any) => [d3.min(d.x), d3.max(d.x)]);
+            // y.domain((d: any) => [d3.min(d.y), d3.max(d.y)]);
+        }
+        else {
+            x.domain([s[0][0], s[1][0]].map(x.invert, x));
+            y.domain([s[1][1], s[0][1]].map(y.invert, y));
+            container.select(".brush").call(brush.move, null);
+        }
+        zoom();
+    }
+    function idled() {
+        idleTimeout = null;
+    }
+    function zoom() {
+        var t = container.transition().duration(650);
+        // container.select("#axis--x").transition(t).call(x_axis);
+        // container.select("#axis--y").transition(t).call(y_axis);
+        container.selectAll("circle").transition(t)
+            .attr("cx", function (d) { return x(d.x); })
+            .attr("cy", function (d) { return y(d.y); })
+            .attr("r", ZOOM_RADIUS);
+    }
+    // .on("keydown", () => {
+    // 	console.log(d3.event.keyCode);
+    // });
     // DATA-POINTS
     container.append('g')
         .selectAll("dot")
@@ -201,7 +253,7 @@ function create_scatter_plot(data) {
         // console.log(d.new);
         return get_color(d.sentiment, d.new);
     })
-        // .style('fill', (d:any) => get_color(d.cluster))
+        .attr("pointer-events", "all")
         .on('mouseover', mouseover)
         .on('mousemove', mousemove)
         .on('mouseleave', mouseleave)
@@ -214,5 +266,41 @@ function scatter_plot(custom_data) {
             data.push(custom_data);
         }
         create_scatter_plot(data);
+        var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
+        var sliderRange = d3
+            .sliderBottom()
+            .min(d3.min(slider_data_vals))
+            .max(d3.max(slider_data_vals))
+            .width(600)
+            .tickFormat(d3.format('.2%'))
+            .ticks(5)
+            .default([0.75, 0.95])
+            .fill('#2196f3')
+            .on('onchange', function (val) {
+            d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));
+            console.log(val);
+            d3.selectAll("circle").style("display", "none");
+            d3.selectAll("circle").transition()
+                .filter(function () {
+                var point_val = Number(this.style.opacity);
+                // console.log(point_val);
+                // console.log(point_val >= val[0]);
+                return point_val >= val[0] && point_val <= val[1];
+            })
+                .duration(300)
+                .style("display", "block");
+        });
+        var gRange = d3
+            .select('div#slider-range')
+            .append('svg')
+            .attr('width', 700)
+            .attr('height', 100)
+            .append('g')
+            .attr('transform', 'translate(30,30)');
+        gRange.call(sliderRange);
+        d3.select('p#value-range').text(sliderRange
+            .value()
+            .map(d3.format('.2%'))
+            .join('-'));
     });
 }
