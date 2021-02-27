@@ -226,9 +226,9 @@ function create_scatter_plot(data: Iterable<unknown>) {
 	// 	.call(d3.axisLeft(y));
 
  let mouse_events = get_mouse_events(data);
- const mouseover 	= mouse_events[0];
- const mousemove 	= mouse_events[1];
- const mouseleave	= mouse_events[2];
+ // const mouseover 	= mouse_events[0];
+ // const mousemove 	= mouse_events[1];
+ // const mouseleave	= mouse_events[2];
  const click 			= mouse_events[3];
 
  const brush = d3.brush().extent([[0, 0], [width, height]]).on("end", brushended);
@@ -311,9 +311,9 @@ function create_scatter_plot(data: Iterable<unknown>) {
 			return get_color(d.sentiment, d.new);
 		})
 		.attr("pointer-events", "all")
-		.on('mouseover', mouseover)
-		.on('mousemove', mousemove)
-		.on('mouseleave', mouseleave)
+		// .on('mouseover', mouseover)
+		// .on('mousemove', mousemove)
+		// .on('mouseleave', mouseleave)
 		.on('click', click);
 
 }
