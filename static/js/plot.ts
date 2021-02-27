@@ -243,39 +243,42 @@ function create_scatter_plot(data: Iterable<unknown>) {
 	function restore() {
 		x.domain([-10, 20]);
 		y.domain([-15, 20]);
-		var t = container.transition().duration(700);
-		container.selectAll("circle").transition(t)
-		.attr("r", 3);
+		let t = container.transition().duration(700);
+		container.selectAll("circle").transition(t).attr("r", 3);
 	}
 
 	function brushended() {
 
 			var s = d3.event.selection;
+			let restore_b = false;
 			if (!s) {
 					if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-					// x.domain(d3.extent(data, function (d) { return d.x; }))//.nice();
-					// y.domain(d3.extent(data, function (d) { return d.y; }))//.nice();
-					x.domain([-10, 20]);
-					y.domain([-15, 20]);
-					var t = container.transition().duration(700);
-					container.selectAll("circle").transition(t)
-					.attr("r", 3);
-					// x.domain((d: any) => [d3.min(d.x), d3.max(d.x)]);
-					// y.domain((d: any) => [d3.min(d.y), d3.max(d.y)]);
+					// x.domain([-10, 20]);
+					// y.domain([-15, 20]);
+					// let t = container.transition().duration(700);
+					// container.selectAll("circle").transition(t).attr("r", 3);
+					restore();
+					restore_b = true
 			} else {
 
 					x.domain([s[0][0], s[1][0]].map(x.invert, x));
 					y.domain([s[1][1], s[0][1]].map(y.invert, y));
 					container.select(".brush").call(brush.move, null);
 			}
-			zoom();
+
+			zoom(restore_b);
 	}
 
 	function idled() {
 			idleTimeout = null;
 	}
 
-	function zoom() {
+	function zoom(restore_b) {
+
+			let rad = ZOOM_RADIUS;
+			if (restore_b) {
+				rad = RADIUS;
+			}
 
 			var t = container.transition().duration(650);
 			// container.select("#axis--x").transition(t).call(x_axis);
@@ -283,7 +286,7 @@ function create_scatter_plot(data: Iterable<unknown>) {
 			container.selectAll("circle").transition(t)
 			.attr("cx", function (d) { return x(d.x); })
 			.attr("cy", function (d) { return y(d.y); })
-			.attr("r", ZOOM_RADIUS);
+			.attr("r", rad);
 	}
 	// .on("keydown", () => {
 	// 	console.log(d3.event.keyCode);
@@ -332,7 +335,7 @@ function scatter_plot(custom_data) {
 					.width(600)
 					.tickFormat(d3.format('.2%'))
 					.ticks(5)
-					.default([0.75, 0.95])
+					.default([0.75, 1])
 					.fill('#2196f3')
 					.on('onchange', val => {
 						d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));

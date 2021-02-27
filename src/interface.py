@@ -91,7 +91,7 @@ class Interface:
     def get_text_by_id(self, id):
         return list(self.search(seg_id=id)["segment"])[0]
 
-    def search(self, seg_id, q):
+    def search(self, seg_id=None, q=None):
         if id:
             return self.dist.df.query(f"id == {seg_id}")
         return self.dist.df.query(f"segment == %{q}%")
