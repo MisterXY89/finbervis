@@ -172,13 +172,14 @@ function create_scatter_plot(data) {
         .attr("height", height + margins.top + margins.bottom)
         .append("g")
         .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
-    // X-AXIS
-    var x_axis = container.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
-    // Y-AXIS
-    var y_axis = container.append("g")
-        .call(d3.axisLeft(y));
+    // // X-AXIS
+    // let x_axis = container.append("g")
+    // 	.attr("transform", "translate(0," + height + ")")
+    // 	.call(d3.axisBottom(x));
+    //
+    // // Y-AXIS
+    // let y_axis = container.append("g")
+    // 	.call(d3.axisLeft(y));
     var mouse_events = get_mouse_events(data);
     var mouseover = mouse_events[0];
     var mousemove = mouse_events[1];
@@ -196,6 +197,7 @@ function create_scatter_plot(data) {
         y.domain([-15, 20]);
         var t = container.transition().duration(700);
         container.selectAll("circle").transition(t).attr("r", 3);
+        window.zoom = false;
     }
     function brushended() {
         var s = d3.event.selection;
@@ -203,10 +205,6 @@ function create_scatter_plot(data) {
         if (!s) {
             if (!idleTimeout)
                 return idleTimeout = setTimeout(idled, idleDelay);
-            // x.domain([-10, 20]);
-            // y.domain([-15, 20]);
-            // let t = container.transition().duration(700);
-            // container.selectAll("circle").transition(t).attr("r", 3);
             restore();
             restore_b = true;
         }
@@ -216,26 +214,28 @@ function create_scatter_plot(data) {
             container.select(".brush").call(brush.move, null);
         }
         zoom(restore_b);
+        d3.select(window.last_target)
+            .attr("r", SELECT_RADIUS)
+            .style("fill", SELECT_COLOR).raise();
     }
     function idled() {
         idleTimeout = null;
     }
     function zoom(restore_b) {
+        window.zoom = true;
         var rad = ZOOM_RADIUS;
         if (restore_b) {
             rad = RADIUS;
         }
         var t = container.transition().duration(650);
-        // container.select("#axis--x").transition(t).call(x_axis);
-        // container.select("#axis--y").transition(t).call(y_axis);
         container.selectAll("circle").transition(t)
             .attr("cx", function (d) { return x(d.x); })
             .attr("cy", function (d) { return y(d.y); })
+            .filter(function () {
+            return this != window.last_target;
+        })
             .attr("r", rad);
     }
-    // .on("keydown", () => {
-    // 	console.log(d3.event.keyCode);
-    // });
     // DATA-POINTS
     container.append('g')
         .selectAll("dot")

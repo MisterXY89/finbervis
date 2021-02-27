@@ -165,12 +165,23 @@ def search():
 	else:
 		seg_id = int(req_data["seg_id"]) if ("seg_id" in req_data) else None
 		q = req_data["q"] if ("q" in req_data) else None
-		result = interface.search(seg_id=seg_id, q=q).to_json()
+		result = interface.search(seg_id=seg_id, q=q)
 		status = True
 
+	result_l = []
+	for index, row in result.iterrows():		
+		result_l.append({
+			"id": int(row.id),
+			"segment": str(row.segment),
+			"sentiment": str(row.sentiment),
+			"x": float(row.x),
+			"y": float(row.y),
+			"props": str(row.props),
+			# "embeddings": row.embeddings,,
+		})
 	return jsonify({
 		"status": status,
-		"result": result,
+		"result": result_l,
 	})
 
 if __name__ == '__main__':

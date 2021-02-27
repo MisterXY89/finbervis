@@ -93,10 +93,18 @@
 
 #selected-segment-ents,
 #toggle_ents_sim_sents,
-#similar_sents_display_plain {
+#similar_sents_display_plain,
+#search_results-wrapper {
   display: none;
 }
 
 .prop-slider-range {
   z-index: 99;
+}
+
+#search-results {
+  width: 95%;
+  max-height: 900px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

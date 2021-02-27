@@ -15,6 +15,24 @@ function toggle_ents() {
         $("#selected-segment").toggle();
     });
 }
+function prep_search_vis(res) {
+    var html = "";
+    // .slice(0,10)
+    res.forEach(function (element, i) {
+        html += '<div class="card" style="width: 100%;">'
+            + '<div class="card-body">'
+            + ("<h5 class=\"card-title\">Result #" + (i + 1) + "</h5>")
+            + "<p class=\"card-text\">"
+            + ("<strong>ID</strong><br>" + element.id + "<hr>")
+            + ("<strong>Segment</strong><br>" + element.segment.slice(0, 50) + " ...<br>")
+            + ("<strong>Sentiment</strong><br>" + element.sentiment)
+            + '</p>'
+            + "<a href=\"#\" class=\"btn btn-primary\">Select Point</a>"
+            + '</div>'
+            + '</div><br>';
+    });
+    return html;
+}
 document.addEventListener("DOMContentLoaded", function () {
     scatter_plot({});
     var test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States.";
@@ -40,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var toggle_ents = d3.select("#toggle-ents");
     var search_button = d3.select("#searchButton");
     var search_input = d3.select("#searchInput");
+    var search_results = d3.select("#search-results");
     test_rule_button.on("click", function () {
         attention_interaction_group.style("opacity", 1);
         spinner.style("display", "block");
@@ -126,7 +145,11 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(url)
             .then(function (resp) { return resp.json(); })
             .then(function (json) {
-            console.log(json.result);
+            var res = json.result;
+            console.log(res);
+            $("#search_results-wrapper").show();
+            search_results.html(prep_search_vis(res));
+            d3.select("#total-results").text(res.length);
         });
     });
 });

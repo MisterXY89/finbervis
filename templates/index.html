@@ -23,10 +23,35 @@
   </div>
 </div>
 <div class="row">
-	<div class="col-md-5">
-    <h2 style="padding-left: 60px;">Projection of sentence embeddings</h2>
+  <div class="col-md-3" style="padding-right: 4em;">
+
+    <div id="search_results-wrapper">
+
+      <h2>Search Results</h2>
+      Total results<span class="muted" id="total-results"></span>
+
+      <div class='row'>
+        <div id="search-results" class="col">
+
+        </div>
+      </div>
+
+
+      <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content md-auto mx-auto text-center" style="margin: auto; text-align: center;">
+            <div id="self-attention-heatmap"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+	<div class="col-md-5" style="padding-left: 6em;">
+    <h2 style="">Projection of sentence embeddings</h2>
     <div class="row">
-      <div class="col-sm-8" style="padding-left: 65px;">
+      <div class="col-sm-8" style="">
         <!-- <label for="searchInput"></label> -->
         <input placeholder="Search query or ID" type="text" class="form-control" id="searchInput" aria-describedby="searchHelp">
         <small id="searchHelp" class="form-text text-muted">When searching for an ID use #123</small>
@@ -35,8 +60,9 @@
         <button type="button" name="searchButton" id="searchButton" class="btn btn-secondary btn-fluid">Search</button>
       </div>
     </div>
-    <div class="row" style="margin-left: 65px;">
-      <div class="row badge-legend">
+    <br />
+    <div class="row" style="">
+      <div class="row badge-legend" style="">
         <span class="badge badge-pill class-neutral">
           neutral
         </span>
@@ -50,28 +76,18 @@
       <div id="plot"></div>
       <hr />
     </div>
-    <div style="padding-left: 65px; float: left;" class="prop-slider-range">
+    <div style=" float: left;" class="prop-slider-range">
       <!-- align-items-center -->
       <div class="row">
-        <strong style="padding-left: 10px;"> Classification Certainty/Probability of data points.</strong>
+        <strong style="padding-left: 15px;"> Classification Certainty/Probability of data points.</strong>
         <div class="col-sm-2"><br /><p id="value-range" style="display: none;"></p></div>
         <div class="col-sm-10"><div id="slider-range"></div></div>
       </div>
-      <!-- <input type="range" class="custom-range form-control" min="0" max="1" step="0.000005" value="0" class="slider" id="prop-slider" style="width: 100%; padding-left:60px;">
-      <p style="width: 20%; float: left; padding-left: 1%;"><span id="prop-slider-output"></span></p> -->
+      <!-- <input type="range" class="custom-range form-control" min="0" max="1" step="0.000005" value="0" class="slider" id="prop-slider" style="width: 100%; ">
+      <p style="width: 20%; float: left; ;"><span id="prop-slider-output"></span></p> -->
     </div>
+    <hr />
 	</div>
-  <div class="col-md-3">
-
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content md-auto mx-auto text-center" style="margin: auto; text-align: center;">
-          <div id="self-attention-heatmap"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
 	<div class="col-md-4">
     <h2>Meta</h2>
     <div class="card" style=" min-height: 100px;">

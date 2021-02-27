@@ -92,9 +92,11 @@ class Interface:
         return list(self.search(seg_id=id)["segment"])[0]
 
     def search(self, seg_id=None, q=None):
-        if id:
+        if seg_id:
             return self.dist.df.query(f"id == {seg_id}")
-        return self.dist.df.query(f"segment == %{q}%")
+        if q[-1] == " ":
+            q = q[0:-1]
+        return self.dist.df[self.dist.df['segment'].str.contains(q)]        
 
 
 

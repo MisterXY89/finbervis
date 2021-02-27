@@ -42,22 +42,22 @@ function get_mouse_events(data) {
 		Tooltip
 			.html(
 				'<table style="width:100%">'
-						// + '<tr>'
-						// 		+ '<th>Class</th>'
-						// 		+ '<td>'}${d.cluster}</td>`
-						// + '</tr>'
 						+ '<tr>'
 								+ '<th>Datapoint</th>'
-								+ `<td>(${d.x},<br>${d.y})</td>`
+								+ `<td>(${Number(d.x).toFixed(2)}, ${Number(d.y).toFixed(2)})</td>`
 						+ '</tr>'
 						+ '<tr>'
 								+ '<th>Sentiment</th>'
 								+ `<td id='model-sentiment'>${d.sentiment}</td>`
 						+ '</tr>'
+						// + '<tr>'
+						// 		+ '<th>Propability</th>'
+						// 		+ `<td>${get_max_value(d.props, true)}</td>`
+						// + '</tr>'
 				+ '</table>',
 			)
 			// .style("left", `${d3.event.pageX+90-width}px`)
-			.style("top", `${d3.event.pageY-height/2}px`)
+			.style("top", `${d3.event.pageY-height}px`)
 			.style("left", `${d3.event.pageX-70}px`)
 			// .style("top", `${d3.event.pageY+70}px`)
 			// .style('border-color', get_color(d.sentiment))
@@ -68,6 +68,8 @@ function get_mouse_events(data) {
 		Tooltip.style("opacity", 0)
 	}
 	var click = (d: any) => {
+		// console.log(d);
+		// console.log(window.d);
 		const attention_interaction_group = d3.select("#self-attention-interaction");
 		attention_interaction_group.style("opacity", 1);
 		d3.select("#user-classification").style("display", "block");
@@ -98,16 +100,23 @@ function get_mouse_events(data) {
 				+ `<p id='selected-segment'>${d.segment}</p>`
 				+ `<p id='selected-segment-ents'>Loading</p>`,
 			)
+		window.d = d;
 		window.segment = d.segment;
+		let rad = RADIUS;
+		let select_rad = SELECT_RADIUS;
+		if (window.zoom) {
+			rad = ZOOM_RADIUS;
+			select_rad += 5;
+		}
 		if (window.last_target != undefined) {
 				d3.select(window.last_target)
-					.attr("r", RADIUS)
+					.attr("r", rad)
 					.style("fill", get_color(Number(window.last_cluster)));
 		}
 		window.last_target = d3.event.currentTarget
 		window.last_cluster = Number(d.cluster)
 		d3.select(d3.event.currentTarget)
-			.attr("r", SELECT_RADIUS)
+			.attr("r", select_rad)
 			.style("fill", SELECT_COLOR).raise();
 	}
 

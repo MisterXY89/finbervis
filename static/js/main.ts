@@ -16,6 +16,25 @@ function toggle_ents () {
 	});
 }
 
+function prep_search_vis(res) {
+	let html = "";
+	// .slice(0,10)
+	res.forEach((element, i) => {
+		html += '<div class="card" style="width: 100%;">'
+	  	+ '<div class="card-body">'
+	    + `<h5 class="card-title">Result #${i+1}</h5>`
+	    + `<p class="card-text">`
+			+ `<strong>ID</strong><br>${element.id}<hr>`
+			+ `<strong>Segment</strong><br>${element.segment.slice(0,50)} ...<br>`
+			+ `<strong>Sentiment</strong><br>${element.sentiment}`
+			+ '</p>'
+			+  `<a href="#" class="btn btn-primary">Select Point</a>`
+	  	+ '</div>'
+			+ '</div><br>';
+	});
+	return html;
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -45,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const toggle_ents = d3.select("#toggle-ents");
 	const search_button = d3.select("#searchButton");
 	const search_input = d3.select("#searchInput");
+	const search_results = d3.select("#search-results");
 
 
 	test_rule_button.on("click", () => {
@@ -140,7 +160,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		fetch(url)
 		.then(resp => resp.json())
 		.then(json => {
-			console.log(json.result);
+			let res = json.result;
+			console.log(res);
+			$("#search_results-wrapper").show();
+			search_results.html(prep_search_vis(res));
+			d3.select("#total-results").text(res.length);
 		});
 	});
 
