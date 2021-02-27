@@ -128,13 +128,15 @@ def get_similar_segments():
 		else:
 			return_sents = False
 		result = interface.dist.get_similar_sents_for(id=seq_id,n=n,return_sents=return_sents)
+		ent_html = interface.get_ents_vis(result)
 		status = True
 
-	print(status)
 
 	return jsonify({
 		"status": status,
 		"result": result,
+		"ent_html": ent_html,
+		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")])
 	})
 
 

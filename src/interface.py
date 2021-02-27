@@ -2,6 +2,7 @@
 import umap
 import torch
 import spacy
+from spacy import displacy
 import numpy as np
 import pandas as pd
 
@@ -80,6 +81,18 @@ class Interface:
         attentions = outputs["attentions"][layer] # index indicates layer
         attentions = attentions.detach().numpy()
         return attentions[0][head].tolist()
+
+    def get_ents_vis(self, sentences):
+        sentences = [self.nlp(s) for s in sentences]
+        html = displacy.render(sentences, style="ent", minify=False) #page=True)
+        html = "</div><hr>".join(html.split("</div>"))
+        return html
+
+    def get_text_by_id(self, id):
+        segment = list(self.dist.df.query(f"id == {id}")["segment"])[0]
+        print(segment)
+        print(type(segment))
+        return str(segment)
 
 
 # int = Interface()

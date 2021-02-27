@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const confirm_user_classification_sentiment_button = d3.select("#confirm-user-classification-sentiment");
 	const similar_sents_display = d3.select("#similar-sents-display");
 	const show_similar_sents_button = d3.select("#show-similar");
+	// const selected_segement_field = d3.select("#selected-segment");
 	const prop_slider = d3.select("#prop-slider").node();
 	const prop_slider_output = d3.select('#prop-slider-output').node();
 	prop_slider_output.innerHTML = prop_slider.value;
@@ -54,12 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		.then(resp => resp.json())
 		.then(json => {
 			console.log(json);
-			let sents = json["result"];
-			let sents_html = "<ul>";
-			sents.forEach(sent => {
-					sents_html += `<li>${sent}</li>`;
-			});
-			sents_html += "</ul>";
+			// let res = json.result;
+			let sents_html = json.ent_html;
+			let new_origin = json.origin_sent_ent_html;
+			console.log(new_origin);
+			console.log(d3.select("#selected-segment"));
+			d3.select("#selected-segment").html(new_origin);
 			similar_sents_display.html(sents_html);
 		});
 	});

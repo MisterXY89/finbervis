@@ -82,3 +82,11 @@
 #user-classification {
   display: none;
 }
+
+.entities {
+  line-height: 1.7em !important;
+}
+
+.entity {
+  padding: 4px !important;
+}
