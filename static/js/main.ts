@@ -1,4 +1,8 @@
 
+// function click_point(point_id) {
+// 	$(`#${id}`).click();
+// }
+
 function toggle_ents () {
 	console.log("click");
 	let seq_id = d3.select("#point_id").text();
@@ -19,7 +23,9 @@ function toggle_ents () {
 function prep_search_vis(res) {
 	let html = "";
 	// .slice(0,10)
+	window.search_result_data = [];
 	res.forEach((element, i) => {
+		window.search_result_data.push(element);
 		html += '<div class="card" style="width: 100%;">'
 	  	+ '<div class="card-body">'
 	    + `<h5 class="card-title">Result #${i+1}</h5>`
@@ -28,7 +34,7 @@ function prep_search_vis(res) {
 			+ `<strong>Segment</strong><br>${element.segment.slice(0,50)} ...<br>`
 			+ `<strong>Sentiment</strong><br>${element.sentiment}`
 			+ '</p>'
-			+  `<a href="#" class="btn btn-primary">Select Point</a>`
+			+  `<a href="#" class="btn btn-primary" onclick='click_point(${i});'>Select Point</a>`
 	  	+ '</div>'
 			+ '</div><br>';
 	});
@@ -65,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const search_button = d3.select("#searchButton");
 	const search_input = d3.select("#searchInput");
 	const search_results = d3.select("#search-results");
+	const toggle_identical_words_sim_sents_button = d3.select("#toggle_identical_words_sim_sents_button");
 
 
 	test_rule_button.on("click", () => {
@@ -101,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			plain_sents.forEach((s:string) => plain_sents_html+= `${s}<hr>`);
 			console.log(plain_sents_html);
 			$("#toggle_ents_sim_sents").show();
+			$("#toggle_identical_words_sim_sents_button").show()
+			$
 			d3.select("#selected-segment-ents").html(new_origin);
 			similar_sents_display.html(sents_html);
 			similar_sents_display_plain.html(plain_sents_html);
@@ -110,6 +119,50 @@ document.addEventListener("DOMContentLoaded", () => {
 	toggle_ents_sim_sents_button.on("click", () => {
 		$("#similar-sents-display").toggle();
 		$("#similar_sents_display_plain").toggle();
+	});
+
+	toggle_identical_words_sim_sents_button.on("click", () => {
+		let segment_select_display = window.segment.toLowerCase();
+		let active_dispaly;
+		if ($("#similar-sents-display").css("display") == "block") {
+			active_dispaly = $("#similar-sents-display");
+		} else {
+			active_dispaly = $("#similar_sents_display_plain");
+		}
+
+		if (active_dispaly.html().includes("identical-token")) {
+			console.log("EXISTING")
+			// toggle & return
+			console.log($(".identical-token").first().css("background-color"));
+			let bg_color = $(".identical-token").first().css("background-color");
+			if (bg_color != "rgba(0, 0, 0, 0)") {
+				$(".identical-token").css("background-color", "transparent");
+			} else {
+				$(".identical-token").css("background-color", "yellow");
+			}
+			return 1;
+		}
+
+		let segment_select_tokens = segment_select_display.split(" ");
+		let similiar_sents = active_dispaly.html().split("<hr>")
+
+		let check = (sent) => {
+		  return sent.split(" ").map(token => {
+				let token_low = token.toLowerCase();
+				if (segment_select_tokens.includes(token_low)) {
+					let class_name = "identical-token";
+					if (stop_words.includes(token_low)) {
+							class_name += ` ${class_name}-stopword`;
+					}
+					return `<span class='${class_name}'>${token}</span>`;
+				}
+				return token;
+			}).join(" ");
+		}
+
+		similiar_sents = similiar_sents.map(sent => check(sent));
+		active_dispaly.html(similiar_sents.join("<hr>"))
+
 	});
 
 

@@ -14,10 +14,64 @@ function get_max_value(str_props, pretty) {
     }
     return max_val;
 }
+function click_point(d) {
+    console.log(d);
+    if (typeof d == "number") {
+        d = window.search_result_data[d];
+    }
+    console.log("CLICK");
+    // console.log(window.d);
+    var SideBar = d3.select("#point-data");
+    var attention_interaction_group = d3.select("#self-attention-interaction");
+    attention_interaction_group.style("opacity", 1);
+    d3.select("#user-classification").style("display", "block");
+    d3.select("#point_id_display").html("#<span id='point_id'>" + d.id + "</span>");
+    SideBar
+        .html('<table style="width:100%">'
+        // + '<tr>'
+        // 		+ '<th>Class</th>'
+        // 		+ '<td>'}${d.cluster}</td>`
+        // + '</tr>'
+        // + '<tr>'
+        // 		+ '<th>Datapoint</th>'
+        // 		+ `<td>(${d.x},<br>${d.y})</td>`
+        // + '</tr>'
+        // + `<input type="hidden" value="${d.id}" id="point_id"/>`
+        + '<tr>'
+        + '<th>Sentiment</th>'
+        + ("<td>" + d.sentiment + "</td>")
+        + '</tr>'
+        + '<tr>'
+        + '<th>Probability</th>'
+        + ("<td>" + get_max_value(d.props, true) + "</td>")
+        + '</tr>'
+        + '</table>'
+        + '<hr />'
+        + "<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span>"
+        + ("<p id='selected-segment'>" + d.segment + "</p>")
+        + "<p id='selected-segment-ents'>Loading</p>");
+    window.d = d;
+    window.segment = d.segment;
+    var rad = RADIUS;
+    var select_rad = SELECT_RADIUS;
+    if (window.zoom) {
+        rad = ZOOM_RADIUS;
+        select_rad += 5;
+    }
+    if (window.last_target != undefined) {
+        d3.select(window.last_target)
+            .attr("r", rad)
+            .style("fill", get_color(Number(window.last_cluster)));
+    }
+    window.last_target = d3.event.currentTarget;
+    window.last_cluster = Number(d.cluster);
+    d3.select(d3.event.currentTarget)
+        .attr("r", select_rad)
+        .style("fill", SELECT_COLOR).raise();
+}
 function get_mouse_events(data) {
     console.log(data[2]);
     // TOOL-TIP & MOUSE EVENTS
-    var SideBar = d3.select("#point-data");
     var Tooltip = d3.select(PLOT_ID)
         .append("div")
         .style("opacity", 0)
@@ -60,56 +114,7 @@ function get_mouse_events(data) {
     var mouseleave = function () {
         Tooltip.style("opacity", 0);
     };
-    var click = function (d) {
-        // console.log(d);
-        // console.log(window.d);
-        var attention_interaction_group = d3.select("#self-attention-interaction");
-        attention_interaction_group.style("opacity", 1);
-        d3.select("#user-classification").style("display", "block");
-        d3.select("#point_id_display").html("#<span id='point_id'>" + d.id + "</span>");
-        SideBar
-            .html('<table style="width:100%">'
-            // + '<tr>'
-            // 		+ '<th>Class</th>'
-            // 		+ '<td>'}${d.cluster}</td>`
-            // + '</tr>'
-            // + '<tr>'
-            // 		+ '<th>Datapoint</th>'
-            // 		+ `<td>(${d.x},<br>${d.y})</td>`
-            // + '</tr>'
-            // + `<input type="hidden" value="${d.id}" id="point_id"/>`
-            + '<tr>'
-            + '<th>Sentiment</th>'
-            + ("<td>" + d.sentiment + "</td>")
-            + '</tr>'
-            + '<tr>'
-            + '<th>Probability</th>'
-            + ("<td>" + get_max_value(d.props, true) + "</td>")
-            + '</tr>'
-            + '</table>'
-            + '<hr />'
-            + "<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span>"
-            + ("<p id='selected-segment'>" + d.segment + "</p>")
-            + "<p id='selected-segment-ents'>Loading</p>");
-        window.d = d;
-        window.segment = d.segment;
-        var rad = RADIUS;
-        var select_rad = SELECT_RADIUS;
-        if (window.zoom) {
-            rad = ZOOM_RADIUS;
-            select_rad += 5;
-        }
-        if (window.last_target != undefined) {
-            d3.select(window.last_target)
-                .attr("r", rad)
-                .style("fill", get_color(Number(window.last_cluster)));
-        }
-        window.last_target = d3.event.currentTarget;
-        window.last_cluster = Number(d.cluster);
-        d3.select(d3.event.currentTarget)
-            .attr("r", select_rad)
-            .style("fill", SELECT_COLOR).raise();
-    };
+    var click = click_point;
     return [
         mouseover,
         mousemove,

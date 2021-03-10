@@ -1,4 +1,7 @@
 "use strict";
+// function click_point(point_id) {
+// 	$(`#${id}`).click();
+// }
 function toggle_ents() {
     console.log("click");
     var seq_id = d3.select("#point_id").text();
@@ -18,7 +21,9 @@ function toggle_ents() {
 function prep_search_vis(res) {
     var html = "";
     // .slice(0,10)
+    window.search_result_data = [];
     res.forEach(function (element, i) {
+        window.search_result_data.push(element);
         html += '<div class="card" style="width: 100%;">'
             + '<div class="card-body">'
             + ("<h5 class=\"card-title\">Result #" + (i + 1) + "</h5>")
@@ -27,7 +32,7 @@ function prep_search_vis(res) {
             + ("<strong>Segment</strong><br>" + element.segment.slice(0, 50) + " ...<br>")
             + ("<strong>Sentiment</strong><br>" + element.sentiment)
             + '</p>'
-            + "<a href=\"#\" class=\"btn btn-primary\">Select Point</a>"
+            + ("<a href=\"#\" class=\"btn btn-primary\" onclick='click_point(" + i + ");'>Select Point</a>")
             + '</div>'
             + '</div><br>';
     });
@@ -59,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var search_button = d3.select("#searchButton");
     var search_input = d3.select("#searchInput");
     var search_results = d3.select("#search-results");
+    var toggle_identical_words_sim_sents_button = d3.select("#toggle_identical_words_sim_sents_button");
     test_rule_button.on("click", function () {
         attention_interaction_group.style("opacity", 1);
         spinner.style("display", "block");
@@ -91,6 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
             plain_sents.forEach(function (s) { return plain_sents_html += s + "<hr>"; });
             console.log(plain_sents_html);
             $("#toggle_ents_sim_sents").show();
+            $("#toggle_identical_words_sim_sents_button").show();
+            $;
             d3.select("#selected-segment-ents").html(new_origin);
             similar_sents_display.html(sents_html);
             similar_sents_display_plain.html(plain_sents_html);
@@ -99,6 +107,46 @@ document.addEventListener("DOMContentLoaded", function () {
     toggle_ents_sim_sents_button.on("click", function () {
         $("#similar-sents-display").toggle();
         $("#similar_sents_display_plain").toggle();
+    });
+    toggle_identical_words_sim_sents_button.on("click", function () {
+        var segment_select_display = window.segment.toLowerCase();
+        var active_dispaly;
+        if ($("#similar-sents-display").css("display") == "block") {
+            active_dispaly = $("#similar-sents-display");
+        }
+        else {
+            active_dispaly = $("#similar_sents_display_plain");
+        }
+        if (active_dispaly.html().includes("identical-token")) {
+            console.log("EXISTING");
+            // toggle & return
+            console.log($(".identical-token").first().css("background-color"));
+            var bg_color = $(".identical-token").first().css("background-color");
+            if (bg_color != "rgba(0, 0, 0, 0)") {
+                $(".identical-token").css("background-color", "transparent");
+            }
+            else {
+                $(".identical-token").css("background-color", "yellow");
+            }
+            return 1;
+        }
+        var segment_select_tokens = segment_select_display.split(" ");
+        var similiar_sents = active_dispaly.html().split("<hr>");
+        var check = function (sent) {
+            return sent.split(" ").map(function (token) {
+                var token_low = token.toLowerCase();
+                if (segment_select_tokens.includes(token_low)) {
+                    var class_name = "identical-token";
+                    if (stop_words.includes(token_low)) {
+                        class_name += " " + class_name + "-stopword";
+                    }
+                    return "<span class='" + class_name + "'>" + token + "</span>";
+                }
+                return token;
+            }).join(" ");
+        };
+        similiar_sents = similiar_sents.map(function (sent) { return check(sent); });
+        active_dispaly.html(similiar_sents.join("<hr>"));
     });
     segment_attention_button.on("click", function () {
         // show heatmap for selected node

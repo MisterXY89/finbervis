@@ -79,10 +79,6 @@
   opacity: 0.3;
 }
 
-#user-classification {
-  display: none;
-}
-
 .entities {
   line-height: 1.7em !important;
 }
@@ -94,7 +90,10 @@
 #selected-segment-ents,
 #toggle_ents_sim_sents,
 #similar_sents_display_plain,
-#search_results-wrapper {
+#search_results-wrapper,
+#toggle_identical_words_sim_sents_button,
+#user-classification
+{
   display: none;
 }
 
@@ -107,4 +106,12 @@
   max-height: 900px;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.identical-token {
+  background-color: rgb(255, 255, 0);
+}
+
+.identical-token-stopword {
+  background-color: rgba(255, 255, 0, 0.25);
 }
