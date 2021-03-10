@@ -17,12 +17,18 @@ function get_max_value(str_props, pretty) {
 }
 
 function click_point(d: any) {
-
 	console.log(d);
-	if (typeof d == "number") {
+
+	let current_target;
+	if (typeof d == "number" || d3.event == null) {
 		d = window.search_result_data[d];
+		console.log(d.id);
+		// current_target = d3.selectAll('circle')._groups[0][d.id];
+		current_target = document.getElementById(`${d.id}`);
+	} else {
+		current_target = d3.event.currentTarget;
 	}
-	console.log("CLICK");
+	console.log(current_target);
 	// console.log(window.d);
 	const SideBar = d3.select("#point-data");
 	const attention_interaction_group = d3.select("#self-attention-interaction");
@@ -68,9 +74,9 @@ function click_point(d: any) {
 				.attr("r", rad)
 				.style("fill", get_color(Number(window.last_cluster)));
 	}
-	window.last_target = d3.event.currentTarget
+	window.last_target = current_target
 	window.last_cluster = Number(d.cluster)
-	d3.select(d3.event.currentTarget)
+	d3.select(current_target)
 		.attr("r", select_rad)
 		.style("fill", SELECT_COLOR).raise();
 }
