@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 
 from .predict import SentimentPredictor
-from .bert_preprocess import get_tokenizer
-from .config import EMBEDDINGS_DATASET_FILE
+from .bert_preprocess import BertPreprocessor
+from .config import EMBEDDINGS_DATASET_FILE, get_tokenizer
 from .dist import Dist
 
 
@@ -25,14 +25,35 @@ class Interface:
         self.tokenizer = get_tokenizer()
         self.nlp = spacy.load('en')
         self.dist = Dist()
+        self.bert_preprocesser = BertPreprocessor()
 
 
     def get_embeddings(self, segment):
-        input_ids = torch.tensor(self.tokenizer.encode(segment)).unsqueeze(0)  # Batch size 1
-        outputs = self.sent_pred.model(input_ids)
-        hs = outputs[0]
-        embedding_arr = hs.detach().numpy()[0]
-        return embedding_arr
+        input_ids = self.bert_preprocesser.tokenize_segments_to_id([segment])
+        # segments_ids = [1]*len(input_ids)
+        # segments_tensors = torch.tensor([segments_ids])
+        # print(input_ids)
+        input_ids = torch.tensor(input_ids)#.unsqueeze(0)
+
+        # input_ids = torch.tensor(self.tokenizer.encode(segment)).unsqueeze(0) # Batch size 1
+        print(input_ids)
+
+        outputs = self.sent_pred.model(input_ids, output_hidden_states=True)
+        # 'attentions', 'clear', 'copy', 'fromkeys', 'get', 'hidden_states', 'items',
+        # 'keys', 'logits', 'loss', 'move_to_end', 'pop', 'popitem', 'setdefault', 'to_tuple', 'update', 'values'
+        # print(outputs)
+        # layer, layer 11 (0 = initial )
+        # print(outputs[1][0])
+        # hs = outputs["hidden_states"]
+        # 0 = embeddings
+        # one for the output of the embeddings + one for the output of each layer
+        # layer 11 = index 11
+        # Hidde n-states of the model at the output of each layer plus the initial embedding outputs.
+        outputs = outputs[1][11][0]
+        cls_embedding = outputs[0]
+        print(len(cls_embedding))
+        return cls_embedding.detach().numpy()
+
 
     def get_sentiment(self, segment):
         return self.sent_pred.predict([segment])
@@ -96,15 +117,15 @@ class Interface:
             return self.dist.df.query(f"id == {seg_id}")
         if q[-1] == " ":
             q = q[0:-1]
-        return self.dist.df[self.dist.df['segment'].str.contains(q)]        
-
-
+        return self.dist.df[self.dist.df['segment'].str.contains(q)]
 
 
 # int = Interface()
-# test_sent = "My name is tilman and why does this not work the way I want it to"
+# test_sent = "my name is ben and this is jack ass"
 #
 # embs = int.get_embeddings(test_sent)
+# av = np.average(embs)
+# print(av)
 # print(f"{embs=}")
 #
 # trans_embs = int.make2D(embs)
