@@ -34,6 +34,19 @@ def send_js(path):
 @app.route("/split_rule")
 def split_rule():
 	req_data = request.args
+	result = []
+	if not "seg_id" in req_data:
+		success = False
+	else:
+		seg_id = int(req_data["seg_id"])
+		result = interface.get_splits(seg_id)
+		print(result)
+		success = True
+
+	return jsonify({
+		"success": success,
+		"result": list(map(interface._prep_return, result)),
+	})
 
 @app.route("/get-attention")
 def attention():
@@ -81,7 +94,7 @@ def test_user_data():
 	}
     interface.dist.update_df({
 		"segment": segment,
-		"sentiment": sentiment,
+		"sentiment": prediction_label,
 		"embeddings": embs,
 		"cluster": None,
 		"x": x,
@@ -121,13 +134,14 @@ def get_similar_segments():
 		result = "Error: 'seq_id' not in req_data."
 	else:
 		seq_id = req_data["seg_id"]
-		n = req_data["n"] if "n" in req_data else 5
+		n = int(req_data["n"]) if "n" in req_data else 5
 		return_sents = req_data["return_sents"] if "return_sents" in req_data else False
 		if return_sents and return_sents == "True":
 			return_sents = True
 		else:
 			return_sents = False
-		result = interface.dist.get_similar_sents_for(id=seq_id,n=n,return_sents=return_sents)
+		result = interface.get_similar_sents(id=seq_id,n=n,return_sents=return_sents)
+		print(result)
 		ent_html = interface.get_ents_vis(result)
 		status = True
 
@@ -169,7 +183,7 @@ def search():
 		status = True
 
 	result_l = []
-	for index, row in result.iterrows():		
+	for index, row in result.iterrows():
 		result_l.append({
 			"id": int(row.id),
 			"segment": str(row.segment),

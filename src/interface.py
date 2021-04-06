@@ -119,6 +119,48 @@ class Interface:
             q = q[0:-1]
         return self.dist.df[self.dist.df['segment'].str.contains(q)]
 
+    def get_splits(self, seg_id):
+        segment = list(self.search(seg_id = seg_id).segment)[0]
+        splits = []
+        split_chars = [",", ";", ":", "-"]
+        for sc in split_chars:
+        	splits.append(segment.split(sc))
+        f_splits = list(filter(lambda el: el, splits))
+        # f_splits = f_splits[0] if len(f_splits) == 1 else f_splits
+        flattened = [val for sublist in f_splits for val in sublist]
+        return flattened
+
+    def _prep_return(self, segment):
+        props = self.sent_pred.predict([segment], pretty=False)
+        print(props)
+        prediction_label = self.sent_pred._prettify_probabilities(props, shorten=False)[0]
+        embs = list(self.get_embeddings(segment))
+        print(f"{embs=}")
+        trans_embs = self.make2D(embs)
+        x = float(trans_embs[0].view())
+        y = float(trans_embs[1].view())
+        dict = {
+            "embeddings": list(map(lambda x: float(x.view()), list(embs))),
+            "x": x,
+            "y": y,
+            "sentiment": prediction_label,
+    		"segment": segment,
+    		"new": True,
+    		"id": len(self.dist.df.index),
+    		"props": props
+    	}
+        self.dist.update_df({
+    		"segment": segment,
+    		"sentiment": prediction_label,
+    		"embeddings": embs,
+    		"cluster": None,
+    		"x": x,
+    		"y": y,
+    		"id": len(self.dist.df.index),
+    		"props": props
+        })
+        print(dict)
+        return dict
 
 # int = Interface()
 # test_sent = "my name is ben and this is jack ass"

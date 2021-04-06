@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var search_input = d3.select("#searchInput");
     var search_results = d3.select("#search-results");
     var toggle_identical_words_sim_sents_button = d3.select("#toggle_identical_words_sim_sents_button");
+    var split_rule_button = d3.select("#split-rule");
     test_rule_button.on("click", function () {
         attention_interaction_group.style("opacity", 1);
         spinner.style("display", "block");
@@ -89,8 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(url)
             .then(function (resp) { return resp.json(); })
             .then(function (json) {
-            // let res = json.result;
-            var plain_sents = json.result;
+            var res = json.result;
+            var plain_sents = res.map(function (el) { return el.segment; });
             var sents_html = json.ent_html;
             var new_origin = json.origin_sent_ent_html;
             var plain_sents_html = "";
@@ -198,6 +199,16 @@ document.addEventListener("DOMContentLoaded", function () {
             $("#search_results-wrapper").show();
             search_results.html(prep_search_vis(res));
             d3.select("#total-results").text(res.length);
+        });
+    });
+    split_rule_button.on("click", function () {
+        var seg_id = Number(d3.select("#point_id").text());
+        var url = "/split_rule?seg_id=" + seg_id;
+        fetch(url)
+            .then(function (resp) { return resp.json(); })
+            .then(function (json) {
+            var split_points = json.result;
+            console.log(split_points);
         });
     });
 });

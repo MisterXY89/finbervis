@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const search_input = d3.select("#searchInput");
 	const search_results = d3.select("#search-results");
 	const toggle_identical_words_sim_sents_button = d3.select("#toggle_identical_words_sim_sents_button");
+	const split_rule_button = d3.select("#split-rule");
 
 
 	test_rule_button.on("click", () => {
@@ -100,8 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		fetch(url)
 		.then(resp => resp.json())
 		.then(json => {
-			// let res = json.result;
-			let plain_sents = json.result;
+			let res = json.result;
+			let plain_sents = res.map(el => el.segment);
 			let sents_html = json.ent_html;
 			let new_origin = json.origin_sent_ent_html;
 			let plain_sents_html = "";
@@ -218,6 +219,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			$("#search_results-wrapper").show();
 			search_results.html(prep_search_vis(res));
 			d3.select("#total-results").text(res.length);
+		});
+	});
+
+	split_rule_button.on("click", () => {
+		let seg_id = Number(d3.select("#point_id").text());
+		let url = `/split_rule?seg_id=${seg_id}`;
+		fetch(url)
+		.then(resp => resp.json())
+		.then(json => {
+			let split_points = json.result;
+			console.log(split_points);
 		});
 	});
 
