@@ -14,16 +14,17 @@ class Dist:
     calculate dist matrix + get most similar sentences
     """
 
-    def __init__(self, threshold = 0.5):
+    def __init__(self, threshold = 1):
         self.DIST_THRESHOLD = threshold
-        self.df = pd.read_csv(CLUSTER_DATASET_FILE)
+        self.df = pd.read_csv(NEW_EMBS_FILE)
         self.dist_matrix = self.get_dist_matrix(self.df)
         self.similiar_sents = self.dist_matrix[self.dist_matrix < self.DIST_THRESHOLD].stack().reset_index()
 
     def get_dist_matrix(self, df):
 
-        embeddings = df.embeddings
-        values = list(embeddings.apply(lambda r: list(filter(lambda x: len(x) > 1, r[:-1][1:].split(" ")))))
+        # embeddings = df.embeddings
+        embeddings = df.cls_embs
+        values = list(embeddings.apply(lambda r: list(filter(lambda x: len(x) > 1, r[:-1][1:].split(",")))))
         values = np.array(list(map(lambda e: list(map(float, e)), values)))
 
         return pd.DataFrame(
@@ -35,7 +36,7 @@ class Dist:
     def update_df(self, dp):
         print(dp)
         print(dp["props"])
-        self.df.loc[len(df.index)] = [dp["segment"], dp["sentiment"],
+        self.df.loc[len(self.df.index)] = [dp["segment"], dp["sentiment"],
                                         dp["embeddings"], dp["cluster"],
                                         dp["x"], dp["y"], dp["id"], dp["props"]]
 
@@ -48,8 +49,14 @@ class Dist:
         if return_sents:
             full_sents = []
             for sent_index in sents_index:
+                row = self.df.iloc[sent_index]
                 print(sent_index)
-                full_sents.append(self.df.iloc[sent_index]["segment"])
+                full_sents.append({
+                    "id": row["id"],
+                    "segment": row["segment"],
+                    "sentiment": row["sentiment"],
+                    "props": row["props"],
+                })
             return full_sents
         return sents_index
 

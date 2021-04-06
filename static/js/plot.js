@@ -1,6 +1,7 @@
 "use strict";
 var DATA_DIR = "./data";
 var CLUSTER_FILE = DATA_DIR + "/projection_with_full_sents_SENT_PROPS.csv";
+var CLUSTER_FILE = DATA_DIR + "/data.csv";
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 // "#336338" = more medium sea blue

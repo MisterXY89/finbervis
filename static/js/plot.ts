@@ -2,6 +2,7 @@
 
 const DATA_DIR:string = "./data";
 const CLUSTER_FILE:string = `${DATA_DIR}/projection_with_full_sents_SENT_PROPS.csv`;
+const CLUSTER_FILE:string = `${DATA_DIR}/data.csv`;
 
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 const COLORS = ['#abe564', '#64abe5', '#9e64e5'];

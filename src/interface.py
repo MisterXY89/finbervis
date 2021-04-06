@@ -27,7 +27,6 @@ class Interface:
         self.dist = Dist()
         self.bert_preprocesser = BertPreprocessor()
 
-
     def get_embeddings(self, segment):
         input_ids = self.bert_preprocesser.tokenize_segments_to_id([segment])
         # segments_ids = [1]*len(input_ids)
@@ -53,7 +52,6 @@ class Interface:
         cls_embedding = outputs[0]
         print(len(cls_embedding))
         return cls_embedding.detach().numpy()
-
 
     def get_sentiment(self, segment):
         return self.sent_pred.predict([segment])
@@ -103,14 +101,42 @@ class Interface:
         attentions = attentions.detach().numpy()
         return attentions[0][head].tolist()
 
-    def get_ents_vis(self, sentences):
-        sentences = [self.nlp(s) for s in sentences]
+    def get_ents_vis(self, sentences, dict=True):
+        print(sentences[0])
+        print(sentences[0]["segment"])
+        print(sentences[0].keys())
+        sentences = [self.nlp(s["segment"]) for s in sentences]
         html = displacy.render(sentences, style="ent", minify=False) #page=True)
         html = "</div><hr>".join(html.split("</div>"))
         return html
 
+    def get_mean(self, attention_list):
+        return [sum(x)/len(x) for x in zip(*attention_list)]
+
+    def get_mean_attention_for_layer(self, segment, layer):
+        # print(self.get_attention_for_segment(segment, layer=11, head=0))
+        print("####################")
+        print(self.get_attention_for_segment(segment, layer=11, head=1))
+        attention_list = [self.get_mean(self.get_attention_for_segment(segment, layer=layer, head=head)) for head in range(12)]
+        # attention_list = list(map(lambda x: sum(x)/len(x),zip(*attention_list)))
+        print(len(attention_list))
+        with open ("debug.txt", "w") as df:
+            df.write(str(attention_list))
+        # print(attention_list)
+        return attention_list
+
     def get_text_by_id(self, id):
         return list(self.search(seg_id=id)["segment"])[0]
+
+    def get_similar_sents(self, id=0, n=5, return_sents=False):
+        print(id)
+        dists = self.dist.get_similar_sents_for(id=id, n=n, return_sents=return_sents)
+        for d in dists:
+            # index 10 for layer 11
+            # attention_list = [self.get_attention_for_segment(d["segment"], layer=10, head=head) for head in range(12)]
+            # attention_list
+            d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)
+        return dists
 
     def search(self, seg_id=None, q=None):
         if seg_id:
