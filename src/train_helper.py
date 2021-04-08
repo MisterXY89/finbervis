@@ -14,7 +14,7 @@ import plotly.express as px
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
 
-from config import get_model_path
+from config import get_model_path, MODEL_DIR
 
 
 def get_bert_parameters(model) -> bool:
@@ -103,11 +103,11 @@ def save_model(model):
 	"""
 
     torch.save(model, get_model_path())
-    # try:
-    #     # They can then be reloaded using `from_pretrained()`
-    #     model_to_save = model.module if hasattr(
-    #         model,
-    #         'module') else model
-    #     model_to_save.save_pretrained(MODEL_DIR)
-    # except Exception as e2:
-    #     print(e2)
+    try:
+        # They can then be reloaded using `from_pretrained()`
+        model_to_save = model.module if hasattr(
+            model,
+            'module') else model
+        model_to_save.save_pretrained(MODEL_DIR)
+    except Exception as e2:
+        print(e2)

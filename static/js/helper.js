@@ -2,6 +2,9 @@
 var PLOT_ID = "#plot";
 var SELECT_COLOR = "#ce0c0f";
 var SELECT_RADIUS = 8;
+function get_sentiment_html(sent) {
+    return "<span class=\"badge badge-pill class-" + sent + "\">" + sent + "</span>";
+}
 function get_max_value(str_props, pretty) {
     pretty = pretty == undefined ? false : pretty;
     if (str_props == "NaN" || str_props == "Na" || str_props == undefined) {
@@ -46,7 +49,7 @@ function click_point(d) {
         // + `<input type="hidden" value="${d.id}" id="point_id"/>`
         + '<tr>'
         + '<th>Sentiment</th>'
-        + ("<td>" + d.sentiment + "</td>")
+        + ("<td>" + get_sentiment_html(d.sentiment) + "</td>")
         + '</tr>'
         + '<tr>'
         + '<th>Probability</th>'

@@ -5,8 +5,7 @@ from scipy.spatial import distance
 from fastdist import fastdist
 
 
-from .config import CLUSTER_DATASET_FILE #, DIST_MATRIX_FILE
-
+from config import CLUSTER_DATASET_FILE, NEW_EMBS_FILE
 
 
 class Dist:

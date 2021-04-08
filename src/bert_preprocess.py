@@ -20,8 +20,8 @@ from keras.preprocessing.sequence import pad_sequences
 from torch.utils.data import TensorDataset, DataLoader, \
                                 RandomSampler, SequentialSampler
 
-from .config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, \
-                    BATCH_SIZE, MAX_LEN, TEST_SIZE
+from config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, \
+                    BATCH_SIZE, MAX_LEN, TEST_SIZE, NEW_DATA_FILE
 
 
 class BertPreprocessor():
@@ -30,7 +30,7 @@ class BertPreprocessor():
     """
     def __init__(self):
         # data loading & parsing
-        self.data_frame = pd.read_csv(CLEANED_DATASET_FILE)
+        self.data_frame = pd.read_csv(NEW_DATA_FILE)
         self.labels = self.data_frame.sentiment.values
         # getting BERT-tokenizer
         self.tokenizer = get_tokenizer()

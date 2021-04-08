@@ -12,8 +12,8 @@ import numpy as np
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
-from .bert_preprocess import BertPreprocessor
-from .config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES
+from bert_preprocess import BertPreprocessor
+from config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES, load_bert
 
 
 class SentimentPredictor:
@@ -42,7 +42,14 @@ class SentimentPredictor:
         load the latest model for later usage
         """
         print("Loading model...")
+        # print(self.latest_model_filename)
+        # self.latest_model_filename
+        # state_dict = torch.load(f"{MODEL_DIR}/pytorch_model.bin")
+        # self.model = load_bert()
+        # self.model.load_state_dict(state_dict)
+        # self.model.from_pretrained(f"{MODEL_DIR}/pytorch_model.bin")
         self.model = torch.load(self.latest_model_filename)
+        # self.model.eval()
 
     def _prettify_probabilities(self,
                                 probabilities: list,
@@ -72,6 +79,7 @@ class SentimentPredictor:
         self.model.eval()
 
         all_logits = []
+        predictions , true_labels = [], []
         # For each batch in our test set...
         for batch in dataloader:
             # Load batch to device(CPU)
@@ -80,16 +88,34 @@ class SentimentPredictor:
 
             # Compute logits
             with torch.no_grad():
+                # output = self.model(b_input_ids, b_attn_mask)
                 logits = self.model(b_input_ids, b_attn_mask)
             all_logits.append(logits)
-
+            
+        
         all_logits = all_logits[0]
-
+        all_logits = all_logits.logits
+                
+        # all_logits = np.asarray(logits_tuple, dtype=np.float16)
+        # train1 = torch.tensor(, dim=0)        
+        # all_logits = all_logits.detach().cpu().numpy()
+        print(type(all_logits))
+        print(len(all_logits))
+        print(dir(all_logits))
+        print("-----")
+        # all_logits = torch.from_numpy(all_logits)
+        # np.asarray(all_logits)
+        # all_logits = (torch.stack(all_logits,dim=1)).squeeze(0)
+        
+        #>> logits.detach().cpu().numpy()
+        
         # Concatenate logits from each batch
-        all_logits = torch.cat(all_logits, dim=0)
+        all_logits = torch.cat(tuple(all_logits), dim=0)
+        print(all_logits)
 
         # Apply softmax to calculate probabilities
-        probs = F.softmax(all_logits, dim=1).cpu().numpy()
+        # TODO: dim=1??????
+        probs = F.softmax(all_logits, dim=0).cpu().numpy()
 
         return probs
 
@@ -117,8 +143,10 @@ class SentimentPredictor:
         """
         dataloader = self._make_predictable(segment_list)
         if self.model is None:
-            self.load_model()
+            self.load_model()        
         probabilities = self._get_probabilies(dataloader)
+        print("#################")
+        print(probabilities)
         if pretty:
             return self._prettify_probabilities(probabilities, shorten=shorten)
         return probabilities

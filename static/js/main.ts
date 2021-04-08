@@ -20,6 +20,13 @@ function toggle_ents () {
 	});
 }
 
+function get_segment_html(seg) {
+	// type="button" class="btn btn-secondary"
+	return `<div title="${seg}">
+  	${seg.slice(0,50)}...
+	</div>`;
+}
+
 function prep_search_vis(res) {
 	let html = "";
 	// .slice(0,10)
@@ -31,8 +38,8 @@ function prep_search_vis(res) {
 	    + `<h5 class="card-title">Result #${i+1}</h5>`
 	    + `<p class="card-text">`
 			+ `<strong>ID</strong><br>${element.id}<hr>`
-			+ `<strong>Segment</strong><br>${element.segment.slice(0,50)} ...<br>`
-			+ `<strong>Sentiment</strong><br>${element.sentiment}`
+			+ `<strong>Segment</strong><br>${get_segment_html(element.segment)}<br>`
+			+ `<strong>Sentiment</strong><br>${get_sentiment_html(element.sentiment)}`
 			+ '</p>'
 			+  `<a href="#" class="btn btn-primary" onclick='click_point(${i});'>Select Point</a>`
 	  	+ '</div>'

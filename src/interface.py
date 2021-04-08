@@ -4,12 +4,31 @@ import torch
 import spacy
 from spacy import displacy
 import numpy as np
+# import transformers
+# import transformers.models.bert.modeling_bert
+# import transformers.modeling_outputs
+# import transformers.modeling_tf_outputs
+# import transformers.modeling_tf_pytorch_utils
+# import transformers.modeling_tf_utils
+# import transformers.modeling_utils
+# from transformers.modeling_bert import BertModel
 import pandas as pd
+import tensorflow as tf
 
-from .predict import SentimentPredictor
-from .bert_preprocess import BertPreprocessor
-from .config import EMBEDDINGS_DATASET_FILE, get_tokenizer
-from .dist import Dist
+# from allennlp.predictors.predictor import Predictor
+# from allennlp.interpret.saliency_interpreters import SimpleGradient
+# 
+# from allennlp.data.vocabulary import Vocabulary
+# 
+# from allennlp.predictors.text_classifier import TextClassifierPredictor
+# from allennlp.data.dataset_readers import TextClassificationJsonReader
+# 
+# from allennlp.models import Model
+
+from predict import SentimentPredictor
+from bert_preprocess import BertPreprocessor
+from config import EMBEDDINGS_DATASET_FILE, get_tokenizer
+from dist import Dist
 
 
 class Interface:
@@ -23,7 +42,7 @@ class Interface:
         self.sent_pred = SentimentPredictor()
         self.sent_pred.load_model()
         self.tokenizer = get_tokenizer()
-        self.nlp = spacy.load('en')
+        self.nlp = spacy.load('en_core_web_sm')        
         self.dist = Dist()
         self.bert_preprocesser = BertPreprocessor()
 
@@ -187,10 +206,92 @@ class Interface:
         })
         print(dict)
         return dict
+        
+    def get_gradient(self, segement, context=""):
+        """
+        Return gradient of input (segement) wrt to model output span prediction
+        Args:
+            segement (str): text of input segement
+            context (str): text of segement context/passage
+            model (QA model): Hugging Face BERT model for QA transformers.modeling_tf_distilbert.TFDistilBertForQuestionAnswering, transformers.modeling_tf_bert.TFBertForQuestionAnswering
+            tokenizer (tokenizer): transformers.tokenization_bert.BertTokenizerFast
+        Returns:
+             (tuple): (gradients, token_words, token_types, answer_text)
+        """
+        props = self.sent_pred.predict([segement], pretty=False)
+        print(props)
+    
+        embedding_matrix = self.sent_pred.model.bert.embeddings.word_embeddings
+        embedding_matrix = torch.tensor(embedding_matrix.weight, dtype=torch.long)
+        # print(t)
+        # print("#####")
+        # print(dir(embedding_matrix.weight))
+        # print("#####")
+        # print(embedding_matrix.weight.size)
+        # print("#####")
+        encoded_tokens = self.tokenizer.encode_plus(segement, add_special_tokens=True, return_tensors="tf")
+        # encoded_tokens = tokenizer.encode_plus(segement, context, add_special_tokens=True, return_tensors="tf")
+        token_ids = list(encoded_tokens["input_ids"].numpy()[0])
+        vocab_size = list(embedding_matrix.shape)[0]
+    
+        # convert token ids to one hot. We can't differentiate wrt to int token ids hence the need for one hot representation
+        token_ids_tensor = tf.constant([token_ids], dtype='int32')
+        token_ids_tensor_one_hot = tf.one_hot(token_ids_tensor, vocab_size)
+    
+    
+        with tf.GradientTape(watch_accessed_variables=False) as tape:
+            # (i) watch input variable
+            tape.watch(token_ids_tensor_one_hot)
+    
+            # multiply input model embedding matrix; allows us do backprop wrt one hot input
+            inputs_embeds = tf.matmul(token_ids_tensor_one_hot,embedding_matrix)
+    
+            print(inputs_embeds)
+            print(type(inputs_embeds))
+            print(dir(inputs_embeds))
+    
+            # (ii) get prediction
+            props = self.sent_pred.predict([segement], pretty=False)
+            # answer_start, answer_end = get_best_start_end_position(start_scores, end_scores)
+            # 
+            # start_output_mask = get_correct_span_mask(answer_start, len(token_ids))
+            # end_output_mask = get_correct_span_mask(answer_end, len(token_ids))
+            # 
+            # # zero out all predictions outside of the correct span positions; we want to get gradients wrt to just these positions
+            # predict_correct_start_token = tf.reduce_sum(start_scores * start_output_mask)
+            # predict_correct_end_token = tf.reduce_sum(end_scores * end_output_mask)
+    
+            # (iii) get gradient of input with respect to both start and end output
+            gradient_non_normalized = tf.norm(
+                tape.gradient(props, token_ids_tensor_one_hot),axis=2)
+    
+            # (iv) normalize gradient scores and return them as "explanations"
+            gradient_tensor = (
+                gradient_non_normalized /
+                tf.reduce_max(gradient_non_normalized)
+            )
+            gradients = gradient_tensor[0].numpy().tolist()
+    
+            token_words = self.tokenizer.convert_ids_to_tokens(token_ids)
+            token_types = list(encoded_tokens["token_type_ids"].numpy()[0])
+            answer_text = self.tokenizer.convert_tokens_to_string(token_ids[answer_start:answer_end])
+    
+            return  gradients,  token_words, token_types,answer_text
 
-# int = Interface()
-# test_sent = "my name is ben and this is jack ass"
-#
+    def sal(self, sent):
+        grad = ""
+        
+        # predictor = Predictor.from_path("https://storage.googleapis.com/allennlp-public-models/ner-elmo.2021-02-12.tar.gz")
+        # grad = SimpleGradient(self.sent_pred).saliency_interpret_from_json(sent)        
+        # grad = SimpleGradient(predictor).saliency_interpret_from_json(sent)
+        return grad
+
+int = Interface()
+# m = int.sent_pred.model
+# print(type(m))
+test_sent = "my name is ben and this is jack ass"
+# test_sent2 = {"sentence": "This shirt was bought at Grandpa Joes in downtown Deep Learning"}
+
 # embs = int.get_embeddings(test_sent)
 # av = np.average(embs)
 # print(av)
@@ -198,3 +299,43 @@ class Interface:
 #
 # trans_embs = int.make2D(embs)
 # print(f"{trans_embs=}")
+
+# grad = int.sal(test_sent2)
+# print(grad)
+
+# grad, tw, tt, at = int.get_gradient(test_sent)
+
+int.get_sentiment(test_sent)
+
+
+# class ModelWrapper(Model):
+#     def __init__(self, vocab, your_model):
+#         super().__init__(vocab)
+#         self.your_model = int.sent_pred.model
+#         self.logits_to_probs = torch.nn.Softmax()
+#         self.loss = torch.nn.CrossEntropyLoss()
+# 
+#     def forward(self, tokens, label=None):
+#         if label is not None:
+#             outputs = self.your_model(tokens, label=label)
+#         else:
+#             outputs = self.your_model(tokens)
+#         probs = self.logits_to_probs(outputs["logits"])
+#         if label is not None:
+#             loss = self.loss(outputs["logits"], label)
+#             outputs["loss"] = loss
+#         outputs["probs"] = probs
+#         return outputs
+# 
+# class PredictorWrapper(TextClassifierPredictor):
+#     def get_interpretable_layer(self):
+#         return self._model.model.bert.embeddings.word_embeddings # This is the initial layer for huggingface's `bert-base-uncased`; change according to your custom model.
+# 
+#     def get_interpretable_text_field_embedder(self):
+#         return self._model.model.bert.embeddings.word_embeddings
+# 
+# predictor = PredictorWrapper(model=ModelWrapper(["they", "are", "yo"], int.sent_pred.model),
+#                              dataset_reader=TextClassificationJsonReader())
+# 
+# grad = SimpleGradient(predictor).saliency_interpret_from_json(test_sent2)
+# print(grad)

@@ -108,10 +108,10 @@
   overflow-x: hidden;
 }
 
-.identical-token {
-  background-color: rgb(255, 255, 0);
+.identical-token {  
+  background-color: rgb(115, 238, 220);
 }
 
 .identical-token-stopword {
-  background-color: rgba(255, 255, 0, 0.25);
+  background-color: rgba(115, 238, 220, 0.25);
 }

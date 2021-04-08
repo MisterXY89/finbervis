@@ -56,6 +56,9 @@ CLUSTER_DATASET_FILE = f"{DATA_DIR}/{CLUSTER_DATASET_FILENAME}"
 NEW_EMBS_FILENAME = "data.csv"
 NEW_EMBS_FILE = f"{DATA_DIR}/{NEW_EMBS_FILENAME}"
 
+NEW_DATA_FILENAME = "new_training_data.csv"
+NEW_DATA_FILE = f"{DATA_DIR}/{NEW_DATA_FILENAME}"
+
 def get_model_filename():
     """
     use current date as verison for possible multiple different models
@@ -97,7 +100,7 @@ def load_bert():
     model = BertForSequenceClassification.from_pretrained(
         "bert-base-uncased",
         # The number of output labels = 3:
-        # positive, negative & neutral
+        # positive, neutral, negative
         num_labels=3,
         output_attentions=True,  # return attentions weights?
         output_hidden_states=True,  # return all hidden-states?
