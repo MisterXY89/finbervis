@@ -88,24 +88,13 @@ class SentimentPredictor:
 
             # Compute logits
             with torch.no_grad():
-                # output = self.model(b_input_ids, b_attn_mask)
                 logits = self.model(b_input_ids, b_attn_mask)
             all_logits.append(logits)
             
         
         all_logits = all_logits[0]
         all_logits = all_logits.logits
-                
-        # all_logits = np.asarray(logits_tuple, dtype=np.float16)
-        # train1 = torch.tensor(, dim=0)        
-        # all_logits = all_logits.detach().cpu().numpy()
-        print(type(all_logits))
-        print(len(all_logits))
-        print(dir(all_logits))
-        print("-----")
-        # all_logits = torch.from_numpy(all_logits)
-        # np.asarray(all_logits)
-        # all_logits = (torch.stack(all_logits,dim=1)).squeeze(0)
+
         
         #>> logits.detach().cpu().numpy()
         
