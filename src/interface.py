@@ -134,14 +134,15 @@ class Interface:
 
     def get_mean_attention_for_layer(self, segment, layer):
         # print(self.get_attention_for_segment(segment, layer=11, head=0))
-        print("####################")
-        print(self.get_attention_for_segment(segment, layer=11, head=1))
-        attention_list = [self.get_mean(self.get_attention_for_segment(segment, layer=layer, head=head)) for head in range(12)]
+        # print("####################")
+        # print(self.get_attention_for_segment(segment, layer=11, head=1))
+        at = [self.get_attention_for_segment(segment, layer=layer, head=head) for head in range(12)]
+        attention_list = self.get_mean([self.get_mean(self.get_attention_for_segment(segment, layer=layer, head=head)) for head in range(12)])        
         # attention_list = list(map(lambda x: sum(x)/len(x),zip(*attention_list)))
-        print(len(attention_list))
-        with open ("debug.txt", "w") as df:
-            df.write(str(attention_list))
-        # print(attention_list)
+        # print(len(attention_list))
+        # with open ("debug.txt", "w") as df:
+        #     df.write(str(attention_list))
+        # print(attention_list)'
         return attention_list
 
     def get_text_by_id(self, id):
@@ -150,11 +151,13 @@ class Interface:
     def get_similar_sents(self, id=0, n=5, return_sents=False):
         print(id)
         dists = self.dist.get_similar_sents_for(id=id, n=n, return_sents=return_sents)
-        for d in dists:
-            # index 10 for layer 11
-            # attention_list = [self.get_attention_for_segment(d["segment"], layer=10, head=head) for head in range(12)]
-            # attention_list
-            d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)
+        if return_sents:
+            for d in dists:
+                # index 10 for layer 11
+                # attention_list = [self.get_attention_for_segment(d["segment"], layer=10, head=head) for head in range(12)]
+                # attention_list
+                d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)
+                d["segment"] = f"[CLS] {d['segment']} [SEP]"
         return dists
 
     def search(self, seg_id=None, q=None):
@@ -252,6 +255,8 @@ class Interface:
     
             # (ii) get prediction
             props = self.sent_pred.predict([segement], pretty=False)
+            props = torch.tensor(props)
+            tf.cast(props, dtype=tf.float16)
             # answer_start, answer_end = get_best_start_end_position(start_scores, end_scores)
             # 
             # start_output_mask = get_correct_span_mask(answer_start, len(token_ids))
@@ -286,7 +291,7 @@ class Interface:
         # grad = SimpleGradient(predictor).saliency_interpret_from_json(sent)
         return grad
 
-int = Interface()
+interface = Interface()
 # m = int.sent_pred.model
 # print(type(m))
 test_sent = "my name is ben and this is jack ass"
@@ -301,11 +306,13 @@ test_sent = "my name is ben and this is jack ass"
 # print(f"{trans_embs=}")
 
 # grad = int.sal(test_sent2)
-# print(grad)
 
-# grad, tw, tt, at = int.get_gradient(test_sent)
-
-int.get_sentiment(test_sent)
+grad, tw, tt, at = interface.get_gradient(test_sent)
+print(grad)
+# 
+# int.get_sentiment(test_sent)
+# s = int.get_similar_sents(id=13, n=5, return_sents=True)
+# print(s)
 
 
 # class ModelWrapper(Model):
