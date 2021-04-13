@@ -57,12 +57,13 @@ class SentimentPredictor:
         """
         get the index with the highest prob and return corresponding label
         """
+        print(probabilities)
         cut_index = len(LABEL_VALUES[np.argmax(LABEL_VALUES)])
         if shorten:
             cut_index = 3
         return [
-            LABEL_VALUES[prob_list.argmax()][:cut_index]
-            for prob_list in probabilities
+            LABEL_VALUES[probabilities.argmax()][:cut_index]
+            # for prob_list in probabilities
         ]
 
     def _get_probabilies(self, dataloader):
@@ -100,7 +101,6 @@ class SentimentPredictor:
         
         # Concatenate logits from each batch
         all_logits = torch.cat(tuple(all_logits), dim=0)
-        print(all_logits)
 
         # Apply softmax to calculate probabilities
         # TODO: dim=1??????
@@ -140,8 +140,6 @@ class SentimentPredictor:
             return self._prettify_probabilities(probabilities, shorten=shorten)
         return probabilities
 
-# TODO: probs + pretty label return for display + further mapping to opacity?
-
 
 # positive -> positive
 SENTENCE_1 = "Surgical strike by the Indian government was openly supported by all the political parties."
@@ -165,9 +163,11 @@ test_segments = [
     SENTENCE_5a
 ]
 
+
 # sent_pred = SentimentPredictor()
 # sent_pred.load_model()
 # predictions = sent_pred.predict([test_segments[0]], pretty=False, shorten=False)
-
+# predictions = sent_pred.predict([test_segments[0]], pretty=True, shorten=False)
+# 
 # print(predictions)
 # print(sent_pred._prettify_probabilities([predictions]))
