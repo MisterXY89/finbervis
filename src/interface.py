@@ -7,12 +7,12 @@ import pandas as pd
 import spacy
 from spacy import displacy
 
-from predict import SentimentPredictor
-from bert_preprocess import BertPreprocessor
-from config import EMBEDDINGS_DATASET_FILE, get_tokenizer, LABEL_VALUES
-from dist import Dist
+from .predict import SentimentPredictor
+from .bert_preprocess import BertPreprocessor
+from .config import EMBEDDINGS_DATASET_FILE, get_tokenizer, LABEL_VALUES
+from .dist import Dist
 
-from saliency_calc import SaliencyCalculator
+from .saliency_calc import SaliencyCalculator
 
 
 class Interface:
@@ -107,10 +107,14 @@ class Interface:
         return attentions[0][head].tolist()
 
     def get_ents_vis(self, sentences, dict=True):
-        print(sentences[0])
-        print(sentences[0]["segment"])
-        print(sentences[0].keys())
-        sentences = [self.nlp(s["segment"]) for s in sentences]
+        # print(sentences[0])
+        # print(sentences[0]["segment"])
+        # print(sentences[0].keys())
+        print(len(sentences))
+        if not dict:
+            sentences = [self.nlp(s) for s in sentences]
+        else:
+            sentences = [self.nlp(s["segment"]) for s in sentences]
         html = displacy.render(sentences, style="ent", minify=False) #page=True)
         html = "</div><hr>".join(html.split("</div>"))
         return html
@@ -143,7 +147,7 @@ class Interface:
                 # attention_list = [self.get_attention_for_segment(d["segment"], layer=10, head=head) for head in range(12)]
                 # attention_list
                 d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)
-                d["segment"] = f"[CLS] {d['segment']} [SEP]"
+                # d["segment"] = f"[CLS] {d['segment']} [SEP]"
         return dists
 
     def search(self, seg_id=None, q=None):
@@ -210,7 +214,7 @@ class Interface:
         return output
         
         
-interface = Interface()
+# interface = Interface()
 
 # sents = [
 #     {
@@ -223,10 +227,10 @@ interface = Interface()
 #     }
 # ]
 
-sents = ["The government is negative", "They did great to fail"]
-scores = interface.get_gradient_scores(sents)
-
-for sc in scores:    
-    print("--------------------")
-    print(sc[0])
-    print(sc[1])
+# sents = ["The government is negative", "They did great to fail"]
+# scores = interface.get_gradient_scores(sents)
+# 
+# for sc in scores:    
+#     print("--------------------")
+#     print(sc[0])
+#     print(sc[1])
