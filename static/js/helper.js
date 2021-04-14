@@ -49,7 +49,7 @@ function click_point(d) {
         // + `<input type="hidden" value="${d.id}" id="point_id"/>`
         + '<tr>'
         + '<th>Sentiment</th>'
-        + ("<td>" + get_sentiment_html(d.sentiment) + "</td>")
+        + ("<td id=\"model-sentiment\">" + get_sentiment_html(d.sentiment) + "</td>")
         + '</tr>'
         + '<tr>'
         + '<th>Probability</th>'
@@ -106,7 +106,7 @@ function get_mouse_events(data) {
             + '</tr>'
             + '<tr>'
             + '<th>Sentiment</th>'
-            + ("<td id='model-sentiment'>" + d.sentiment + "</td>")
+            + ("<td>" + d.sentiment + "</td>")
             + '</tr>'
             // + '<tr>'
             // 		+ '<th>Propability</th>'
@@ -133,6 +133,7 @@ function get_mouse_events(data) {
     ];
 }
 function add_labeled_record(sentiment, segment) {
+    console.log("add_label");
     var data = new FormData();
     var json_string = JSON.stringify({ sentiment: sentiment, segment: segment });
     console.log(json_string);
