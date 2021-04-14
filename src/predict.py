@@ -12,8 +12,8 @@ import numpy as np
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 
-from bert_preprocess import BertPreprocessor
-from config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES, load_bert
+from .bert_preprocess import BertPreprocessor
+from .config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES, load_bert
 
 
 class SentimentPredictor:

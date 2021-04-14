@@ -20,7 +20,7 @@ from keras.preprocessing.sequence import pad_sequences
 from torch.utils.data import TensorDataset, DataLoader, \
                                 RandomSampler, SequentialSampler
 
-from config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, \
+from .config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, \
                     BATCH_SIZE, MAX_LEN, TEST_SIZE, NEW_DATA_FILE
 
 
