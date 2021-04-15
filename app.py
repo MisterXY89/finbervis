@@ -128,6 +128,11 @@ def add_labeled_record():
 @app.route("/get_similar_segments")
 def get_similar_segments():
 	req_data = request.args
+	# if 2<3:
+	# 	time.sleep(2)
+	# 	return jsonify({
+	# 		"test": 123
+	# 	})
 	print(req_data)
 	if not "seg_id" in req_data:
 		status = False
@@ -141,16 +146,44 @@ def get_similar_segments():
 		else:
 			return_sents = False
 		result = interface.get_similar_sents(id=seq_id,n=n,return_sents=return_sents)
-		print(result)
 		ent_html = interface.get_ents_vis(result)
+		
 		status = True
-
 
 	return jsonify({
 		"status": status,
 		"result": result,
-		"ent_html": ent_html,
-		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")])
+		"ent_html": ent_html,		
+		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")], dict=False)
+	})
+	
+	
+@app.route("/get_scores")
+def get_scores():
+	req_data = request.args
+	print(req_data)
+	if not "seg_id" in req_data:
+		status = False
+		result = "Error: 'seq_id' not in req_data."
+	else:
+		seg_id = req_data["seg_id"]
+		
+		segment = list(interface.search(seg_id=seg_id)["segment"])[0]
+		print(segment)
+		output = interface.get_gradient_scores([segment])[0]
+		print(output)
+		print(type(output))
+		print(type(output[0]))
+		print(type(output[0][0]))
+		result = {
+			"scores": output[0],
+			"tokens": output[1],
+		}
+		status = True
+	
+	return jsonify({
+		"status": status,
+		"result": result,
 	})
 
 @app.route("/get_entities")
@@ -161,7 +194,7 @@ def get_entities():
 		result = f"Error: 'seq_id' not in \n{req_data=}"
 	else:
 		seq_id = req_data["seq_id"]
-		result = interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")])
+		result = interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")], dict=False)
 		status = True
 
 	return jsonify({
