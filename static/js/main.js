@@ -42,6 +42,73 @@ function prep_search_vis(res) {
     });
     return html;
 }
+function visualize_saliency(res, el) {
+    var tokens = res.tokens;
+    var scores = res.scores;
+    var token_html = "<div class='sal-text'>";
+    tokens.forEach(function (tok, i) {
+        var opacity = Math.abs(scores[i]);
+        var token_grad_color = "158,100,229";
+        if (scores[i] > 0) { // check what is what
+            token_grad_color = "171,229,100";
+        }
+        var color = "rgba(" + token_grad_color + ", " + opacity + ")";
+        token_html += "<span style=\"background-color: " + color + ";\">" + tok + " </span>";
+    });
+    token_html += "</div>";
+    console.log(token_html);
+    console.log(el.parentElement.parentElement.getElementsByTagName("div")[0]);
+    el.parentElement.parentElement.getElementsByTagName("div")[0].innerHTML += token_html;
+    var parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
+    var sal_div = parent.getElementsByClassName("sal-text")[0];
+    var plain_div = parent.getElementsByClassName("plain-text")[0];
+    sal_div.style.display == "block";
+    plain_div.style.display == "none";
+    // toggle_sal_plain(el);	
+    // return token_html;
+}
+function get_sal_div(el) {
+    return el.parentElement.parentElement.getElementsByClassName("sal-text")[0];
+}
+function toggle_sal_plain(el) {
+    var parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
+    console.log(parent);
+    var sal_div = parent.getElementsByClassName("sal-text")[0];
+    var plain_div = parent.getElementsByClassName("plain-text")[0];
+    if (sal_div.style.display == "block") {
+        sal_div.style.display == "none";
+        plain_div.style.display == "block";
+    }
+    else {
+        sal_div.style.display == "block";
+        plain_div.style.display == "none";
+    }
+}
+function saliecy_is_computed(el) {
+    return el.parentElement.parentElement.getElementsByTagName("div")[0].getElementsByClassName("sal-text")[0] !== undefined;
+}
+function get_saliency_scores(el, seg_id) {
+    if (saliecy_is_computed(el)) {
+        console.log("SAL IS COMPUTED");
+        toggle_sal_plain(el);
+        return 1;
+    }
+    // console.log(el);
+    var spinner = el.getElementsByClassName("saliency-calc-spinner")[0];
+    var img = el.getElementsByTagName("img")[0];
+    spinner.style.display = "block";
+    img.style.display = "none";
+    var url = "/get_scores?seg_id=" + seg_id;
+    fetch(url)
+        .then(function (resp) { return resp.json(); })
+        .then(function (json) {
+        var res = json.result;
+        img.style.display = "block";
+        spinner.style.display = "none";
+        visualize_saliency(res, el);
+    });
+    return 1;
+}
 document.addEventListener("DOMContentLoaded", function () {
     scatter_plot({});
     var test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States.";
@@ -91,22 +158,32 @@ document.addEventListener("DOMContentLoaded", function () {
         var id = d3.select("#point_id").text();
         var url = "/get_similar_segments?seg_id=" + id + "&return_sents=True";
         console.log(url);
+        // TODO: disable button & add loading cirlcle next to it
+        $("#sim-sent-spinner").toggle();
+        document.getElementById("show-similar").disabled = true;
         fetch(url)
             .then(function (resp) { return resp.json(); })
             .then(function (json) {
             var res = json.result;
-            var plain_sents = res.map(function (el) { return el.segment; });
+            // let plain_sents = res.map(el => el.segment);
             var sents_html = json.ent_html;
             var new_origin = json.origin_sent_ent_html;
             var plain_sents_html = "";
-            plain_sents.forEach(function (s) { return plain_sents_html += s + "<hr>"; });
-            console.log(plain_sents_html);
+            var img_filename = "icons8-flächendiagramm-100.png";
+            var spinner_html = "<div class=\"spinner-border text-secondary text-center saliency-calc-spinner\" role=\"status\">\n\t\t\t\t<span class=\"sr-only\">Loading...</span>\n\t\t\t</div>";
+            var img_html = function (seg_id) { return "<a href=\"#saliency_calc\" onclick=\"get_saliency_scores(this, " + seg_id + ");\">" + spinner_html + "<img src=\"img/" + img_filename + "\" width=\"45px\" alt=\"Saliency calc\"/></a><br>"; };
+            res.forEach(function (s) {
+                plain_sents_html += "<div class=\"row\"><div class=\"col-10\"><div class=\"plain-text\">" + s.segment + "</div></div><div class=\"col-2\">" + img_html(s.id) + get_sentiment_html(s.sentiment) + "</div></div><hr>";
+            });
             $("#toggle_ents_sim_sents").show();
             $("#toggle_identical_words_sim_sents_button").show();
-            $;
             d3.select("#selected-segment-ents").html(new_origin);
             similar_sents_display.html(sents_html);
             similar_sents_display_plain.html(plain_sents_html);
+            similar_sents_display.style("display", "none");
+            similar_sents_display_plain.style("display", "block");
+            $("#sim-sent-spinner").hide();
+            document.getElementById("show-similar").disabled = false;
         });
     });
     toggle_ents_sim_sents_button.on("click", function () {

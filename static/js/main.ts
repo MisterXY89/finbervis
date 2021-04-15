@@ -48,6 +48,79 @@ function prep_search_vis(res) {
 	return html;
 }
 
+function visualize_saliency(res, el) {
+	let tokens = res.tokens;
+	let scores = res.scores;
+	let token_html = "<div class='sal-text'>";
+	tokens.forEach((tok, i) => {
+		let opacity = Math.abs(scores[i]);
+		let token_grad_color = "158,100,229";
+		if (scores[i] > 0) { // check what is what
+			token_grad_color = "171,229,100";
+		} 
+		let color = `rgba(${token_grad_color}, ${opacity})`;
+		token_html += `<span style="background-color: ${color};">${tok} </span>`;
+	});
+	token_html += "</div>";
+	console.log(token_html);
+	console.log(el.parentElement.parentElement.getElementsByTagName("div")[0]);
+	el.parentElement.parentElement.getElementsByTagName("div")[0].innerHTML += token_html;
+	
+	let parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
+	let sal_div = parent.getElementsByClassName("sal-text")[0];
+	let plain_div = parent.getElementsByClassName("plain-text")[0];
+	
+	sal_div.style.display == "block";
+	plain_div.style.display == "none";
+	// toggle_sal_plain(el);	
+	// return token_html;
+}
+
+function get_sal_div(el) {
+	return el.parentElement.parentElement.getElementsByClassName("sal-text")[0];
+}
+
+function toggle_sal_plain(el) {
+	let parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
+	console.log(parent);
+	let sal_div = parent.getElementsByClassName("sal-text")[0];
+	let plain_div = parent.getElementsByClassName("plain-text")[0];
+	
+	if (sal_div.style.display == "block") {
+		sal_div.style.display == "none";
+		plain_div.style.display == "block";
+	} else {
+		sal_div.style.display == "block";
+		plain_div.style.display == "none";
+	}
+}
+
+function saliecy_is_computed(el) {	
+	return el.parentElement.parentElement.getElementsByTagName("div")[0].getElementsByClassName("sal-text")[0] !== undefined;
+}
+
+function get_saliency_scores(el, seg_id) {
+	if (saliecy_is_computed(el)) {
+		console.log("SAL IS COMPUTED")
+		toggle_sal_plain(el);
+		return 1;
+	}
+	// console.log(el);
+	let spinner = el.getElementsByClassName("saliency-calc-spinner")[0];
+	let img = el.getElementsByTagName("img")[0];
+	spinner.style.display = "block";
+	img.style.display = "none";
+	let url = `/get_scores?seg_id=${seg_id}`;
+	fetch(url)
+	.then(resp => resp.json())
+	.then(json => {
+		let res = json.result;
+		img.style.display = "block";
+		spinner.style.display = "none";
+		visualize_saliency(res, el);
+	});
+	return 1;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -105,22 +178,37 @@ document.addEventListener("DOMContentLoaded", () => {
 		let id = d3.select("#point_id").text();
 		let url: string = `/get_similar_segments?seg_id=${id}&return_sents=True`;
 		console.log(url);
+		// TODO: disable button & add loading cirlcle next to it
+		$("#sim-sent-spinner").toggle();
+		document.getElementById("show-similar").disabled = true;
 		fetch(url)
 		.then(resp => resp.json())
 		.then(json => {
 			let res = json.result;
-			let plain_sents = res.map(el => el.segment);
+			// let plain_sents = res.map(el => el.segment);
 			let sents_html = json.ent_html;
 			let new_origin = json.origin_sent_ent_html;
 			let plain_sents_html = "";
-			plain_sents.forEach((s:string) => plain_sents_html+= `${s}<hr>`);
-			console.log(plain_sents_html);
+			let img_filename = "icons8-flächendiagramm-100.png";
+			let spinner_html = `<div class="spinner-border text-secondary text-center saliency-calc-spinner" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>`;
+			let img_html = (seg_id) => `<a href="#saliency_calc" onclick="get_saliency_scores(this, ${seg_id});">${spinner_html}<img src="img/${img_filename}" width="45px" alt="Saliency calc"/></a><br>`;
+			res.forEach((s) => {
+				plain_sents_html+= `<div class="row"><div class="col-10"><div class="plain-text">${s.segment}</div></div><div class="col-2">${img_html(s.id)}${get_sentiment_html(s.sentiment)}</div></div><hr>`;
+			});
 			$("#toggle_ents_sim_sents").show();
-			$("#toggle_identical_words_sim_sents_button").show()
-			$
+			$("#toggle_identical_words_sim_sents_button").show();
 			d3.select("#selected-segment-ents").html(new_origin);
 			similar_sents_display.html(sents_html);
 			similar_sents_display_plain.html(plain_sents_html);
+			
+			similar_sents_display.style("display", "none");
+			similar_sents_display_plain.style("display", "block");
+			
+			$("#sim-sent-spinner").hide();
+			document.getElementById("show-similar").disabled = false;
+			
 		});
 	});
 
