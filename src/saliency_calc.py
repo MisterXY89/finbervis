@@ -42,7 +42,7 @@ class SaliencyCalculator:
             # v = visualization.visualize_text(self.vis_data_records_ig)
             
         # sm = lambda wa: F.softmax(torch.tensor(wa), dim=0).cpu().numpy()
-        return list(map(lambda rec: (rec.word_attributions, rec.raw_input), self.vis_data_records_ig))  
+        return list(map(lambda rec: (rec.word_attributions.tolist(), rec.raw_input), self.vis_data_records_ig))
 
 
 

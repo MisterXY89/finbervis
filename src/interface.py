@@ -128,6 +128,7 @@ class Interface:
         # print(self.get_attention_for_segment(segment, layer=11, head=1))
         at = [self.get_attention_for_segment(segment, layer=layer, head=head) for head in range(12)]
         attention_list = self.get_mean([self.get_mean(self.get_attention_for_segment(segment, layer=layer, head=head)) for head in range(12)])        
+        attention_list = list(map(float, attention_list))
         # attention_list = list(map(lambda x: sum(x)/len(x),zip(*attention_list)))
         # print(len(attention_list))
         # with open ("debug.txt", "w") as df:
