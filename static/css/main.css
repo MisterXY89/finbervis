@@ -92,7 +92,9 @@
 #similar_sents_display_plain,
 #search_results-wrapper,
 #toggle_identical_words_sim_sents_button,
-#user-classification
+#user-classification,
+#sim-sent-spinner,
+.saliency-calc-spinner
 {
   display: none;
 }
@@ -114,4 +116,8 @@
 
 .identical-token-stopword {
   background-color: rgba(115, 238, 220, 0.25);
+}
+
+#sim-sent-spinner {
+  margin: auto !important;
 }
