@@ -51,7 +51,7 @@ class Dist:
                 row = self.df.iloc[sent_index]
                 print(sent_index)
                 full_sents.append({
-                    "id": row["id"],
+                    "id": int(row["id"]),
                     "segment": row["segment"],
                     "sentiment": row["sentiment"],
                     "props": row["props"],
