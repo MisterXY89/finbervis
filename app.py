@@ -133,7 +133,6 @@ def get_similar_segments():
 	# 	return jsonify({
 	# 		"test": 123
 	# 	})
-	print(req_data)
 	if not "seg_id" in req_data:
 		status = False
 		result = "Error: 'seq_id' not in req_data."
@@ -153,7 +152,7 @@ def get_similar_segments():
 	return jsonify({
 		"status": status,
 		"result": result,
-		"ent_html": ent_html,		
+		"ent_html": ent_html,
 		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")], dict=False)
 	})
 	
