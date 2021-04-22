@@ -2,7 +2,7 @@
 {% block header %}
 <div class="jumbotron jumbotron-fluid bg-white text-center">
   <div class="container-fluid">
-    <h1 class="display-4">A good title</h1>
+    <h1 class="display-4">FinBerVis</h1>
     <p class="lead">A visual debugging tool for fine-tuned transformer models for (mutli-label) sequence classification tasks</p>
   </div>
 </div>
@@ -29,8 +29,18 @@
 
     <div id="search_results-wrapper">
 
-      <h2>Search Results</h2>
-      Total results: <span class="muted" id="total-results"></span>
+      <h2 id="search-header">All Segments</h2>
+      Total segments: <span class="muted" id="total-results"></span>
+      <div class="row">
+        <div class="col-sm-8" style="">
+          <!-- <label for="searchInput"></label> -->
+          <input placeholder="Search query or ID" type="text" class="form-control" id="searchInput" aria-describedby="searchHelp">
+          <small id="searchHelp" class="form-text text-muted">When searching for an ID use #123</small>
+        </div>
+        <div class="col-sm-4">
+          <button type="button" name="searchButton" id="searchButton" class="btn btn-secondary btn-fluid">Search</button>
+        </div>
+      </div>
       <br /> <br />
       <div class='row'>
         <div id="search-results" class="col">
@@ -56,12 +66,12 @@
     <h2 style="">Projection of sentence embeddings</h2>
     <div class="row">
       <div class="col-sm-8" style="">
-        <!-- <label for="searchInput"></label> -->
-        <input placeholder="Search query or ID" type="text" class="form-control" id="searchInput" aria-describedby="searchHelp">
-        <small id="searchHelp" class="form-text text-muted">When searching for an ID use #123</small>
+        <!-- <label for="segmentInput"></label> -->
+        <input placeholder="Enter your own sentence" type="text" class="form-control" id="segmentInput" aria-describedby="segmentInputHelp">
+        <!-- <small id="segmentInputHelp" class="form-text text-muted">When searching for an ID use #123</small> -->
       </div>
       <div class="col-sm-4">
-        <button type="button" name="searchButton" id="searchButton" class="btn btn-secondary btn-fluid">Search</button>
+        <button type="button" name="addButton" id="test-rule" class="btn btn-secondary btn-fluid">Add</button>
       </div>
     </div>
     <br />
@@ -105,93 +115,134 @@
           Select a point to see its data here and to interact with the self-attention!
         </p>
         <hr />
-        <!-- ', '#64abe5', '#9e64e5 -->
-        <div id="user-classification">
+        <!-- ', '#64abe5', '#9e64e5 -->        
+
+        <!-- user_classification_modal -->
+        <div class="modal fade" id="userClassificationModal" tabindex="-1" role="dialog" aria-labelledby="userClassificationModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="userClassificationModalLabel">Edit predicted sentiment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div id="user-classification">
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="form-group">
+                        <label for="sentiment-classes-user-classification">Select the correct sentiment class, if wrongly classified.</label>
+                        <select class="form-control" id="sentiment-classes-user-classification">
+                          <option value="positive">Positive</option>
+                          <option value="neutral">Neutral</option>
+                          <option value="negative">Negative</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                <button type="button" id="confirm-user-classification-sentiment" name="confirm-user-classification-sentiment" class="btn btn-outline-primary" data-dismiss="modal">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr />
+        
+        <div class="buttons-row">
           <div class="row">
-            <div class="col-8">
-              <div class="form-group">
-                <label for="sentiment-classes-user-classification">Select the correct sentiment class, if wrongly classified.</label>
-                <select class="form-control" id="sentiment-classes-user-classification">
-                  <option value="positive">Positive</option>
-                  <option value="neutral">Neutral</option>
-                  <option value="negative">Negative</option>
-                </select>
-              </div>
+            <div class="col-6">
+              <button type="button" class="btn btn-outline-primary btn-block" name="show-similar" id="show-similar">
+                Show similar sentences 
+                <div class="spinner-border text-secondary text-center" role="status" id="sim-sent-spinner">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </button>
             </div>
-            <div class="col-4">
-              <a href="#confirm-user-classification-sentiment" id="confirm-user-classification-sentiment" name="confirm-user-classification-sentiment" class="btn btn-outline-primary">Confirm</a>
+ 
+            <div class="col-6 self-attention-collapse">
+              <button class="btn btn-outline-primary btn-block" type="button" data-toggle="collapse" data-target="#collapseSelfAttention" aria-expanded="false" aria-controls="collapseSelfAttention">
+                Detail self-attention
+              </button>
             </div>
           </div>
-        </div>
-        <hr />
-        <div class="self-attention-collapse">
-          <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseSelfAttention" aria-expanded="false" aria-controls="collapseSelfAttention">
-            Detail self-attention analysis
-          </button>
-
-        </div>
-
-        <div class="collapse" id="collapseSelfAttention">
-          <br />
-          <div id="self-attention-interaction">
-
-            <div class="row">
-              <div class="col-6">
-                <label for="segment-attention">Show an self-attention heatmap for the selected datapoint</label>
-              </div>
-              <div class="col-6">
-                <div class="row">
-                  <div class="col-6">
-                    <input class="form-control" type="number" min="1" max="12" id="layer_input" name="layer_input" value="1" aria-describedby="layer_input_help"/>
-                    <small id="layer_input_help" class="form-text text-muted">Layer (1-12)</small>
-                  </div>
-                  <div class="col-6">
-                    <input class="form-control" type="number" min="1" max="12" id="head_input" name="head_input" value="1" aria-describedby="head_input_help"/>
-                    <small id="head_input_help" class="form-text text-muted">Head (1-12)</small>
-                  </div>
-                </div>
-                <br />
-                <button type="button" data-toggle="modal" data-target=".bd-example-modal-lg" class="btn btn-fluid btn-warning" id="segment-attention" name="segment-attention">Show Self-Attention</button> <br />
-              </div>
+            
+            
+          </div>
+          
+          <div id="show-simmilar">          
+            <br /><br />
+            <a href="#show-simmilar" id="toggle_ents_sim_sents">Toggle Entities</a>
+            <a href="#toggle-identical-words" id="toggle_identical_words_sim_sents_button">Toggle identical words</a>
+            <a href="#toggle-mean-attention" id="toggle_mean_attention">Toggle attention</a>
+            <div id="similar-sents-display">
+              
             </div>
+            <div id="similar_sents_display_plain">
+              
+            </div>
+            
+            <div id="similar_sents_display_attention">
+              
+            </div>
+          </div>
+          
+          
+          <div class="collapse" id="collapseSelfAttention">
             <br />
-            <div class="row">
-              <div class="col-6">
-                <label for="explore-neighbours">Show self-attention heatmaps datapoints near the selected</label>
-              </div>
-              <div class="col-6">
-                <div class="row">
-                  <div class="col-6">
-                    <input class="form-control" type="number" min="1" max="12" id="layer_input_neighbours" name="layer_input_neighbours" value="1" aria-describedby="layer_input_neighbours_help"/>
-                    <small id="layer_input_neighbours_help" class="form-text text-muted">Layer (1-12)</small>
-                  </div>
-                  <div class="col-6">
-                    <input class="form-control" type="number" min="1" max="12" id="head_input_neighbours" name="head_input_neighbours" value="1" aria-describedby="head_input_neighbours_help"/>
-                    <small id="head_input_neighbours_help" class="form-text text-muted">Head (1-12)</small>
-                  </div>
+            <div id="self-attention-interaction">
+              
+              <div class="row">
+                <div class="col-6">
+                  <label for="segment-attention">Show an self-attention heatmap for the selected datapoint</label>
                 </div>
-                <br />
-                <a class="btn btn-warning" href="#explore-neighbours" id="explore-neighbours" name="explore-neighbours">Neighbourhood Self-Attention</a>
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col-6">
+                      <input class="form-control" type="number" min="1" max="12" id="layer_input" name="layer_input" value="1" aria-describedby="layer_input_help"/>
+                      <small id="layer_input_help" class="form-text text-muted">Layer (1-12)</small>
+                    </div>
+                    <div class="col-6">
+                      <input class="form-control" type="number" min="1" max="12" id="head_input" name="head_input" value="1" aria-describedby="head_input_help"/>
+                      <small id="head_input_help" class="form-text text-muted">Head (1-12)</small>
+                    </div>
+                  </div>
+                  <br />
+                  <button type="button" data-toggle="modal" data-target=".bd-example-modal-lg" class="btn btn-fluid btn-warning" id="segment-attention" name="segment-attention">Show Self-Attention</button> <br />
+                </div>
               </div>
+              <br />
+              <div class="row">
+                <div class="col-6">
+                  <label for="explore-neighbours">Show self-attention heatmaps datapoints near the selected</label>
+                </div>
+                <div class="col-6">
+                  <div class="row">
+                    <div class="col-6">
+                      <input class="form-control" type="number" min="1" max="12" id="layer_input_neighbours" name="layer_input_neighbours" value="1" aria-describedby="layer_input_neighbours_help"/>
+                      <small id="layer_input_neighbours_help" class="form-text text-muted">Layer (1-12)</small>
+                    </div>
+                    <div class="col-6">
+                      <input class="form-control" type="number" min="1" max="12" id="head_input_neighbours" name="head_input_neighbours" value="1" aria-describedby="head_input_neighbours_help"/>
+                      <small id="head_input_neighbours_help" class="form-text text-muted">Head (1-12)</small>
+                    </div>
+                  </div>
+                  <br />
+                  <a class="btn btn-warning" href="#explore-neighbours" id="explore-neighbours" name="explore-neighbours">Neighbourhood Self-Attention</a>
+                </div>
+              </div>
+              
             </div>
-
+            
           </div>
-
+          <!-- <hr /> -->
+          
         </div>
-        <hr />
-
-        <div id="show-simmilar">
-          <button type="button" class="btn btn-primary" name="show-similar" id="show-similar">Show similar sentences</button>
-          <br /><br />
-          <a href="#show-simmilar" id="toggle_ents_sim_sents">Toggle Entities</a>
-          <a href="#toggle-identical-words" id="toggle_identical_words_sim_sents_button">Toggle identical words</a>
-          <div id="similar-sents-display">
-
-          </div>
-          <div id="similar_sents_display_plain">
-
-          </div>
-        </div>
+        
       </div>
     </div>
     <br />
@@ -199,30 +250,27 @@
     <div class="row rules">
 
       <br />
-      <div class="col-md-6 col-sm-12">
+      <!-- <div class="col-md-6 col-sm-12">
 
         <div class="card" style="">
           <div class="card-body">
-            <h5 class="card-title">Split-Rule</h5>
-            <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+            <h5 class="card-title">Split-Rule</h5>            
             <p class="card-text">
               <label>
-                <!-- for="split-rule"> -->
                 Split the sentence in sub-sentences and plot the embeddings of each sentence
               </label>
               <button id="split-rule" name="split-rule" type="button" class="btn btn-outline-primary btn-block">Split</button>
             </p>
           </div>
         </div>
-      </div>
+      </div> -->
 
   		<!-- <br /> -->
 
-      <div class="col-md-6 col-sm-12">
+      <!-- <div class="col-md-6 col-sm-12">
     		<div class="card">
     		  <div class="card-body">
     		    <h5 class="card-title">Test-Rule</h5>
-    		    <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
     		    <p class="card-text">
     					<label>
     						 Enter your own sentence, plot it and get the predicted sentiment.
@@ -232,12 +280,27 @@
     				</p>
     		  </div>
     		</div>
-      </div>
+      </div> -->
 
     </div>
 
 		<br />
 	</div>
+  
+  <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;" id="toast-modal">
+    <div class="toast" style="position: absolute; top: 0; right: 0;">
+      <div class="toast-header">
+        <i class="material-icons">info-outline</i>
+        <strong class="mr-auto">Information</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>      
+      <div class="toast-body" id="toast-msg">
+        Hello, world! This is a toast message.
+      </div>
+    </div>
+  </div>
 
 </div>
 {% endblock %}

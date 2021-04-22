@@ -121,3 +121,14 @@
 #sim-sent-spinner {
   margin: auto !important;
 }
+
+.material-icons:hover {
+  cursor: pointer;
+}
+
+
+.search-seg {
+  font-size: 0.85em;
+}
+
+/* .show-similar */
