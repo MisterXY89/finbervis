@@ -135,6 +135,11 @@ class Interface:
         #     df.write(str(attention_list))
         # print(attention_list)'
         return attention_list
+        
+    def get_tokens(self, segment):
+        input_ids = self.tokenizer.encode(segment)
+        tokenized_text = self.tokenizer.convert_ids_to_tokens(input_ids)
+        return tokenized_text        
 
     def get_text_by_id(self, id):
         return list(self.search(seg_id=id)["segment"])[0]
@@ -145,15 +150,15 @@ class Interface:
         if return_sents:
             for d in dists:
                 # index 10 for layer 11
-                # attention_list = [self.get_attention_for_segment(d["segment"], layer=10, head=head) for head in range(12)]
-                # attention_list
-                d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)
-                # d["segment"] = f"[CLS] {d['segment']} [SEP]"
+                d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)    
+                d["tokens"] = self.get_tokens(d["segment"])                
         return dists
 
     def search(self, seg_id=None, q=None):
         if seg_id:
             return self.dist.df.query(f"id == {seg_id}")
+        if q == "=all":
+            return self.dist.df
         if q[-1] == " ":
             q = q[0:-1]
         return self.dist.df[self.dist.df['segment'].str.contains(q)]
