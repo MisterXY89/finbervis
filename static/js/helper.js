@@ -2,8 +2,12 @@
 var PLOT_ID = "#plot";
 var SELECT_COLOR = "#ce0c0f";
 var SELECT_RADIUS = 8;
+function toast_msg(msg) {
+    $("#toast-msg").html("hey");
+    $("#toast-modal").toast("show");
+}
 function get_sentiment_html(sent) {
-    return "<span class=\"badge badge-pill class-" + sent + "\">" + sent + "</span>";
+    return "<span class=\"badge badge-pill class-" + sent + "\" style=\"line-height:1.5em;\">" + sent + "</span>";
 }
 function get_max_value(str_props, pretty) {
     pretty = pretty == undefined ? false : pretty;
@@ -36,6 +40,7 @@ function click_point(d) {
     attention_interaction_group.style("opacity", 1);
     d3.select("#user-classification").style("display", "block");
     d3.select("#point_id_display").html("#<span id='point_id'>" + d.id + "</span>");
+    var split_html = '<span> | <a href="#split" id="split-rule">Split</a></span>';
     SideBar
         .html('<table style="width:100%">'
         // + '<tr>'
@@ -49,7 +54,7 @@ function click_point(d) {
         // + `<input type="hidden" value="${d.id}" id="point_id"/>`
         + '<tr>'
         + '<th>Sentiment</th>'
-        + ("<td id=\"model-sentiment\">" + get_sentiment_html(d.sentiment) + "</td>")
+        + ("<td id=\"model-sentiment\"><div class=\"row\">" + get_sentiment_html(d.sentiment) + " <i class=\"material-icons\" data-toggle=\"modal\" data-target=\"#userClassificationModal\" id=\"confirm-user-classification-sentiment\">edit</i></div></td>")
         + '</tr>'
         + '<tr>'
         + '<th>Probability</th>'
@@ -57,7 +62,7 @@ function click_point(d) {
         + '</tr>'
         + '</table>'
         + '<hr />'
-        + "<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span>"
+        + ("<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span> " + split_html)
         + ("<p id='selected-segment'>" + d.segment + "</p>")
         + "<p id='selected-segment-ents'>Loading</p>");
     window.d = d;
@@ -144,7 +149,9 @@ function add_labeled_record(sentiment, segment) {
     }).then(function (resp) { return resp.json(); })
         .then(function (json) {
         if (json["status"]) {
-            alert("Entry added");
+            // alert("Entry added");
+            toast_msg("New sentiment added!");
+            $("#userClassificationModal").modal("hide");
             window.added_segment = segment;
         }
         // console.log(json);
