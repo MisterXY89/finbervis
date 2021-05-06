@@ -25,11 +25,13 @@ def index():
 
 
 @app.route('/data/<path:path>')
-def send_js(path):
+def send_data(path):
     """
     enable reading from data folder
     """
-    return send_from_directory('data', path)
+    response = send_from_directory('data', path)
+    # response.cache_control.max_age = 120
+    return response
 
 @app.route("/split_rule")
 def split_rule():
@@ -127,6 +129,7 @@ def add_labeled_record():
 
 @app.route("/get_similar_segments")
 def get_similar_segments():
+	print("sim")
 	req_data = request.args
 	# if 2<3:
 	# 	time.sleep(2)
@@ -145,7 +148,9 @@ def get_similar_segments():
 		else:
 			return_sents = False
 		result = interface.get_similar_sents(id=seq_id,n=n,return_sents=return_sents)
-		ent_html = interface.get_ents_vis(result)
+		ent_html = interface.get_ents_vis(result)		
+		
+		print(result)
 		
 		status = True
 
@@ -208,9 +213,11 @@ def search():
 	if not "seg_id" in req_data and not "q" in req_data:
 		status = False
 		result = f"Error: 'not <seg_id> or <q> in req_data'\n{req_data=}"
-	else:
+	else:		
 		seg_id = int(req_data["seg_id"]) if ("seg_id" in req_data) else None
 		q = req_data["q"] if ("q" in req_data) else None
+		# if q == "=all":
+		# 	return render_template("includes/all_search.html")
 		result = interface.search(seg_id=seg_id, q=q)
 		status = True
 
@@ -223,6 +230,9 @@ def search():
 			"x": float(row.x),
 			"y": float(row.y),
 			"props": str(row.props),
+			"tokens": row.tokens,
+			"saliency_score": row.saliency_score,
+			"mean_attention": row.mean_attention
 			# "embeddings": row.embeddings,,
 		})
 	return jsonify({
