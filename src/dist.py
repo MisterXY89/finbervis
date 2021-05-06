@@ -54,7 +54,10 @@ class Dist:
                     "id": int(row["id"]),
                     "segment": row["segment"],
                     "sentiment": row["sentiment"],
-                    "props": row["props"],                    
+                    "props": row["props"],
+                    "saliency_score": row["saliency_score"],
+                    "tokens": row["tokens"],
+                    "mean_attention": row["mean_attention"]
                 })
             return full_sents
         return sents_index
