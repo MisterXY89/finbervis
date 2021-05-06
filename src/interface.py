@@ -29,30 +29,15 @@ class Interface:
         self.tokenizer = self.bert_preprocesser.tokenizer
         self.nlp = spacy.load('en_core_web_sm')        
         self.dist = Dist()
-        self.sal_calc = SaliencyCalculator(self.tokenizer, self.sent_pred.model)
-            
+        self.sal_calc = SaliencyCalculator(self.tokenizer, self.sent_pred.model)            
 
     def get_embeddings(self, segment):
-        input_ids = self.bert_preprocesser.tokenize_segments_to_id([segment])
-        # segments_ids = [1]*len(input_ids)
-        # segments_tensors = torch.tensor([segments_ids])
-        # print(input_ids)
+        input_ids = self.bert_preprocesser.tokenize_segments_to_id([segment])        
         input_ids = torch.tensor(input_ids)#.unsqueeze(0)
 
         # input_ids = torch.tensor(self.tokenizer.encode(segment)).unsqueeze(0) # Batch size 1
         print(input_ids)
-
-        outputs = self.sent_pred.model(input_ids, output_hidden_states=True)
-        # 'attentions', 'clear', 'copy', 'fromkeys', 'get', 'hidden_states', 'items',
-        # 'keys', 'logits', 'loss', 'move_to_end', 'pop', 'popitem', 'setdefault', 'to_tuple', 'update', 'values'
-        # print(outputs)
-        # layer, layer 11 (0 = initial )
-        # print(outputs[1][0])
-        # hs = outputs["hidden_states"]
-        # 0 = embeddings
-        # one for the output of the embeddings + one for the output of each layer
-        # layer 11 = index 11
-        # Hidde n-states of the model at the output of each layer plus the initial embedding outputs.
+        outputs = self.sent_pred.model(input_ids, output_hidden_states=True)        
         outputs = outputs[1][11][0]
         cls_embedding = outputs[0]
         print(len(cls_embedding))
@@ -107,15 +92,12 @@ class Interface:
         return attentions[0][head].tolist()
 
     def get_ents_vis(self, sentences, dict=True):
-        # print(sentences[0])
-        # print(sentences[0]["segment"])
-        # print(sentences[0].keys())
         print(len(sentences))
         if not dict:
             sentences = [self.nlp(s) for s in sentences]
         else:
             sentences = [self.nlp(s["segment"]) for s in sentences]
-        html = displacy.render(sentences, style="ent", minify=False) #page=True)
+        html = displacy.render(sentences, style="ent", minify=False)
         html = "</div><hr>".join(html.split("</div>"))
         return html
 
@@ -139,19 +121,14 @@ class Interface:
     def get_tokens(self, segment):
         input_ids = self.tokenizer.encode(segment)
         tokenized_text = self.tokenizer.convert_ids_to_tokens(input_ids)
-        return tokenized_text        
+        return tokenized_text
 
     def get_text_by_id(self, id):
         return list(self.search(seg_id=id)["segment"])[0]
 
     def get_similar_sents(self, id=0, n=5, return_sents=False):
         print(id)
-        dists = self.dist.get_similar_sents_for(id=id, n=n, return_sents=return_sents)
-        if return_sents:
-            for d in dists:
-                # index 10 for layer 11
-                d["attention"] = self.get_mean_attention_for_layer(d["segment"], 10)    
-                d["tokens"] = self.get_tokens(d["segment"])                
+        dists = self.dist.get_similar_sents_for(id=id, n=n, return_sents=return_sents)        
         return dists
 
     def search(self, seg_id=None, q=None):
