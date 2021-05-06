@@ -6,31 +6,24 @@ from tqdm import tqdm
 
 import plotly.express as px
 
-from .config import CLUSTER_DATASET_FILE
-from .predict import SentimentPredictor
-from .bert_preprocess import get_tokenizer
+from config import NEW_EMBS_FILE
 
-data = pd.read_csv(CLUSTER_DATASET_FILE)
+# data = pd.read_csv(CLUSTER_DATASET_FILE)
 
-segments = list(data["segment"])
+# segments = list(data["segment"])
 
-sent_pred = SentimentPredictor()
-sent_pred.load_model()
-tokenizer = get_tokenizer()
+from interface import Interface
 
-def get_attention_for_segment(self, segment, layer):
-    input_ids = torch.tensor(tokenizer.encode(segment)).unsqueeze(0)
-    outputs = sent_pred.model(input_ids, return_dict=True, output_attentions=True)
-    attentions = outputs["attentions"][layer] # index indicates layer
-    attentions = attentions.detach().numpy()
-    return attentions
+interface = Interface()
 
-# 12x27
-# batch_size, num_heads, sequence_length, sequence_length
-#[head][token_index] (START....END)
-at = get_attention_for_segment("", segments[0], 11)[0]
-# print(at)
-print(len(at))
+print(interface.dist.df)
+print(interface.dist.df.mean_attention)
 
-fig = px.imshow(at)
-fig.show()
+segments = list(interface.dist.df.segment)
+mean_attention_list = []
+for seg in tqdm(segments):
+    seg_mean_att = interface.get_mean_attention_for_layer(seg, 10)
+    mean_attention_list.append(seg_mean_att)
+
+interface.dist.df["mean_attention"] = mean_attention_list
+interface.dist.df.to_csv(NEW_EMBS_FILE, index=False, encoding="utf-8")    
