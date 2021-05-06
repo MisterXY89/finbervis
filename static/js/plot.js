@@ -1,7 +1,7 @@
 "use strict";
 var DATA_DIR = "./data";
-var CLUSTER_FILE = DATA_DIR + "/projection_with_full_sents_SENT_PROPS.csv";
-var CLUSTER_FILE = DATA_DIR + "/data.csv";
+// const DATA_FILE:string = `${DATA_DIR}/projection_with_full_sents_SENT_PROPS.csv`;
+var DATA_FILE = DATA_DIR + "/data.csv";
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 // "#336338" = more medium sea blue
@@ -45,7 +45,7 @@ var height = 750;
 var visWidth = width - margins.left - margins.right;
 var visHeight = height - margins.top - margins.bottom;
 // append the svg object to the body of the page
-// console.log(`> Loading file: ${CLUSTER_FILE}`);
+// console.log(`> Loading file: ${DATA_FILE}`);
 var x = d3.scaleLinear()
     .domain([-10, 20])
     .range([0, width]);
@@ -263,10 +263,11 @@ function create_scatter_plot(data) {
 }
 function scatter_plot(custom_data) {
     custom_data = (custom_data == undefined) ? false : custom_data;
-    d3.csv(CLUSTER_FILE, function (data) {
+    d3.csv(DATA_FILE, function (data) {
         if (custom_data != {}) {
             data.push(custom_data);
         }
+        console.log(data);
         create_scatter_plot(data);
         var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
         var sliderRange = d3

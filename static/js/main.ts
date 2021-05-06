@@ -37,6 +37,10 @@ function toggle_ents () {
 	});
 }
 
+function to_array(string) {
+	return string.slice(1, -1).split(", ").map(el => Number(el));
+}
+
 function get_segment_html(seg) {
 	// type="button" class="btn btn-secondary"
 	return `<div class="search-seg" title="${seg}">
@@ -54,7 +58,8 @@ function prep_search_vis(res) {
 	  	+ '<div class="card-body">'
 				+ `<div class="card-title row">`
 					+ `<div class="col-8">`				
-						+ `<h5>Result #${i+1}</h5>`
+						// + `<h5>Result #${i+1}</h5>`
+							+ `<strong>Segment</strong> <span class="text-muted">#${element.id}</span><br>`
 					+ `</div>`
 					+ `<div class="col-4">`
 						+ `<a href="#" class="btn btn-primary" onclick='click_point(${i});'>Select</a>`
@@ -62,7 +67,7 @@ function prep_search_vis(res) {
 				+ `</div>`
 	    	+ `<p class="card-text">`
 					// + `<strong>ID</strong> ${element.id}<hr>`
-					+ `<strong>Segment</strong> <span class="text-muted">#${element.id}</span><br>${get_segment_html(element.segment)}<br>`
+					+ `${get_segment_html(element.segment)}<br>`
 					+ `<div class="row">`
 						+ `<div class="col-8">`
 							+ `<strong>Sentiment</strong>`
@@ -156,8 +161,8 @@ function get_saliency_scores(el, seg_id) {
 	return 1;
 }
 
-function get_mean_attention_html(tokens, attention) {
-	// let tokens = sent.split(" ");
+function get_mean_attention_html(tokens, attention, sent) {
+	// tokens = ("[CLS]" + sent).split(" ");
 	let att_html = "";
 	tokens.forEach((tok, i) => {
 		tok = tok.replace("##", "");
@@ -169,6 +174,7 @@ function get_mean_attention_html(tokens, attention) {
 			// white edf6f9
 			// ffb600 - warm yellow
 			// ff4800 - warm orange
+		console.log(attention[i]);
 		let color_val = color(attention[i]);
 		att_html += `<span style="border-top: 3px ${color_val} solid;">${tok} </span>`;
 
@@ -177,30 +183,124 @@ function get_mean_attention_html(tokens, attention) {
 }
 
 function search_data(search_q) {
-	let params = "";
+	let params = "";	
 	if (search_q[0] == "#") {
 		params = `?seg_id=${search_q.slice(1)}` : "";
 	} else {
 		params = `?q=${search_q}`;
 	}
 	let url = `/search${params}`;
+	
+	
 	fetch(url)
-	.then(resp => resp.json())
+	.then(resp => {
+		if (search_q == ")()UJIH=all") {
+			return resp.text();
+		} 
+		return resp.json();
+	})
 	.then(json => {
-		let res = json.result;
-		console.log(res);
+		console.log(json);
 		$("#search_results-wrapper").show();
-		d3.select("#search-results").html(prep_search_vis(res));
-		d3.select("#total-results").text(res.length);
-		if (search_q == "=all") {
+		if (search_q == "OJOJOJOO =all") {
+			alert("=all");
 			$("#search-header").html("All Segments");
-		} else {			
-			$("#search-header").html("Filtered Segments");
-		}
+			$("#search-results").html(json);
+			$("#search-results").show();
+		} else {
+			let res = json.result;
+			console.log(res);
+			d3.select("#search-results").html(prep_search_vis(res));
+			d3.select("#total-results").text(res.length);
+		}			
 	});
 }
 
+function extract_ents_json(html, res) {
+	let json = [];
+	var doc = document.createElement('html');
+	doc.innerHTML = html;
+	let ents = Array.from(doc.getElementsByClassName("entities"))//.slice(1);
+	console.log(ents);
+	console.log(ents.length);
+	// html = 
+	ents.forEach((ent_sent, i) => {
+		console.log("#### SENT ", i);
+		let curr_i = 0;
+		Array.from(ent_sent.getElementsByTagName("mark")).forEach((el, mark_i) => {
+			console.log("-----");
+			let el_toks = el.textContent;
+			let el_style = el.style;
+			let el_ent_type = el.getElementsByTagName("span")[0].textContent;
+			el_toks = el_toks.replace(el_ent_type, "").replace(/\n/g, "").replace(/\s\s+/g, " ");
+			el_toks = (el_toks[0] == " ") ? el_toks.slice(1) : el_toks;
+			el_toks = (el_toks[el_toks.length-1][-1] == " ") ? el_toks.slice(-1) : el_toks;
+			el_toks = el_toks.split(" ").filter(el => el.length > 0);
+			let el_toks_copy = [];
+			el_toks.forEach(et => {
+				if(et.includes(",")) {
+					let ets = et.split(",");
+					el_toks_copy.push(ets[0]);
+					el_toks_copy.push(",");
+					el_toks_copy.push(ets[1]);
+				} else {
+					el_toks_copy.push(et);
+				}				
+			});
+			el_toks = el_toks_copy;
+			// let el_tok_index = ent_sent.textContent.slice(curr_i, Number(ent_sent.textContent.slice(curr_i).indexOf(el_toks.join(" "))) +el_toks.join(" ").length+curr_i).split(" ").map(el => el.replace(/\n/g, "")).filter(el => el.length > 0).length-el_toks.length-6;
+			let split_index_end = ent_sent.textContent.slice(curr_i).indexOf(el_toks.join(" "));
+			if (split_index_end == -1) {
+				split_index_end = ent_sent.textContent.slice(curr_i).indexOf(el_toks[0]);
+			}
+			split_index_end += el_toks.join(" ").length
+			let el_tok_index = ent_sent.textContent.slice(0, split_index_end).split(" ").map(el => el.replace(/\n/g, "")).filter(el => el.length > 0).length -5;
+			curr_i = el_tok_index;
+			console.log(el_toks);
+			console.log(el_tok_index);
+			el_toks = el_toks.map(s => s.toLowerCase());
+			// console.log(el_ent_type);
+			// console.log(el_toks);
+			
+			let count = el_toks.length;
+			
+			if (res[i]["entity_styles"] == undefined) {
+				res[i]["entity_styles"] = {};				
+			} 
+			if (res[i]["entities"] == undefined) {				
+				res[i]["entities"] = []
+			}
+			res[i]["entity_styles"][el_ent_type] = el_style;
+			res[i].tokens.forEach((tok, tok_i) => {
+					if (count == 0 && res[i]["entities"].length == res[i].tokens.length) {
+						return;
+					}
+					let push_ent_type = "";
+					
+					if (res[i]["entities"][tok_i] == undefined) {
+						res[i]["entities"][tok_i] = "";
+					}
+										
+					if (res[i]["entities"][tok_i] == "") {
+						console.log(tok_i, tok);
+						if(el_toks.includes(tok) && tok_i >= el_tok_index && tok_i <= el_tok_index+12) {
+							console.log("SAME");
+							console.log(el_ent_type);
+							push_ent_type = `${el_ent_type}_${mark_i}`;
+							count --;
+						}				
+						res[i]["entities"][tok_i] = push_ent_type;
+						console.log(res[i]["entities"]);
+					}					
+			});
+	 });
+ });
+ return res;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+	
+	document.getElementById("show-similar").disabled = true;
 		
 	search_data("=all");
 	$('.toast').toast();
@@ -236,6 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const split_rule_button = d3.select("#split-rule");
 	const toggle_mean_attention_button = d3.select("#toggle_mean_attention");
 	const similar_sents_display_attention = d3.select("#similar_sents_display_attention");
+	const toggle_gradients_button = d3.select("#toggle_gradients");
 
 
 	test_rule_button.on("click", () => {
@@ -256,6 +357,40 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 
 	});
+	
+	toggle_gradients_button.on("click", () => {
+		$("#similar-sents-display").show();
+		$("#similar-sents-ents-display").hide();
+		
+		Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
+			Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
+				let sal_scores = window.sim_res[sent_i]["saliency_score"];
+				sal_scores = to_array(sal_scores);
+				let opacity = Math.abs(sal_scores[span_i]);
+				let token_grad_color = "158,100,229";
+				if (sal_scores[span_i] > 0) { // check what is what
+					token_grad_color = "171,229,100";
+				} 
+				let color = `rgba(${token_grad_color}, ${opacity})`;
+				
+				if (span.classList.contains("identical-token")) {
+					span.classList.remove("identical-token");
+				}
+				
+				if (span.classList.contains("identical-token-stopword")) {
+					span.classList.remove("identical-token-stopword");
+				}
+				
+				if (span.classList.contains("saliency-active")) {
+					span.style.backgroundColor = "transparent";
+					span.classList.remove("saliency-active");
+				} else {					
+					span.style.backgroundColor = color;		
+					span.classList.add("saliency-active");
+				}
+			});
+		});
+	});
 
 
 	show_similar_sents_button.on("click", () => {
@@ -269,32 +404,56 @@ document.addEventListener("DOMContentLoaded", () => {
 		.then(resp => resp.json())
 		.then(json => {
 			let res = json.result;
-			console.log(res);
-			// let plain_sents = res.map(el => el.segment);
-			let sents_html = json.ent_html;
-			let new_origin = json.origin_sent_ent_html;
-			let plain_sents_html = "";
-			let similar_sents_display_attention_html = "";
-			let sal_calc_icon = '<i class="material-icons" id="graph_icon">insert_chart</i>';
-			let spinner_html = `<div class="spinner-border text-secondary text-center saliency-calc-spinner" role="status">
-				<span class="sr-only">Loading...</span>
-			</div>`;
-			let img_html = (seg_id) => `<a href="#saliency_calc" onclick="get_saliency_scores(this, ${seg_id});">${spinner_html}${sal_calc_icon}</a><br>`;
-			res.forEach((s) => {
-				plain_sents_html+= `<div class="row"><div class="col-10"><div class="plain-text">${s.segment}</div></div><div class="col-2">${img_html(s.id)}${get_sentiment_html(s.sentiment)}</div></div><hr>`;
-				similar_sents_display_attention_html +=`<div class="row">${get_mean_attention_html(s.tokens, s.attention)}</div></hr>`;
+			res = res.map(el => {
+				return {
+					id: el.id, 
+					mean_attention: el.mean_attention, 
+					props: el.props,
+					saliency_score: el.saliency_score,
+					segment: el.segment,
+					sentiment: el.sentiment,
+					tokens: tok_to_array(el.tokens)
+				}
 			});
+			
+			window.sim_res = res;
+			console.log(res);
+			
+			let ents_html = json.ent_html;
+			// let ents_json = extract_ents_json(ents_html, res);
+			// console.log(ents_json);
+			
+			let new_origin = json.origin_sent_ent_html;			
+			let sim_sent_html = "";
+			
+			res.forEach(el => {				
+				sim_sent_html += `<div class='row'>
+				<div class='sim-sentence col-10'> 
+					${el.tokens.map(tok => `<span>${tok}</span> `).join(" ")} 
+				</div>
+				<div class='col-2'>
+					<span class='text-muted'>ID: #${el.id}</span> <br>
+					<span class='text-muted'>${get_max_value(el.props, true)}</span> <br>
+					${get_sentiment_html(el.sentiment)} <br>
+				</div>
+			</div>
+			<hr/>`;
+			});
+			
+			
+			$("#similar-sents-display").css("opacity", 1);
+			$("#similar-sents-ents-display").css("opacity", 1);
+			
+			$("#similar-sents-display").html(sim_sent_html);
+			$("#selected-segment-ents").html(new_origin);
+			$("#similar-sents-ents-display").html(ents_html);
+			
 			$("#toggle_ents_sim_sents").show();
+			$("#toggle_mean_attention").show();
 			$("#toggle_identical_words_sim_sents_button").show();
-			d3.select("#selected-segment-ents").html(new_origin);
-			similar_sents_display.html(sents_html);
-			similar_sents_display_plain.html(plain_sents_html);
-			similar_sents_display_attention.html(similar_sents_display_attention_html);
+			$("#toggle_gradients").show();
 			
-			similar_sents_display.style("display", "none");
-			similar_sents_display_plain.style("display", "block");
-			
-			$("#sim-sent-spinner").hide();
+			$("#sim-sent-spinner").toggle();
 			document.getElementById("show-similar").disabled = false;
 			
 		});
@@ -302,59 +461,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	toggle_ents_sim_sents_button.on("click", () => {
 		$("#similar-sents-display").toggle();
-		$("#similar_sents_display_plain").toggle();		
+		$("#similar-sents-ents-display").toggle();		
 	});
 	
 	toggle_mean_attention_button.on("click", () => {
-		$("#similar_sents_display_attention").toggle();
-		$("#similar_sents_display_plain").toggle();
-		$("#similar_sents_display_plain").hide();
-		$("#similar-sents-display").hide();
+		$("#similar-sents-display").show();
+		$("#similar-sents-ents-display").hide();
+		
+		Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
+			let mean_attention = window.sim_res[sent_i]["mean_attention"];
+			mean_attention = to_array(mean_attention);
+			// console.log(mean_attention);
+			Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
+				// console.log(mean_attention[span_i]);
+				var color = d3.scaleLinear()
+					.domain([0, 1])
+					.range(["#b3b5b5", "#b30017"]);   // output for opacity between .3 and 1 %
+				
+				let color_val = color(mean_attention[span_i]);
+				// console.log(color_val);
+				if (span.style.borderTop == "none" || span.style.borderTop == "") {
+					span.style.borderTop = `3px solid ${color_val}`;					
+				} else {
+					span.style.borderTop = "none";
+				}
+				
+			});
+		});
 	});
 	
 
 	toggle_identical_words_sim_sents_button.on("click", () => {
-		let segment_select_display = window.segment.toLowerCase();
-		let active_dispaly;
-		if ($("#similar-sents-display").css("display") == "block") {
-			active_dispaly = $("#similar-sents-display");
-		} else {
-			active_dispaly = $("#similar_sents_display_plain");
-		}
-
-		if (active_dispaly.html().includes("identical-token")) {
-			console.log("EXISTING")
-			// toggle & return
-			console.log($(".identical-token").first().css("background-color"));
-			let bg_color = $(".identical-token").first().css("background-color");
-			if (bg_color != "rgba(0, 0, 0, 0)") {
-				$(".identical-token").css("background-color", "transparent");
-			} else {
-				$(".identical-token").css("background-color", "yellow");
-			}
-			return 1;
-		}
-
-		let segment_select_tokens = segment_select_display.split(" ");
-		let similiar_sents = active_dispaly.html().split("<hr>")
-
-		let check = (sent) => {
-		  return sent.split(" ").map(token => {
-				let token_low = token.toLowerCase();
+		// let segment_select_display = window.tokens.toLowerCase();
+		let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
+		
+		Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
+			Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
+				let token_low = span.textContent;
+				if (span.backgroundColor != "") {						
+					span.style.backgroundColor = "";
+					span.classList.remove("saliency-active");
+				}
 				if (segment_select_tokens.includes(token_low)) {
-					let class_name = "identical-token";
+					let class_name = "identical-token";					
 					if (stop_words.includes(token_low)) {
 							class_name += ` ${class_name}-stopword`;
 					}
-					return `<span class='${class_name}'>${token}</span>`;
+					if (span.classList.contains("identical-token")) {
+						span.classList.remove("identical-token");
+						if (span.classList.contains("identical-token-stopword")) {
+							span.classList.remove("identical-token-stopword");
+						}
+					} else {
+						class_name.split(" ").forEach(n => span.classList.add(n));
+					}
 				}
-				return token;
-			}).join(" ");
-		}
+			});
+		});
+		
 
-		similiar_sents = similiar_sents.map(sent => check(sent));
-		active_dispaly.html(similiar_sents.join("<hr>"))
-
+	});
+	
+	$("#saliency-show-selected-segment").click(() => {
+		// show ...
 	});
 
 

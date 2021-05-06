@@ -13,6 +13,12 @@
 }
 
 
+.sim-sentence span {
+  padding: 2.5px;
+  line-height: 1.2em;
+  border-top: none;
+}
+
 #spinning-overlay {
   width: 100%;
   height: 100%;
@@ -94,7 +100,10 @@
 #toggle_identical_words_sim_sents_button,
 #user-classification,
 #sim-sent-spinner,
-.saliency-calc-spinner
+.saliency-calc-spinner,
+#toggle_mean_attention,
+#similar-sents-ents-display,
+#toggle_gradients
 {
   display: none;
 }

@@ -27,7 +27,15 @@ function get_max_value(str_props, pretty) {
 	return max_val;
 }
 
+function tok_to_array(string) {
+	return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(el => el.slice(0, -1))	
+}
+
 function click_point(d: any) {
+	
+	document.getElementById("show-similar").disabled = false;
+	$("#similar-sents-display").css("opacity", 0.5);
+	$("#similar-sents-ents-display").css("opacity", 0.5);
 	console.log(d);
 
 	let current_target;
@@ -48,6 +56,7 @@ function click_point(d: any) {
 	d3.select("#point_id_display").html(`#<span id='point_id'>${d.id}</span>`);
 	
 	let split_html = '<span> | <a href="#split" id="split-rule">Split</a></span>';
+	let sal_html = '<span> | <a href="#split" id="saliency-show-selected-segment">Gradients</a></span>';
 	SideBar
 		.html(
 			'<table style="width:100%">'
@@ -70,7 +79,7 @@ function click_point(d: any) {
 					+ '</tr>'
 			+ '</table>'
 			+ '<hr />'
-			+ `<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick="toggle_ents();">Toggle Entities</a></span> ${split_html}`
+			+ `<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick="toggle_ents();">Toggle Entities</a></span> ${split_html} ${sal_html}`
 			+ `<p id='selected-segment'>${d.segment}</p>`
 			+ `<p id='selected-segment-ents'>Loading</p>`,
 		)
