@@ -2,6 +2,8 @@
 import os
 import sys
 import umap
+import numba
+import pickle
 import numpy as np
 import pandas as pd
 
@@ -22,50 +24,67 @@ NEW_EMBS_FILE = f"{DATA_DIR}/{NEW_EMBS_FILENAME}"
 data = pd.read_csv(NEW_EMBS_FILE)
 # print(data.head())
 
-def get_segment_vectors(df, f=0, t=100):
-    embeddings = df.cls_embs
-    values = list(embeddings.apply(lambda r: list(filter(lambda x: len(x) > 1, r[:-1][1:].split(",")))))[f:t]
-    print(len(values))
-    segment_vectors = np.array(list(map(lambda e: np.array(list(map(float, e))), values)))
+def get_segment_vectors(df, f=0, t=50):
+    cls_embeddings = df.cls_embs
+    cls_values = list(cls_embeddings.apply(lambda r: list(filter(lambda x: len(x) > 1, r[:-1][1:].split(",")))))
+    segment_vectors = np.array(list(map(lambda e: np.array(list(map(float, e))), cls_values)))
     return segment_vectors
 
-
-X = get_segment_vectors(data)
-print(X)
-print(dir(X))
-# print(len(X))
+embs = np.array(get_segment_vectors(data))
+X = [embs, embs]
 print("fitting UMAP")
 
-# sys.exit(0)
-
-relation_dict = {i:i for i in range(X.size)}
-relation_dicts = [relation_dict.copy() for i in range(X.size - 1)]
-
-# plt.matshow(ordered_digits[-1].reshape((8,8)))
-
-# print(relation_dicts)
-print(len(relation_dicts))
+relation_dict_training = {i:i for i in range(len(embs))}
+relation_dicts_training = [relation_dict_training]
 
 reducer = umap.AlignedUMAP()
+print(dir(reducer))
+
+reducer.fit(X, relations = relation_dicts_training)
+
+new_vecs = get_segment_vectors(data, f=200, t=220)
+relation_dict_up = {i:i for i in range(len(embs)+len(new_vecs)+20)}
+
+# reducer.update(new_vecs, relations = relation_dict_up)
+
+
+# print(reducer.embeddings_)
 # print(dir(reducer))
-print(X)
-print(X.shape)
-print(len(X))
-coords = reducer.fit(X, relations = relation_dicts)
 
-print(coords)
-print(coords.shape)
+state = reducer.__getstate__()
+print(state)
 
-Y = get_segment_vectors(data, f=200, t=220)
-new_coords = reducer.update(Y)
+for key in state.keys():    
+    print(f"{key}: {type(state[key])}")
+    
+    
+for map in state["mappers_"]:
+    print(map)
+    print(type(map))
 
-print(new_coords)
+reducer_embs = reducer.embeddings_
+reducer.embeddings_ = []
+
+print(type(reducer_embs[0]))
+print(reducer_embs[0])
+print(type(reducer_embs[0][0]))
+print(reducer_embs[0][0])
+print(type(reducer_embs[0][0][0]))
+print(reducer_embs[0][0][0])
+
+reducer_embs_list = [list(rel) for rel in list(reducer_embs)]
+
+print(type(reducer_embs_list))
+print(type(reducer_embs_list[0]))
+print(type(reducer_embs_list[0][0]))
+print(type(reducer_embs_list[0][0][0]))
+
+with open(f"{DATA_DIR}/reducer.pk", "wb") as file:
+    pickle.dump(reducer, file) # protocol=pickle.HIGHEST_PROTOCOL
+
+with open(f"{DATA_DIR}/reducer_embs.pk", "wb") as file:
+    pickle.dump(reducer_embs_list, file)
 
 
-plt.scatter(
-    coords[:, 0],
-    coords[:, 1])
-plt.gca().set_aspect('equal', 'datalim')
-plt.title('UMAP projection of CLS_EMBS', fontsize=24)
-
-plt.show()
+    
+    
