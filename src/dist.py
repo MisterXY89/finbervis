@@ -5,7 +5,10 @@ from scipy.spatial import distance
 from fastdist import fastdist
 
 
-from .config import CLUSTER_DATASET_FILE, NEW_EMBS_FILE
+from .config import (
+    CLUSTER_DATASET_FILE, 
+    NEW_EMBS_FILE
+)
 
 
 class Dist:
@@ -13,7 +16,7 @@ class Dist:
     calculate dist matrix + get most similar sentences
     """
 
-    def __init__(self, threshold = 1):
+    def __init__(self, threshold = 10):
         self.DIST_THRESHOLD = threshold
         self.df = pd.read_csv(NEW_EMBS_FILE)
         self.dist_matrix = self.get_dist_matrix(self.df)
@@ -33,11 +36,16 @@ class Dist:
         )
 
     def update_df(self, dp):
-        print(dp)
-        print(dp["props"])
-        self.df.loc[len(self.df.index)] = [dp["segment"], dp["sentiment"],
-                                        dp["embeddings"], dp["cluster"],
-                                        dp["x"], dp["y"], dp["id"], dp["props"]]
+        """
+        Index(['segment', 'sentiment', 'embeddings', 'props', 'cls_embs', 'cluster',
+       'x', 'y', 'id', 'mean_attention', 'tokens', 'saliency_score',
+       'truth_label'],
+        """
+        self.df.loc[len(self.df)] = [dp["segment"], dp["sentiment"],
+                                        [], dp["props"], dp["embeddings"], -1,
+                                        dp["x"], dp["y"], dp["id"], [], 
+                                        dp["tokens"], [], "not set"
+                                    ]
 
     def get_similar_sents_for(self, id=0, n=5, return_sents=False):
         # via head & tail cut of self-dist = 0
