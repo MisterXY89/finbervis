@@ -2,6 +2,7 @@
 import os
 import time
 import json
+import numpy as np
 from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory, jsonify, make_response
 
 from src import interface
@@ -151,9 +152,8 @@ def get_similar_segments():
 		else:
 			return_sents = False
 		result = interface.get_similar_sents(id=seq_id,n=n,return_sents=return_sents)
-		ent_html = interface.get_ents_vis(result)		
-		
-		print(result)
+		result = interface.get_entities_for_tokens(result)
+		ent_html = interface.get_ents_vis(result)
 		
 		status = True
 
@@ -230,6 +230,7 @@ def search():
 			"id": int(row.id),
 			"segment": str(row.segment),
 			"sentiment": str(row.sentiment),
+			"truth_label": str(row.truth_label),
 			"x": float(row.x),
 			"y": float(row.y),
 			"props": str(row.props),
