@@ -101,7 +101,9 @@ def interpret_sentence(model_wrapper, ig, tokenizer, sentence, vis_data_records_
     pred_ind = round(pred)
 
     # compute attributions and approximation delta using integrated gradients
-    attributions_ig, delta = ig.attribute(input_embedding, n_steps=500, return_convergence_delta=True)
+    #, n_steps=500
+    # , baseline=[zeros]
+    attributions_ig, delta = ig.attribute(input_embedding, return_convergence_delta=True)
 
     print('pred: ', pred_ind, '(', '%.2f' % pred, ')', ', delta: ', abs(delta))
 
