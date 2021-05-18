@@ -1,6 +1,6 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.25
+@version: 2021.05.18
 ---
 Use the fine-tunded model to predict sentiment of segments
 """
@@ -10,10 +10,19 @@ import glob
 import torch
 import numpy as np
 import torch.nn.functional as F
-from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
+from torch.utils.data import (
+    DataLoader,
+    SequentialSampler,
+    TensorDataset
+)
 
 from .bert_preprocess import BertPreprocessor
-from .config import MODEL_DIR, BATCH_SIZE, LABEL_VALUES, load_bert
+from .config import (
+    load_bert,
+    BATCH_SIZE,
+    LABEL_VALUES,
+    MODEL_DIR
+)    
 
 
 class SentimentPredictor:
@@ -103,7 +112,6 @@ class SentimentPredictor:
         all_logits = torch.cat(tuple(all_logits), dim=0)
 
         # Apply softmax to calculate probabilities
-        # TODO: dim=1??????
         probs = F.softmax(all_logits, dim=0).cpu().numpy()
 
         return probs
