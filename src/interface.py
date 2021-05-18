@@ -1,15 +1,32 @@
+"""
+@author: Tilman Kerl
+@version: 2020.18.05
+---
+Contains everything the app needs // 
+is the interface to all backend-functionality
+"""
 
+
+import math
 import umap
 import torch
+import numba
+import pickle
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 import spacy
 from spacy import displacy
 
 from .predict import SentimentPredictor
 from .bert_preprocess import BertPreprocessor
-from .config import EMBEDDINGS_DATASET_FILE, get_tokenizer, LABEL_VALUES
+from .config import (
+    EMBEDDINGS_DATASET_FILE, 
+    DATA_DIR,
+    LABEL_VALUES, 
+    get_tokenizer
+)
 from .dist import Dist
 
 from .saliency_calc import SaliencyCalculator
@@ -27,9 +44,18 @@ class Interface:
         self.sent_pred.load_model()
         self.bert_preprocesser = self.sent_pred.bp
         self.tokenizer = self.bert_preprocesser.tokenizer
-        self.nlp = spacy.load('en_core_web_sm')        
+        self.nlp = spacy.load('en_core_web_sm')
         self.dist = Dist()
-        self.sal_calc = SaliencyCalculator(self.tokenizer, self.sent_pred.model)            
+        self.sal_calc = SaliencyCalculator(self.tokenizer, self.sent_pred.model)
+        self.load_reducer()
+        
+    def load_reducer(self):
+        with open(f"{DATA_DIR}/reducer.pk", "rb") as file:
+            self.reducer = pickle.load(file)
+        with open(f"{DATA_DIR}/reducer_embs.pk", "rb") as file:
+            reducer_embs = pickle.load(file)
+        reducer_embs_ready = numba.typed.List([np.array(rel) for rel in np.array(reducer_embs)])
+        self.reducer.embeddings_ = reducer_embs_ready
 
     def get_embeddings(self, segment):
         input_ids = self.bert_preprocesser.tokenize_segments_to_id([segment])        
@@ -100,9 +126,105 @@ class Interface:
         html = displacy.render(sentences, style="ent", minify=False)
         html = "</div><hr>".join(html.split("</div>"))
         return html
-
+        
+    def update_UMAP(self, vecs):
+        # vecs = np.array([list_of_embeddings])
+        print(vecs)
+        # vecs = np.array(vecs)
+        reducer_embs = self.reducer.embeddings_
+        relation_dict_up = {i:i for i in range(sum(map(len, reducer_embs))+len(vecs)-len(reducer_embs[0]))}
+        self.reducer.update(vecs, relations = relation_dict_up)
+        return list(list(self.reducer.embeddings_)[-1])
+        
+    def get_entities_for_tokens(self, res):
+        for r in res:
+            ents = self._get_entity_token_mapping(r["segment"], r["tokens"])
+            r["entities"] = ents
+        return res
+        
+    def _fix_bert_tokens(self, bt):
+        return list(map(lambda el: el[0:-1], str(bt).replace("', '##", "")[2:-1].split(", '")))
+        
+    def _get_entity_token_mapping(self, sentence, bert_tokens):
+        doc = self.nlp(sentence)
+        entity_list = [el.ent_type_ for el in doc]
+        spacy_tokens = list(doc)
+        
+        bert_tokens = bert_tokens[1:-1]
+        new_entity_list = [] # [CLS]
+        
+        bert_tokens = self._fix_bert_tokens(bert_tokens)
+        
+        e = 0
+        for i, token in enumerate(spacy_tokens):    
+            if token.text.lower() == bert_tokens[e]:
+                new_entity_list.append(entity_list[i])
+                e += 1
+                continue
+                    
+            length_of_spacy_token = len(token.text)
+            count_string = ""
+            while len(count_string) < length_of_spacy_token:
+                new_entity_list.append(entity_list[i])
+                count_string += bert_tokens[e]
+                e += 1
+                
+        new_entity_list.append("") # [SEP]
+        return new_entity_list
+        
     def get_mean(self, attention_list):
         return [sum(x)/len(x) for x in zip(*attention_list)]
+        
+    def get_deRose_attention(self, segment):                
+        # To calculate the influence for a token w at the last layer L, the
+        # number of heads is counted, which are used to get to the [CLS] token
+        # (c_L (w, [CLS])). 
+        # For the previous layer L − 1 holds, with c_{L−1} (w, w ′ )
+        # is the number of heads used from w to w ′ :
+        
+        # wie viele heads attended CLS? mit a > 0.5        
+        
+        tokens = self.get_tokens(segment)
+        # print(tokens)
+        
+        # def get_tok(li, w):
+        #     layer_att = at[li-1]
+        #     alpha = 0
+        #     num_alpha = 0
+        #     for head in range(12):
+        #         head_att = layer_att[head]
+        #         w_i = tokens.index(w)
+        #         for tok_h in head_att:
+        #             alpha += tok_h[w_i]
+        #             num_alpha += 1
+        #     # return [at[li-1][h][tokens.index(w)] for h in range(12)][tokens.index(w)]
+        #     return alpha#/num_alpha
+        
+        def c(l, w):
+            attention_for_l = [self.get_attention_for_segment(segment, layer=l-1, head=head) for head in range(12)]
+            count = 0
+            # w_L = [self.get_attention_for_segment(segment, layer=11, head=head) for head in range(12)]
+            for head in attention_for_l:
+                # from w to w' 
+                w_index = tokens.index(w)                
+                num = list(filter(lambda x: x > 0.8, head[w_index]))
+                if num:
+                    count += len(num) # len            
+            if count > 5: # clamp to 5
+                return 5                                
+            return count
+    
+        def infl(w, l=1):
+            last_layer = 12
+            summe = sum([math.pow(0.5, (last_layer-li))*c(li, w) for li in range(1, last_layer+1)])
+            return 1/(last_layer-l+1) * summe
+        
+        infl_toks = [infl(tok) for tok in tokens]        
+        # print(infl_toks)
+        # infl_toks_transformed = list(map(lambda val: np.interp(val,[min(infl_toks),max(infl_toks)],[0,1]), infl_toks))
+        # print(infl_toks_transformed)
+        return infl_toks
+        
 
     def get_mean_attention_for_layer(self, segment, layer):
         # print(self.get_attention_for_segment(segment, layer=11, head=0))
@@ -151,37 +273,35 @@ class Interface:
         flattened = [val for sublist in f_splits for val in sublist]
         return flattened
 
-    def _prep_return(self, segment):
-        props = self.sent_pred.predict([segment], pretty=False)
-        print(props)
-        prediction_label = self.sent_pred._prettify_probabilities(props, shorten=False)[0]
-        embs = list(self.get_embeddings(segment))
-        print(f"{embs=}")
-        trans_embs = self.make2D(embs)
-        x = float(trans_embs[0].view())
-        y = float(trans_embs[1].view())
-        dict = {
-            "embeddings": list(map(lambda x: float(x.view()), list(embs))),
-            "x": x,
-            "y": y,
-            "sentiment": prediction_label,
-    		"segment": segment,
-    		"new": True,
-    		"id": len(self.dist.df.index),
-    		"props": props
-    	}
-        self.dist.update_df({
-    		"segment": segment,
-    		"sentiment": prediction_label,
-    		"embeddings": embs,
-    		"cluster": None,
-    		"x": x,
-    		"y": y,
-    		"id": len(self.dist.df.index),
-    		"props": props
-        })
-        print(dict)
-        return dict
+    def pred_split(self, splits):
+        preds = []
+        for e, split in enumerate(splits):
+            props = self.sent_pred.predict([split], pretty=False)
+            preds.append({
+                "segment": split,
+                "sentiment": self.sent_pred._prettify_probabilities(props, shorten=False)[0],
+                "props": props,
+                "embeddings": np.array(self.get_embeddings(split)),
+                "tokens": self.get_tokens(split),
+                "new": True,
+                "id": len(self.dist.df)+e
+            })
+            
+        embs = list(map(lambda x: x["embeddings"], preds))
+        while len(embs) < 4:
+            embs.append(embs[0])
+        embs = np.array(embs)
+        trans_embs = self.update_UMAP(embs)
+        for i, pr in enumerate(preds):
+            pr.update({
+                "x": float(trans_embs[i][0]),
+                "y": float(trans_embs[i][1]),
+            })
+            pr["embeddings"] = list(map(float, list(pr["embeddings"])))
+            pr["props"] = list(map(float, list(pr["props"])))
+            self.dist.update_df(pr)
+            
+        return preds
         
     def get_gradient_scores(self, sentences):
         sentences_data = []
@@ -198,10 +318,10 @@ class Interface:
         
         
 # interface = Interface()
-
+# 
 # sents = [
 #     {
-#         "sent": "The government could have done more",
+#         "sent": "The government could have done more to prevent this from happening",
 #         "label": 2,
 #     },
 #     {
@@ -209,9 +329,34 @@ class Interface:
 #         "label": 0
 #     }
 # ]
+# 
+# import time
+# 
+# t1 = time.time()
+# rose_1 = interface.get_deRose_attention(sents[0]["sent"])
+# # rose_2 = interface.get_deRose_attention(sents[1]["sent"])
+# print(f"{rose_1=}")
+# print(time.time()-t1)
+# print(f"{rose_2=}")
+
+# interface.dist.df["deRoseAttention"] = list(range(len(interface.dist.df)))
+# deRoseAttentions = []
+# for index, row in tqdm(interface.dist.df.iterrows(), total=len(interface.dist.df)):
+#     seg = str(row.segment)
+#     # print(seg)
+#     try:
+#         dr_att = interface.get_deRose_attention(seg)
+#     except Exception as e:
+#         print(e)
+#         dr_att = []
+#     deRoseAttentions.append(dr_att)
+    
+# interface.dist.df["deRoseAttention"] = deRoseAttentions
+# interface.dist.df.to_csv(NEW_EMBS_FILE, index=False)
 
 # sents = ["The government is negative", "They did great to fail"]
-# scores = interface.get_gradient_scores(sents)
+# scores = interface.get_gradient_scores([sents[0]["sent"], sents[1]["sent"]])
+# print(f"{scores=}")
 # 
 # for sc in scores:    
 #     print("--------------------")
