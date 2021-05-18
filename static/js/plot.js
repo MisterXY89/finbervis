@@ -1,7 +1,7 @@
 "use strict";
 var DATA_DIR = "./data";
 // const DATA_FILE:string = `${DATA_DIR}/projection_with_full_sents_SENT_PROPS.csv`;
-var DATA_FILE = DATA_DIR + "/data.csv";
+var DATA_FILE = DATA_DIR + "/data_copy.csv";
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 // "#336338" = more medium sea blue
@@ -16,7 +16,7 @@ var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 // "#424047" = gray
 var SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
 var RADIUS = 2;
-var ZOOM_RADIUS = 6;
+var ZOOM_RADIUS = 5;
 function get_color(el, new_point) {
     // console.log(new_point);
     if (new_point) {
@@ -26,6 +26,12 @@ function get_color(el, new_point) {
         return COLORS[SENTIMENT_CLASSES.indexOf(el)];
     }
     return COLORS[el];
+}
+function get_color_truth(d) {
+    if (d.sentiment != d.truth_label) {
+        return "black";
+    }
+    return get_color(d.sentiment, d.new);
 }
 function get_radius(new_point) {
     if (new_point) {
@@ -255,55 +261,69 @@ function create_scatter_plot(data) {
         // console.log(d.new);
         return get_color(d.sentiment, d.new);
     })
+        // .style("fill", "none")
+        .style('stroke', function (d) {
+        // console.log(d);
+        return get_color_truth(d);
+    })
+        .style("stroke-width", 1)
         .attr("pointer-events", "all")
         // .on('mouseover', mouseover)
         // .on('mousemove', mousemove)
         // .on('mouseleave', mouseleave)
         .on('click', click);
 }
-function scatter_plot(custom_data) {
+function scatter_plot(custom_data, click) {
     custom_data = (custom_data == undefined) ? false : custom_data;
+    click = (click == undefined) ? false : click;
     d3.csv(DATA_FILE, function (data) {
-        if (custom_data != {}) {
+        console.log("custom_data", custom_data);
+        if (Array.from(custom_data).length != 0) {
             data.push(custom_data);
         }
         console.log(data);
         create_scatter_plot(data);
-        var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
-        var sliderRange = d3
-            .sliderBottom()
-            .min(d3.min(slider_data_vals))
-            .max(d3.max(slider_data_vals))
-            .width(600)
-            .tickFormat(d3.format('.2%'))
-            .ticks(5)
-            .default([0.75, 1])
-            .fill('#2196f3')
-            .on('onchange', function (val) {
-            d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));
-            console.log(val);
-            d3.selectAll("circle").style("display", "none");
-            d3.selectAll("circle").transition()
-                .filter(function () {
-                var point_val = Number(this.style.opacity);
-                // console.log(point_val);
-                // console.log(point_val >= val[0]);
-                return point_val >= val[0] && point_val <= val[1];
-            })
-                .duration(300)
-                .style("display", "block");
-        });
-        var gRange = d3
-            .select('div#slider-range')
-            .append('svg')
-            .attr('width', 700)
-            .attr('height', 100)
-            .append('g')
-            .attr('transform', 'translate(30,30)');
-        gRange.call(sliderRange);
-        d3.select('p#value-range').text(sliderRange
-            .value()
-            .map(d3.format('.2%'))
-            .join('-'));
+        if (!$(".slider").is(":visible")) {
+            var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
+            var sliderRange = d3
+                .sliderBottom()
+                .min(d3.min(slider_data_vals))
+                .max(d3.max(slider_data_vals))
+                .width(600)
+                .tickFormat(d3.format('.2%'))
+                .ticks(5)
+                .default([0.70, 1])
+                .fill('#2196f3')
+                .on('onchange', function (val) {
+                d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));
+                console.log(val);
+                d3.selectAll("circle").style("display", "none");
+                d3.selectAll("circle").transition()
+                    .filter(function () {
+                    var point_val = Number(this.style.opacity);
+                    // console.log(point_val);
+                    // console.log(point_val >= val[0]);
+                    return point_val >= val[0] && point_val <= val[1];
+                })
+                    .duration(300)
+                    .style("display", "block");
+            });
+            var gRange = d3
+                .select('div#slider-range')
+                .append('svg')
+                .attr('width', 700)
+                .attr('height', 100)
+                .append('g')
+                .attr('transform', 'translate(30,30)');
+            gRange.call(sliderRange);
+            d3.select('p#value-range').text(sliderRange
+                .value()
+                .map(d3.format('.2%'))
+                .join('-'));
+        }
+        if (click) {
+            console.log("click_point", click);
+            click_point(custom_data);
+        }
     });
 }
