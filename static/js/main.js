@@ -18,23 +18,75 @@ function edit_sentiment() {
         add_labeled_record(correct_sentiment, selected_segement);
     }
 }
-function toggle_ents() {
-    console.log("click");
-    var seq_id = d3.select("#point_id").text();
-    var url = "/get_entities?seq_id=" + seq_id;
-    console.log(url);
+function toggle_attention_select() {
+    $("#selected-segment").hide();
+    $("#selected-segment-ents").hide();
+    $("#selected-segment-tokens").show();
+    var sent = document.getElementById("selected-segment-tokens");
+    var sent_attention = to_array(window.d.mean_attention);
+    Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
+        if (span.style.borderTop == "" || span.style.borderTop == undefined || span.style.borderTop == "unset") {
+            var color = d3.scaleLinear()
+                .domain([0, 1])
+                .range(["#edf6f9", "#e01e37"]); // output for opacity between .3 and 1 %
+            // white edf6f9
+            // ffb600 - warm yellow
+            // ff4800 - warm orange
+            console.log(sent_attention[span_i]);
+            var color_val = color(sent_attention[span_i]);
+            span.style.borderTop = "3px " + color_val + " solid";
+        }
+        else {
+            span.style.borderTop = "unset";
+        }
+    });
+}
+function split_select_sentence() {
+    var seg_id = Number(d3.select("#point_id").text());
+    var url = "/split_rule?seg_id=" + seg_id;
     fetch(url)
         .then(function (resp) { return resp.json(); })
         .then(function (json) {
-        console.log(json);
-        // let res = json.result;
-        var ents_html = json.result;
-        d3.select("#selected-segment-ents").html(ents_html);
-        $("#selected-segment-ents").toggle();
-        $("#selected-segment").toggle();
+        var split_points = json.result;
+        console.log(split_points);
     });
 }
+function toggle_ents() {
+    if ($("#selected-segment-ents").text() != "Loading" && !$("#selected-segment-ents").is(":visible")) {
+        $("#selected-segment-ents").show();
+        $("#selected-segment").hide();
+        $("#selected-segment-tokens").hide();
+        console.log("not visible but calculated");
+        return 1;
+    }
+    else if ($("#selected-segment-ents").is(":visible")) {
+        $("#selected-segment-ents").hide();
+        $("#selected-segment-tokens").show();
+    }
+    else {
+        var seq_id = d3.select("#point_id").text();
+        var url = "/get_entities?seq_id=" + seq_id;
+        fetch(url)
+            .then(function (resp) { return resp.json(); })
+            .then(function (json) {
+            // let res = json.result;
+            var ents_html = json.result;
+            if (ents_html.indexOf("<mark") == -1) {
+                toast_msg("No entities found");
+            }
+            d3.select("#selected-segment-ents").html(ents_html);
+            $("#selected-segment").hide();
+            $("#selected-segment-tokens").hide();
+            $("#selected-segment-ents").show();
+            // $("#selected-segment-ents").toggle();
+            // $("#selected-segment").toggle();
+        });
+    }
+}
 function to_array(string) {
+    if (typeof string == "object") {
+        return string;
+    }
     return string.slice(1, -1).split(", ").map(function (el) { return Number(el); });
 }
 function get_segment_html(seg) {
@@ -75,15 +127,18 @@ function prep_search_vis(res) {
     });
     return html;
 }
+// todo rem
 function visualize_saliency(res, el) {
     var tokens = res.tokens;
     var scores = res.scores;
+    var label = res.sentiment;
     var token_html = "<div class='sal-text'>";
     tokens.forEach(function (tok, i) {
         var opacity = Math.abs(scores[i]);
-        var token_grad_color = "158,100,229";
-        if (scores[i] > 0) { // check what is what
-            token_grad_color = "171,229,100";
+        // todo: scale change
+        var token_grad_color = "58,100,229"; // negative values
+        if (scores[i] > 0) {
+            token_grad_color = "221,89,100";
         }
         var color = "rgba(" + token_grad_color + ", " + opacity + ")";
         token_html += "<span style=\"background-color: " + color + ";\">" + tok + " </span>";
@@ -275,18 +330,64 @@ function extract_ents_json(html, res) {
     });
     return res;
 }
+function toggle_grads() {
+    $("#selected-segment").hide();
+    $("#selected-segment-ents").hide();
+    $("#selected-segment-tokens").show();
+    var sent = document.getElementById("selected-segment-tokens");
+    Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
+        var sal_scores = window.d["saliency_score"];
+        sal_scores = to_array(sal_scores);
+        var opacity = Math.abs(sal_scores[span_i]);
+        var token_grad_color = "58,100,229"; // negative values
+        if (sal_scores[span_i] > 0) {
+            token_grad_color = "221,89,100";
+        }
+        var color = "rgba(" + token_grad_color + ", " + opacity + ")";
+        // if (span.classList.contains("identical-token")) {
+        // 	span.classList.remove("identical-token");
+        // }
+        // if (span.classList.contains("identical-token-stopword")) {
+        // 	span.classList.remove("identical-token-stopword");
+        // }
+        if (span.classList.contains("saliency-active")) {
+            span.style.backgroundColor = "transparent";
+            span.classList.remove("saliency-active");
+        }
+        else {
+            span.style.backgroundColor = color;
+            span.classList.add("saliency-active");
+        }
+    });
+    // sent += '<span id="info-grad"><br /> <i class="material-icons">info_outline</i> Red indicated importance for predicted label</span>';
+}
+function toggle_plain_sent() {
+    if ($("#selected-segment").is(':visible')) {
+        $("#selected-segment-ents").hide();
+        $("#selected-segment").hide();
+        $("#selected-segment-tokens").show();
+    }
+    else {
+        $("#selected-segment-tokens").hide();
+        $("#selected-segment-ents").hide();
+        $("#selected-segment").show();
+        $("#info-grad").hide();
+    }
+}
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("show-similar").disabled = true;
     search_data("=all");
-    $('.toast').toast();
+    $('.toast').toast({
+        delay: 12500
+    });
     // $('#toast').toast('hide');
-    scatter_plot({});
+    scatter_plot({}, false);
     var test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States.";
     // "taking office at a moment of profound economic, health and political crises with a promise to seek unity after a tumultuous four years that tore at the fabric of American society.";
     console.log(test_sent);
     var spinner = d3.select("#spinning-overlay");
     var test_rule_button = d3.select("#test-rule");
-    var test_rule_segment_field = d3.select("#test-rule-segment");
+    var test_rule_segment_field = d3.select("#segmentInput");
     var segment_attention_button = d3.select("#segment-attention");
     var explore_neighbours_button = d3.select("#explore-neighbours");
     var hide_heatmap_button = d3.select("#hide-heatmap");
@@ -320,9 +421,10 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(function (json) {
             console.log(json);
             // add_datapoint(json);
-            scatter_plot(json);
             spinner.style("display", "none");
-            user_classification_select.style("display", "block");
+            scatter_plot(json, true);
+            // click_point(json);
+            // user_classification_select.style("display", "block");
         });
     });
     toggle_gradients_button.on("click", function () {
@@ -333,9 +435,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 var sal_scores = window.sim_res[sent_i]["saliency_score"];
                 sal_scores = to_array(sal_scores);
                 var opacity = Math.abs(sal_scores[span_i]);
-                var token_grad_color = "158,100,229";
-                if (sal_scores[span_i] > 0) { // check what is what
-                    token_grad_color = "171,229,100";
+                var token_grad_color = "58,100,229"; // negative values
+                if (sal_scores[span_i] > 0) {
+                    token_grad_color = "221,89,100";
                 }
                 var color = "rgba(" + token_grad_color + ", " + opacity + ")";
                 if (span.classList.contains("identical-token")) {
@@ -374,28 +476,35 @@ document.addEventListener("DOMContentLoaded", function () {
                     saliency_score: el.saliency_score,
                     segment: el.segment,
                     sentiment: el.sentiment,
-                    tokens: tok_to_array(el.tokens)
+                    tokens: tok_to_array(el.tokens),
+                    entities: el.entities,
+                    truth_label: el.truth_label
                 };
             });
             window.sim_res = res;
             console.log(res);
-            var ents_html = json.ent_html;
-            // let ents_json = extract_ents_json(ents_html, res);
-            // console.log(ents_json);
-            var new_origin = json.origin_sent_ent_html;
-            var sim_sent_html = "";
-            res.forEach(function (el) {
-                sim_sent_html += "<div class='row'>\n\t\t\t\t<div class='sim-sentence col-10'> \n\t\t\t\t\t" + el.tokens.map(function (tok) { return "<span>" + tok + "</span> "; }).join(" ") + " \n\t\t\t\t</div>\n\t\t\t\t<div class='col-2'>\n\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\n\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<hr/>";
-            });
+            if (!res.length == 0) {
+                var ents_html = json.ent_html;
+                // let ents_json = extract_ents_json(ents_html, res);
+                // console.log(ents_json);
+                var new_origin = json.origin_sent_ent_html;
+                var sim_sent_html_1 = "";
+                res.forEach(function (el) {
+                    sim_sent_html_1 += "<div class='row'>\n\t\t\t\t\t<div class='sim-sentence col-10'> \n\t\t\t\t\t\t" + el.tokens.map(function (tok) { return "<span>" + tok + "</span> "; }).join(" ") + " \n\t\t\t\t\t</div>\n\t\t\t\t\t<div class='col-2'>\n\t\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\n\t\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr/>";
+                });
+                $("#similar-sents-display").html(sim_sent_html_1);
+                $("#selected-segment-ents").html(new_origin);
+                $("#similar-sents-ents-display").html(ents_html);
+                $("#toggle_ents_sim_sents").show();
+                $("#toggle_mean_attention").show();
+                $("#toggle_identical_words_sim_sents_button").show();
+                $("#toggle_gradients").show();
+            }
+            else {
+                $("#similar-sents-display").html("No similiar sentences below the similiarity threshold (10) could be found.");
+            }
             $("#similar-sents-display").css("opacity", 1);
             $("#similar-sents-ents-display").css("opacity", 1);
-            $("#similar-sents-display").html(sim_sent_html);
-            $("#selected-segment-ents").html(new_origin);
-            $("#similar-sents-ents-display").html(ents_html);
-            $("#toggle_ents_sim_sents").show();
-            $("#toggle_mean_attention").show();
-            $("#toggle_identical_words_sim_sents_button").show();
-            $("#toggle_gradients").show();
             $("#sim-sent-spinner").toggle();
             document.getElementById("show-similar").disabled = false;
         });
@@ -403,6 +512,47 @@ document.addEventListener("DOMContentLoaded", function () {
     toggle_ents_sim_sents_button.on("click", function () {
         $("#similar-sents-display").toggle();
         $("#similar-sents-ents-display").toggle();
+        // let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
+        // 
+        // Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
+        // 	let index = 0;
+        // 	let element = window.sim_res[sent_i];
+        // 	let ents = element["entities"];
+        // 	Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
+        // 
+        // 		if (span.backgroundColor != "") {
+        // 			span.style.backgroundColor = "";
+        // 			span.classList.remove("saliency-active");
+        // 		}
+        // 
+        // 		if (span.classList.contains("saliency-active")) {
+        // 			span.style.backgroundColor = "transparent";
+        // 			span.classList.remove("entity");
+        // 			span.classList.remove(`entity entity-${ent_type}`);
+        // 		}
+        // 
+        // 		let el_entity = ents[span_i];
+        // 		if (el_entity != "") {
+        // 				console.log(el_entity);
+        // 				console.log(ents[span_i+1]);
+        // 				// if (span_i +1 >= ents.length) {
+        // 				if (ents[span_i+1] != el_entity) {
+        // 					// let next_el = Array.from(sent.getElementsByTagName("span"))[span_i+1];
+        // 					span.textContent += `(${el_entity})`;
+        // 				}
+        // 
+        // 				if (span.classList.contains("entity")) {
+        // 					span.style.backgroundColor = "transparent";
+        // 					span.classList.remove("entity");
+        // 					span.classList.remove(`entity-${el_entity}`);
+        // 				} else {
+        // 					span.classList.add("entity");
+        // 					span.classList.add(`entity-${el_entity}`);
+        // 				}
+        // 		}
+        // 
+        // 	});
+        // });
     });
     toggle_mean_attention_button.on("click", function () {
         $("#similar-sents-display").show();
@@ -455,8 +605,31 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     });
-    $("#saliency-show-selected-segment").click(function () {
-        // show ...
+    $("#toggle-ente").on("click", function () {
+        // let segment_select_display = window.tokens.toLowerCase();
+        var segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
+        Array.from(document.getElementsByClassName("sim-sentence")).forEach(function (sent, sent_i) {
+            var index = 0;
+            var element = window.sim_res[sent_i];
+            var ents = element["entities"];
+            Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
+                var el_entity = ents[span_i];
+                console.log(el_entity);
+                // let ent_type = el_entity
+                if (span.backgroundColor != "") {
+                    span.style.backgroundColor = "";
+                    span.classList.remove("saliency-active");
+                }
+                if (span.classList.contains("saliency-active")) {
+                    span.style.backgroundColor = "transparent";
+                    span.classList.remove("entity");
+                    span.classList.remove("entity entity-" + ent_type);
+                }
+                else {
+                    span.classList.remove("entity");
+                }
+            });
+        });
     });
     segment_attention_button.on("click", function () {
         // show heatmap for selected node
