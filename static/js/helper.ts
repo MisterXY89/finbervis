@@ -65,10 +65,12 @@ function click_point(d: any) {
 
 	let current_target;
 	if (typeof d == "number" || d3.event == null) {
-		d = window.search_result_data[d];
-		console.log(d.id);
-		// current_target = d3.selectAll('circle')._groups[0][d.id];
+		if (window.search_result_data[d] != undefined) {
+			d = window.search_result_data[d];
+		} 
+		console.log("d.id", d.id);
 		current_target = document.getElementById(`${d.id}`);
+		// current_target = d3.selectAll('circle')._groups[0][d.id];		
 	} else {
 		current_target = d3.event.currentTarget;
 	}
@@ -80,8 +82,10 @@ function click_point(d: any) {
 	d3.select("#user-classification").style("display", "block");
 	d3.select("#point_id_display").html(`#<span id='point_id'>${d.id}</span>`);
 	
-	let split_html = '<span> | <a href="#split" id="split-rule">Split</a></span>';
-	let sal_html = '<span> | <a href="#split" id="saliency-show-selected-segment">Gradients</a></span>';
+	let split_html = '<span> | <a href="#split" id="split-rule" onclick="split_select_sentence()">Split</a></span>';
+	let sal_html = '<span> | <a href="#toggleGrads" id="saliency-show-selected-segment" onclick="toggle_grads()">Integrated Gradients</a></span>';
+	let plain_sent_html = '<span> | <a href="#plainSent" id="show-plain-selected-sent" onclick="toggle_plain_sent()">Toggle Plain/Token</a></span>';
+	let attention_sent_html = '<span> | <a href="#toggle-attention-select" id="toggle-attention-select" onclick="toggle_attention_select()">Toggle Attention</a></span>';
 	SideBar
 		.html(
 			'<table style="width:100%">'
@@ -102,10 +106,15 @@ function click_point(d: any) {
 							+ '<th>Probability</th>'
 							+ `<td>${get_max_value(d.props, true)}</td>`
 					+ '</tr>'
+					+ '<tr>'
+							+ '<th>True label</th>'
+							+ `<td>${get_sentiment_html(d.sentiment, d.truth_label, true)}</td>`
+					+ '</tr>'
 			+ '</table>'
 			+ '<hr />'
-			+ `<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick="toggle_ents();">Toggle Entities</a></span> ${split_html} ${sal_html}`
+			+ `<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick="toggle_ents();">Toggle Entities</a></span> ${split_html} ${sal_html} ${attention_sent_html} ${plain_sent_html}`
 			+ `<p id='selected-segment'>${d.segment}</p>`
+			+ `<p id='selected-segment-tokens'>${tok_to_array(d.tokens).map(tok => `<span>${tok}</span> `).join(" ")} </p>`
 			+ `<p id='selected-segment-ents'>Loading</p>`,
 		)
 	window.d = d;
@@ -119,18 +128,16 @@ function click_point(d: any) {
 	if (window.last_target != undefined) {
 			d3.select(window.last_target)
 				.attr("r", rad)
-				.style("fill", get_color(Number(window.last_cluster)));
+				.style("fill", window.last_color);
 	}
 	window.last_target = current_target
-	window.last_cluster = Number(d.cluster)
+	window.last_color = get_color(d.sentiment)
 	d3.select(current_target)
 		.attr("r", select_rad)
 		.style("fill", SELECT_COLOR).raise();
 }
 
 function get_mouse_events(data) {
-
-	console.log(data[2]);
 
 	// TOOL-TIP & MOUSE EVENTS
 	const Tooltip = d3.select(PLOT_ID)
