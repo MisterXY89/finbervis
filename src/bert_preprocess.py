@@ -1,6 +1,6 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.25
+@version: 2020.18.05
 ---
 Prepare the given data to use it in the Trainer class (train.py):
 tokenize the segments and encode them to an id, pad the padding_token_ids
@@ -17,11 +17,22 @@ import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.sequence import pad_sequences
-from torch.utils.data import TensorDataset, DataLoader, \
-                                RandomSampler, SequentialSampler
+from torch.utils.data import (
+    DataLoader,
+    SequentialSampler,
+    TensorDataset,
+    RandomSampler
+)
 
-from .config import get_tokenizer, CLEANED_DATASET_FILE, LABEL_VALUES, \
-                    BATCH_SIZE, MAX_LEN, TEST_SIZE, NEW_DATA_FILE
+from .config import (
+    get_tokenizer, 
+    BATCH_SIZE, 
+    CLEANED_DATASET_FILE, 
+    LABEL_VALUES,
+    MAX_LEN, 
+    NEW_DATA_FILE,
+    TEST_SIZE
+)
 
 
 class BertPreprocessor():
