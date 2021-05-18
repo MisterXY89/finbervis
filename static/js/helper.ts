@@ -1,17 +1,27 @@
 
 const PLOT_ID:string = "#plot";
-const SELECT_COLOR:string = "#ce0c0f";
+// const SELECT_COLOR:string = "#ce0c0f"; // red
+const SELECT_COLOR:string = "rgb(255, 108, 0)";
 const SELECT_RADIUS:number = 8;
 
 
 function toast_msg(msg) {
-	$("#toast-msg").html("hey");
-	$("#toast-modal").toast("show");
+	$("#toast-msg").html(msg);
+	$('.toast').toast("show");
 }
 
 
-function get_sentiment_html(sent) {
-	return `<span class="badge badge-pill class-${sent}" style="line-height:1.5em;">${sent}</span>`;
+function get_sentiment_html(sent, truth_label, is_truth_label) {
+	truth_label = truth_label == undefined ? "" : truth_label;
+	is_truth_label = is_truth_label == undefined ? false : is_truth_label;
+	let truth_label_sentiment_class = "";
+	if (is_truth_label && truth_label != sent) {
+		console.log(truth_label);
+		console.log(sent);
+		truth_label_sentiment_class = "truth-label-sentiment";
+		sent = truth_label;
+	}
+	return `<span class="badge badge-pill class-${sent} ${truth_label_sentiment_class}" style="line-height:1.5em;">${sent}</span>`;
 }
 
 function get_max_value(str_props, pretty) {
@@ -20,7 +30,13 @@ function get_max_value(str_props, pretty) {
 		console.log(str_props);
 		return (pretty) ? "-" : 0;
 	}
-	let max_val:number|string = Number(d3.max(str_props.slice(1,-1).replace(" ", "").split(",").map(el => Number(el))));
+	let max_val:number|string;
+	if (typeof str_props == "object" && str_props.length == 3) {
+		console.log("str_props", str_props);
+		max_val = d3.max(str_props);
+	} else {		
+		max_val = Number(d3.max(str_props.slice(1,-1).replace(" ", "").split(",").map(el => Number(el))));
+	}
 	if (pretty) {
 			max_val = (""+max_val*100).slice(0,4) + "%";
 	}
@@ -28,6 +44,15 @@ function get_max_value(str_props, pretty) {
 }
 
 function tok_to_array(string) {
+	if (string == undefined) {
+		return [];
+	}
+	if (typeof string == "object") {
+		if (string.tokens != undefined) {
+			return string.tokens;
+		}
+		return string;
+	}
 	return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(el => el.slice(0, -1))	
 }
 

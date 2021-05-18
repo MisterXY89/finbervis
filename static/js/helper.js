@@ -1,13 +1,23 @@
 "use strict";
 var PLOT_ID = "#plot";
-var SELECT_COLOR = "#ce0c0f";
+// const SELECT_COLOR:string = "#ce0c0f"; // red
+var SELECT_COLOR = "rgb(255, 108, 0)";
 var SELECT_RADIUS = 8;
 function toast_msg(msg) {
-    $("#toast-msg").html("hey");
-    $("#toast-modal").toast("show");
+    $("#toast-msg").html(msg);
+    $('.toast').toast("show");
 }
-function get_sentiment_html(sent) {
-    return "<span class=\"badge badge-pill class-" + sent + "\" style=\"line-height:1.5em;\">" + sent + "</span>";
+function get_sentiment_html(sent, truth_label, is_truth_label) {
+    truth_label = truth_label == undefined ? "" : truth_label;
+    is_truth_label = is_truth_label == undefined ? false : is_truth_label;
+    var truth_label_sentiment_class = "";
+    if (is_truth_label && truth_label != sent) {
+        console.log(truth_label);
+        console.log(sent);
+        truth_label_sentiment_class = "truth-label-sentiment";
+        sent = truth_label;
+    }
+    return "<span class=\"badge badge-pill class-" + sent + " " + truth_label_sentiment_class + "\" style=\"line-height:1.5em;\">" + sent + "</span>";
 }
 function get_max_value(str_props, pretty) {
     pretty = pretty == undefined ? false : pretty;
@@ -15,13 +25,29 @@ function get_max_value(str_props, pretty) {
         console.log(str_props);
         return (pretty) ? "-" : 0;
     }
-    var max_val = Number(d3.max(str_props.slice(1, -1).replace(" ", "").split(",").map(function (el) { return Number(el); })));
+    var max_val;
+    if (typeof str_props == "object" && str_props.length == 3) {
+        console.log("str_props", str_props);
+        max_val = d3.max(str_props);
+    }
+    else {
+        max_val = Number(d3.max(str_props.slice(1, -1).replace(" ", "").split(",").map(function (el) { return Number(el); })));
+    }
     if (pretty) {
         max_val = ("" + max_val * 100).slice(0, 4) + "%";
     }
     return max_val;
 }
 function tok_to_array(string) {
+    if (string == undefined) {
+        return [];
+    }
+    if (typeof string == "object") {
+        if (string.tokens != undefined) {
+            return string.tokens;
+        }
+        return string;
+    }
     return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(function (el) { return el.slice(0, -1); });
 }
 function click_point(d) {
