@@ -41,13 +41,15 @@ def split_rule():
 		success = False
 	else:
 		seg_id = int(req_data["seg_id"])
-		result = interface.get_splits(seg_id)
-		print(result)
+		splits = interface.get_splits(seg_id)
+		result = interface.pred_split(splits)		
+		# print(result)
 		success = True
-
+		
+		
 	return jsonify({
 		"success": success,
-		"result": list(map(interface._prep_return, result)),
+		"result": result,
 	})
 
 @app.route("/get-attention")
