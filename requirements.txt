@@ -103,7 +103,7 @@ py==1.9.0
 py-rouge==1.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
-pydantic==1.7.3
+pydantic==1.7.4
 Pygments==2.8.1
 pylint==2.7.4
 pynndescent==0.5.2
