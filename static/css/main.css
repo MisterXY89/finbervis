@@ -103,7 +103,8 @@
 .saliency-calc-spinner,
 #toggle_mean_attention,
 #similar-sents-ents-display,
-#toggle_gradients
+#toggle_gradients,
+#selected-segment-tokens
 {
   display: none;
 }
@@ -138,6 +139,25 @@
 
 .search-seg {
   font-size: 0.85em;
+}
+
+/* .entity {
+  background-color: green !important;
+  border-radius: 8px;
+} */
+
+.saliency-active {
+  border-radius: 4px;
+  padding: 3px;
+  line-height: 1.1em;
+}
+
+.truth-label-sentiment {
+  border: 1px solid red;
+}
+
+.toast {
+  z-index: 99 !important;
 }
 
 /* .show-similar */
