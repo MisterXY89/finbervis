@@ -77,36 +77,37 @@ def test_user_data():
     req_data = request.args
     segment = req_data["segment"]
     props = interface.sent_pred.predict([segment], pretty=False)
-    print(props)
     prediction_label = interface.sent_pred._prettify_probabilities(props, shorten=False)[0]
-    print(f"{prediction_label=}")
-    embs = list(interface.get_embeddings(segment))
-    print(f"{embs=}")
-    trans_embs = interface.make2D(embs)
-    print(f"{trans_embs=}")
-    x = float(trans_embs[0].view())
-    y = float(trans_embs[1].view())
+    embs_solo = np.array(interface.get_embeddings(segment))
+    embs = np.array([embs_solo, embs_solo, embs_solo, embs_solo])
+    trans_embs = interface.update_UMAP(embs)
+    x = float(trans_embs[0][0])
+    y = float(trans_embs[0][1])
+    new_tokens= interface.get_tokens(segment)
+    embs_solo = list(map(float, list(embs_solo)))
+    props = list(map(float, list(props)))
     dict = {
-        "embeddings": list(map(lambda x: float(x.view()), list(embs))),
+        "embeddings": embs_solo,
         "x": x,
         "y": y,
+		"tokens": new_tokens,
         "sentiment": prediction_label,
 		"segment": segment,
 		"new": True,
-		"id": len(interface.df.index),
+		"id": len(interface.dist.df),
 		"props": props
 	}
     interface.dist.update_df({
 		"segment": segment,
 		"sentiment": prediction_label,
 		"embeddings": embs,
-		"cluster": None,
 		"x": x,
 		"y": y,
-		"id": len(interface.df.index),
-		"props": props
+		"id": len(interface.dist.df),
+		"props": props,
+		"tokens": new_tokens,
     })
-    print(dict)
+    # print(dict)
     return jsonify(dict)
 
 
