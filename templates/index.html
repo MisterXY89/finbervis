@@ -115,6 +115,19 @@
           Select a point to see its data here and to interact with the self-attention!
         </p>
         <hr />
+        <div id="select-splits">   
+          <div class="row">
+            <div class="col-1">
+              <div role="status" class="spinner-border text-primary mx-auto text-center" id="splits-spinner">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+            <div class="col-11">
+              <code style="line-height: 3em;" class="text-primary">Calculating &amp; predicting splits</code>                  
+            </div>
+          </div>
+          <hr>        
+        </div>
         <!-- ', '#64abe5', '#9e64e5 -->        
 
         <!-- user_classification_modal -->
@@ -173,7 +186,7 @@
           </div>
           
           <div id="show-simmilar">          
-            <br /><br />
+            <br />
             <a href="#show-simmilar" id="toggle_ents_sim_sents">Toggle Entities |</a>
             <a href="#toggle-identical-words" id="toggle_identical_words_sim_sents_button">Toggle identical words |</a>
             <a href="#toggle-mean-attention" id="toggle_mean_attention">Toggle attention | </a> 
@@ -185,11 +198,7 @@
             </div>
             <div id="similar-sents-ents-display">
               
-            </div>
-            
-            <div id="similar_sents_display_attention">
-              
-            </div>
+            </div>            
           </div>
           
           
@@ -288,8 +297,8 @@
 		<br />
 	</div>
   
-  <div aria-live="polite" aria-atomic="true" style="position: absolute; top: 10; right: 10;" id="toast-modal">
-    <div class="toast" style="position: absolute; top: 0; right: 0;">
+  <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 10px; right: 10px;" id="toast-modal">
+    <div class="toast" style="position: relative; z-index: 99;">
       <div class="toast-header">
         <i class="material-icons text-primary">info-outline</i>
         <strong class="mr-auto">Information</strong>

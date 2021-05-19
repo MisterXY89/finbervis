@@ -112,7 +112,7 @@ function click_point(d: any) {
 					+ '</tr>'
 			+ '</table>'
 			+ '<hr />'
-			+ `<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick="toggle_ents();">Toggle Entities</a></span> ${split_html} ${sal_html} ${attention_sent_html} ${plain_sent_html}`
+			+ `<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick="toggle_ents();">Toggle Entities</a></span> ${split_html} ${sal_html} ${attention_sent_html} ${plain_sent_html}<br />` 
 			+ `<p id='selected-segment'>${d.segment}</p>`
 			+ `<p id='selected-segment-tokens'>${tok_to_array(d.tokens).map(tok => `<span>${tok}</span> `).join(" ")} </p>`
 			+ `<p id='selected-segment-ents'>Loading</p>`,

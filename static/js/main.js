@@ -6,8 +6,6 @@ function edit_sentiment() {
     var correct_sentiment = d3.select("#sentiment-classes-user-classification").property("value");
     var model_sentiment = d3.select("#model-sentiment").text();
     var selected_segement = d3.select("#selected-segment").text();
-    console.log(correct_sentiment);
-    console.log(model_sentiment);
     if (window.added_segment == selected_segement) {
         alert("You already added this segment.");
     }
@@ -47,14 +45,29 @@ function toggle_attention_select() {
     });
 }
 function split_select_sentence() {
-    var seg_id = Number(d3.select("#point_id").text());
-    var url = "/split_rule?seg_id=" + seg_id;
-    fetch(url)
-        .then(function (resp) { return resp.json(); })
-        .then(function (json) {
-        var split_points = json.result;
-        console.log(split_points);
-    });
+    if ($("#select-splits").is(":visible")) {
+        $("#select-splits").hide();
+    }
+    else {
+        $("#select-splits").show();
+        if ($("#splits-spinner").is(":visible")) {
+            var seg_id = Number(d3.select("#point_id").text());
+            var url = "/split_rule?seg_id=" + seg_id;
+            fetch(url)
+                .then(function (resp) { return resp.json(); })
+                .then(function (json) {
+                var split_points = json.result;
+                console.log(split_points);
+                var split_html = "<div>";
+                split_points.forEach(function (el) {
+                    split_html += "<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-10\">" + el.segment + "</div>\n\t\t\t\t\t\t<div class='col-2'>\n\t\t\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\n\t\t\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div><hr><br>";
+                });
+                split_html += "</div></hr>";
+                $("#select-splits").html(split_html);
+                $("#select-splits").show();
+            });
+        }
+    }
 }
 function toggle_ents() {
     if ($("#selected-segment-ents").text() != "Loading" && !$("#selected-segment-ents").is(":visible")) {
@@ -674,13 +687,6 @@ document.addEventListener("DOMContentLoaded", function () {
         search_data(search_q);
     });
     split_rule_button.on("click", function () {
-        var seg_id = Number(d3.select("#point_id").text());
-        var url = "/split_rule?seg_id=" + seg_id;
-        fetch(url)
-            .then(function (resp) { return resp.json(); })
-            .then(function (json) {
-            var split_points = json.result;
-            console.log(split_points);
-        });
+        // old split rule 
     });
 });

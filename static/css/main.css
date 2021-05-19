@@ -104,7 +104,9 @@
 #toggle_mean_attention,
 #similar-sents-ents-display,
 #toggle_gradients,
-#selected-segment-tokens
+#selected-segment-tokens,
+#select-splits,
+#show-simmilar
 {
   display: none;
 }
@@ -158,6 +160,20 @@
 
 .toast {
   z-index: 99 !important;
+}
+
+#selected-segment-tokens,
+#selected-segment,
+#selected-segment-ents
+{
+    padding-top: 1em;
+}
+
+.similar-sents-display span,
+.selected-segment-tokens span 
+{
+  line-height: 2.5em !important;
+  padding-bottom: 40px !important;
 }
 
 /* .show-similar */

@@ -268,10 +268,11 @@ class Interface:
         split_chars = [",", ";", ":", "-"]
         for sc in split_chars:
         	splits.append(segment.split(sc))
-        f_splits = list(filter(lambda el: el, splits))
-        # f_splits = f_splits[0] if len(f_splits) == 1 else f_splits
-        flattened = [val for sublist in f_splits for val in sublist]
-        return flattened
+        f_splits = list(filter(lambda el: el, splits))        
+        combis = ["".join(char_split[0:i]) for char_split in f_splits for i in range(1, len(char_split))][1:]
+        f_splits.append(combis)        
+        f_splits = [x for char_split in f_splits for x in char_split if x != segment]
+        return f_splits
 
     def pred_split(self, splits):
         preds = []

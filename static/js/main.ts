@@ -57,14 +57,43 @@ function toggle_attention_select() {
 }
 
 function split_select_sentence() {
-	let seg_id = Number(d3.select("#point_id").text());
-	let url = `/split_rule?seg_id=${seg_id}`;
-	fetch(url)
-	.then(resp => resp.json())
-	.then(json => {
-		let split_points = json.result;
-		console.log(split_points);
-	});
+	
+	if ($("#select-splits").is(":visible")) {
+		
+		$("#select-splits").hide();
+		
+	} else {
+		
+		$("#select-splits").show();
+		
+		if ($("#splits-spinner").is(":visible")) {
+				
+			let seg_id = Number(d3.select("#point_id").text());
+			let url = `/split_rule?seg_id=${seg_id}`;
+			fetch(url)
+			.then(resp => resp.json())
+			.then(json => {
+				let split_points = json.result;			
+				console.log(split_points);
+				let split_html = "<div>";
+				split_points.forEach(el => {
+					split_html += `<div class="row">
+						<div class="col-10">${el.segment}</div>
+						<div class='col-2'>
+							<span class='text-muted'>ID: #${el.id}</span> <br>
+							<span class='text-muted'>${get_max_value(el.props, true)}</span> <br>
+							${get_sentiment_html(el.sentiment)} <br>
+						</div>
+					</div><hr><br>`;
+				});
+				split_html += "</div></hr>";
+				$("#select-splits").html(split_html);
+				$("#select-splits").show();
+			});
+			
+		}		
+		
+	}
 }
 
 function toggle_ents() {	
@@ -732,7 +761,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
 				
 				let el_entity = ents[span_i];
-				console.log(el_entity);
+				// console.log(el_entity);
 				// let ent_type = el_entity
 				
 				if (span.backgroundColor != "") {
@@ -783,14 +812,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	split_rule_button.on("click", () => {
-		let seg_id = Number(d3.select("#point_id").text());
-		let url = `/split_rule?seg_id=${seg_id}`;
-		fetch(url)
-		.then(resp => resp.json())
-		.then(json => {
-			let split_points = json.result;
-			console.log(split_points);
-		});
+		
+		// old split rule 
 	});
 
 });
