@@ -207,7 +207,7 @@ class Interface:
             for head in attention_for_l:
                 # from w to w' 
                 w_index = tokens.index(w)                
-                num = list(filter(lambda x: x > 0.8, head[w_index]))
+                num = list(filter(lambda x: x > 0.65, head[w_index]))
                 if num:
                     count += len(num) # len            
             if count > 5: # clamp to 5
@@ -284,7 +284,8 @@ class Interface:
                 "embeddings": np.array(self.get_embeddings(split)),
                 "tokens": self.get_tokens(split),
                 "new": True,
-                "id": len(self.dist.df)+e
+                "id": len(self.dist.df)+e,
+                "deRoseAttention": [],
             })
             
         embs = list(map(lambda x: x["embeddings"], preds))

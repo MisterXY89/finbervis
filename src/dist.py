@@ -44,7 +44,8 @@ class Dist:
         self.df.loc[len(self.df)] = [dp["segment"], dp["sentiment"],
                                         [], dp["props"], dp["embeddings"], -1,
                                         dp["x"], dp["y"], dp["id"], [], 
-                                        dp["tokens"], [], "not set"
+                                        dp["tokens"], [], "not set", 
+                                        dp["deRoseAttention"]
                                     ]
 
     def get_similar_sents_for(self, id=0, n=5, return_sents=False):
@@ -65,7 +66,8 @@ class Dist:
                     "props": row["props"],
                     "saliency_score": row["saliency_score"],
                     "tokens": row["tokens"],
-                    "mean_attention": row["mean_attention"]
+                    "mean_attention": row["mean_attention"],
+                    "deRoseAttention": row["deRoseAttention"]
                 })
             return full_sents
         return sents_index

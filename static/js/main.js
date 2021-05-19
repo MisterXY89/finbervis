@@ -23,16 +23,21 @@ function toggle_attention_select() {
     $("#selected-segment-ents").hide();
     $("#selected-segment-tokens").show();
     var sent = document.getElementById("selected-segment-tokens");
-    var sent_attention = to_array(window.d.mean_attention);
+    // let sent_attention = to_array(window.d["mean_attention"]);
+    var sent_attention = to_array(window.d["deRoseAttention"]);
     Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
         if (span.style.borderTop == "" || span.style.borderTop == undefined || span.style.borderTop == "unset") {
+            var max_val = d3.max(sent_attention);
+            var min_val = d3.min(sent_attention);
             var color = d3.scaleLinear()
-                .domain([0, 1])
-                .range(["#edf6f9", "#e01e37"]); // output for opacity between .3 and 1 %
+                .domain([min_val, max_val])
+                .range(["#d9d9d9", "#ff5921"]);
+            // var color = d3.scaleLinear()
+            // 	.domain([0, 1])
+            // 	.range(["#ffd6a1", "#e35f00"]);   // output for opacity between .3 and 1 %
             // white edf6f9
             // ffb600 - warm yellow
-            // ff4800 - warm orange
-            console.log(sent_attention[span_i]);
+            // ff4800 - warm orange			
             var color_val = color(sent_attention[span_i]);
             span.style.borderTop = "3px " + color_val + " solid";
         }
@@ -84,8 +89,12 @@ function toggle_ents() {
     }
 }
 function to_array(string) {
+    // console.log(string);
     if (typeof string == "object") {
         return string;
+    }
+    if (string == undefined) {
+        return [];
     }
     return string.slice(1, -1).split(", ").map(function (el) { return Number(el); });
 }
@@ -144,8 +153,8 @@ function visualize_saliency(res, el) {
         token_html += "<span style=\"background-color: " + color + ";\">" + tok + " </span>";
     });
     token_html += "</div>";
-    console.log(token_html);
-    console.log(el.parentElement.parentElement.getElementsByTagName("div")[0]);
+    // console.log(token_html);
+    // console.log(el.parentElement.parentElement.getElementsByTagName("div")[0]);
     el.parentElement.parentElement.getElementsByTagName("div")[0].innerHTML += token_html;
     var parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
     var sal_div = parent.getElementsByClassName("sal-text")[0];
@@ -162,7 +171,7 @@ function get_sal_div(el) {
 }
 function toggle_sal_plain(el) {
     var parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
-    console.log(parent);
+    // console.log(parent);
     var sal_div = parent.getElementsByClassName("sal-text")[0];
     var plain_div = parent.getElementsByClassName("plain-text")[0];
     if (sal_div.style.display == "block") {
@@ -207,12 +216,12 @@ function get_mean_attention_html(tokens, attention, sent) {
         // let color_val = attention[i];
         // border-top: 3px and map value to color
         var color = d3.scaleLinear()
-            .domain([0, 1])
-            .range(["#edf6f9", "#e01e37"]); // output for opacity between .3 and 1 %
+            .domain([0, 0.9])
+            .range(["#ddd", "#540012"]); // output for opacity between .3 and 1 %
         // white edf6f9
         // ffb600 - warm yellow
         // ff4800 - warm orange
-        console.log(attention[i]);
+        // console.log(attention[i]);
         var color_val = color(attention[i]);
         att_html += "<span style=\"border-top: 3px " + color_val + " solid;\">" + tok + " </span>";
     });
@@ -246,7 +255,7 @@ function search_data(search_q) {
         }
         else {
             var res = json.result;
-            console.log(res);
+            // console.log(res);
             d3.select("#search-results").html(prep_search_vis(res));
             d3.select("#total-results").text(res.length);
         }
@@ -413,7 +422,7 @@ document.addEventListener("DOMContentLoaded", function () {
         attention_interaction_group.style("opacity", 1);
         spinner.style("display", "block");
         var segment = test_rule_segment_field.property("value");
-        console.log(segment);
+        // console.log(segment);
         var url = "/test_user_data"
             + ("?segment=" + segment);
         fetch(url)
@@ -428,6 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     toggle_gradients_button.on("click", function () {
+        $("#show-simmilar").show();
         $("#similar-sents-display").show();
         $("#similar-sents-ents-display").hide();
         Array.from(document.getElementsByClassName("sim-sentence")).forEach(function (sent, sent_i) {
@@ -458,6 +468,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     show_similar_sents_button.on("click", function () {
+        $("#show-simmilar").show();
         var id = d3.select("#point_id").text();
         var url = "/get_similar_segments?seg_id=" + id + "&return_sents=True";
         console.log(url);
@@ -472,6 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return {
                     id: el.id,
                     mean_attention: el.mean_attention,
+                    deRoseAttention: el.deRoseAttention,
                     props: el.props,
                     saliency_score: el.saliency_score,
                     segment: el.segment,
@@ -482,7 +494,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 };
             });
             window.sim_res = res;
-            console.log(res);
+            // console.log(res);
             if (!res.length == 0) {
                 var ents_html = json.ent_html;
                 // let ents_json = extract_ents_json(ents_html, res);
@@ -510,6 +522,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     toggle_ents_sim_sents_button.on("click", function () {
+        $("#show-simmilar").show();
         $("#similar-sents-display").toggle();
         $("#similar-sents-ents-display").toggle();
         // let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
@@ -555,18 +568,23 @@ document.addEventListener("DOMContentLoaded", function () {
         // });
     });
     toggle_mean_attention_button.on("click", function () {
+        $("#show-simmilar").show();
         $("#similar-sents-display").show();
         $("#similar-sents-ents-display").hide();
         Array.from(document.getElementsByClassName("sim-sentence")).forEach(function (sent, sent_i) {
-            var mean_attention = window.sim_res[sent_i]["mean_attention"];
-            mean_attention = to_array(mean_attention);
-            // console.log(mean_attention);
+            var deRose_attention = window.sim_res[sent_i]["deRoseAttention"];
+            deRose_attention = to_array(deRose_attention);
+            var max_val = d3.max(deRose_attention);
+            var min_val = d3.min(deRose_attention);
+            // let mean_attention = window.sim_res[sent_i]["mean_attention"];			
             Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
-                // console.log(mean_attention[span_i]);
+                // console.log(deRose_attention[span_i]);
+                // var scale = d3.scale.linear().domain([0, max]).range([0, 100]);
                 var color = d3.scaleLinear()
-                    .domain([0, 1])
-                    .range(["#b3b5b5", "#b30017"]); // output for opacity between .3 and 1 %
-                var color_val = color(mean_attention[span_i]);
+                    .domain([min_val, max_val])
+                    .range(["#d9d9d9", "#ff5921"]);
+                var color_val = color(deRose_attention[span_i]);
+                // console.log(color_val);
                 // console.log(color_val);
                 if (span.style.borderTop == "none" || span.style.borderTop == "") {
                     span.style.borderTop = "3px solid " + color_val;
@@ -578,6 +596,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     toggle_identical_words_sim_sents_button.on("click", function () {
+        $("#show-simmilar").show();
         // let segment_select_display = window.tokens.toLowerCase();
         var segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
         Array.from(document.getElementsByClassName("sim-sentence")).forEach(function (sent, sent_i) {
@@ -606,6 +625,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     $("#toggle-ente").on("click", function () {
+        $("#show-simmilar").show();
         // let segment_select_display = window.tokens.toLowerCase();
         var segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
         Array.from(document.getElementsByClassName("sim-sentence")).forEach(function (sent, sent_i) {
@@ -614,7 +634,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var ents = element["entities"];
             Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
                 var el_entity = ents[span_i];
-                console.log(el_entity);
+                // console.log(el_entity);
                 // let ent_type = el_entity
                 if (span.backgroundColor != "") {
                     span.style.backgroundColor = "";

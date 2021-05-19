@@ -42,7 +42,9 @@ def split_rule():
 		success = False
 	else:
 		seg_id = int(req_data["seg_id"])
+		print(seg_id)
 		splits = interface.get_splits(seg_id)
+		print(splits)
 		result = interface.pred_split(splits)		
 		# print(result)
 		success = True
@@ -87,6 +89,7 @@ def test_user_data():
     new_tokens= interface.get_tokens(segment)
     embs_solo = list(map(float, list(embs_solo)))
     props = list(map(float, list(props)))
+    deRoseAttention = list(interface.get_deRose_attention(segment))
     dict = {
         "embeddings": embs_solo,
         "x": x,
@@ -96,7 +99,8 @@ def test_user_data():
 		"segment": segment,
 		"new": True,
 		"id": len(interface.dist.df),
-		"props": props
+		"props": props,
+		"deRoseAttention": deRoseAttention,
 	}
     interface.dist.update_df({
 		"segment": segment,
@@ -107,6 +111,7 @@ def test_user_data():
 		"id": len(interface.dist.df),
 		"props": props,
 		"tokens": new_tokens,
+		"deRoseAttention": deRoseAttention,
     })
     # print(dict)
     return jsonify(dict)
@@ -236,7 +241,8 @@ def search():
 			"props": str(row.props),
 			"tokens": row.tokens,
 			"saliency_score": row.saliency_score,
-			"mean_attention": row.mean_attention
+			"mean_attention": row.mean_attention,
+			"deRoseAttention": row.deRoseAttention,
 			# "embeddings": row.embeddings,,
 		})
 	return jsonify({

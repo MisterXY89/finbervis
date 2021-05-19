@@ -7,8 +7,7 @@ function edit_sentiment() {
 	let correct_sentiment = d3.select("#sentiment-classes-user-classification").property("value");
 	let model_sentiment = d3.select("#model-sentiment").text();
 	let selected_segement = d3.select("#selected-segment").text();
-	console.log(correct_sentiment);
-	console.log(model_sentiment);
+		
 	if (window.added_segment == selected_segement) {
 		alert("You already added this segment.");
 	}
@@ -27,17 +26,25 @@ function toggle_attention_select() {
 	$("#selected-segment-tokens").show();
 	
 	let sent = document.getElementById("selected-segment-tokens");
-	let sent_attention = to_array(window.d.mean_attention);
+	// let sent_attention = to_array(window.d["mean_attention"]);
+	let sent_attention = to_array(window.d["deRoseAttention"]);		
 	Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
 		
 		if (span.style.borderTop == "" || span.style.borderTop == undefined || span.style.borderTop == "unset") {
+			
+			let max_val = d3.max(sent_attention);
+			let min_val = d3.min(sent_attention);
+			
 			var color = d3.scaleLinear()
-				.domain([0, 1])
-				.range(["#edf6f9", "#e01e37"]);   // output for opacity between .3 and 1 %
+				.domain([min_val, max_val])
+				.range(["#d9d9d9", "#ff5921"]); 
+				
+			// var color = d3.scaleLinear()
+			// 	.domain([0, 1])
+			// 	.range(["#ffd6a1", "#e35f00"]);   // output for opacity between .3 and 1 %
 				// white edf6f9
 				// ffb600 - warm yellow
-				// ff4800 - warm orange
-			console.log(sent_attention[span_i]);
+				// ff4800 - warm orange			
 			let color_val = color(sent_attention[span_i]);
 			span.style.borderTop = `3px ${color_val} solid`;
 		} else {
@@ -95,8 +102,12 @@ function toggle_ents() {
 }
 
 function to_array(string) {
+	// console.log(string);
 	if (typeof string == "object") {
 		return string;
+	}
+	if (string == undefined) {
+		return [];
 	}
 	return string.slice(1, -1).split(", ").map(el => Number(el));
 }
@@ -160,8 +171,8 @@ function visualize_saliency(res, el) {
 		token_html += `<span style="background-color: ${color};">${tok} </span>`;
 	});
 	token_html += "</div>";
-	console.log(token_html);
-	console.log(el.parentElement.parentElement.getElementsByTagName("div")[0]);
+	// console.log(token_html);
+	// console.log(el.parentElement.parentElement.getElementsByTagName("div")[0]);
 	el.parentElement.parentElement.getElementsByTagName("div")[0].innerHTML += token_html;
 	
 	let parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
@@ -184,7 +195,7 @@ function get_sal_div(el) {
 
 function toggle_sal_plain(el) {
 	let parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
-	console.log(parent);
+	// console.log(parent);
 	let sal_div = parent.getElementsByClassName("sal-text")[0];
 	let plain_div = parent.getElementsByClassName("plain-text")[0];
 	
@@ -232,12 +243,12 @@ function get_mean_attention_html(tokens, attention, sent) {
 		// let color_val = attention[i];
 		// border-top: 3px and map value to color
 		var color = d3.scaleLinear()
-      .domain([0, 1])
-      .range(["#edf6f9", "#e01e37"]);   // output for opacity between .3 and 1 %
+      .domain([0, 0.9])
+      .range(["#ddd", "#540012"]);   // output for opacity between .3 and 1 %
 			// white edf6f9
 			// ffb600 - warm yellow
 			// ff4800 - warm orange
-		console.log(attention[i]);
+		// console.log(attention[i]);
 		let color_val = color(attention[i]);
 		att_html += `<span style="border-top: 3px ${color_val} solid;">${tok} </span>`;
 
@@ -272,7 +283,7 @@ function search_data(search_q) {
 			$("#search-results").show();
 		} else {
 			let res = json.result;
-			console.log(res);
+			// console.log(res);
 			d3.select("#search-results").html(prep_search_vis(res));
 			d3.select("#total-results").text(res.length);
 		}			
@@ -459,7 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		attention_interaction_group.style("opacity", 1);
 		spinner.style("display", "block");
 		let segment = test_rule_segment_field.property("value");
-		console.log(segment);
+		// console.log(segment);
 		let url: string = "/test_user_data"
 										+ `?segment=${segment}`;
 		fetch(url)
@@ -476,6 +487,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 	
 	toggle_gradients_button.on("click", () => {
+		
+		$("#show-simmilar").show();
+		
 		$("#similar-sents-display").show();
 		$("#similar-sents-ents-display").hide();
 		
@@ -511,6 +525,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 	show_similar_sents_button.on("click", () => {
+		
+		$("#show-simmilar").show();
+		
 		let id = d3.select("#point_id").text();
 		let url: string = `/get_similar_segments?seg_id=${id}&return_sents=True`;
 		console.log(url);
@@ -525,6 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				return {
 					id: el.id, 
 					mean_attention: el.mean_attention, 
+					deRoseAttention: el.deRoseAttention,
 					props: el.props,
 					saliency_score: el.saliency_score,
 					segment: el.segment,
@@ -536,7 +554,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			});
 			
 			window.sim_res = res;
-			console.log(res);
+			// console.log(res);
 			
 			if (!res.length == 0) {
 				let ents_html = json.ent_html;
@@ -583,6 +601,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	toggle_ents_sim_sents_button.on("click", () => {
+		
+		$("#show-simmilar").show();
+		
 		$("#similar-sents-display").toggle();
 		$("#similar-sents-ents-display").toggle();
 		
@@ -630,20 +651,27 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 	
 	toggle_mean_attention_button.on("click", () => {
+		
+		$("#show-simmilar").show();
+		
 		$("#similar-sents-display").show();
 		$("#similar-sents-ents-display").hide();
 		
 		Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
-			let mean_attention = window.sim_res[sent_i]["mean_attention"];
-			mean_attention = to_array(mean_attention);
-			// console.log(mean_attention);
+			let deRose_attention = window.sim_res[sent_i]["deRoseAttention"];
+			deRose_attention = to_array(deRose_attention);
+			let max_val = d3.max(deRose_attention);
+			let min_val = d3.min(deRose_attention);
+			// let mean_attention = window.sim_res[sent_i]["mean_attention"];			
 			Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
-				// console.log(mean_attention[span_i]);
+				// console.log(deRose_attention[span_i]);
+				// var scale = d3.scale.linear().domain([0, max]).range([0, 100]);
 				var color = d3.scaleLinear()
-					.domain([0, 1])
-					.range(["#b3b5b5", "#b30017"]);   // output for opacity between .3 and 1 %
+					.domain([min_val, max_val])
+					.range(["#d9d9d9", "#ff5921"]);
 				
-				let color_val = color(mean_attention[span_i]);
+				let color_val = color(deRose_attention[span_i]);
+				// console.log(color_val);
 				// console.log(color_val);
 				if (span.style.borderTop == "none" || span.style.borderTop == "") {
 					span.style.borderTop = `3px solid ${color_val}`;					
@@ -656,6 +684,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 	
 	toggle_identical_words_sim_sents_button.on("click", () => {
+		
+		$("#show-simmilar").show();
+		
 		// let segment_select_display = window.tokens.toLowerCase();
 		let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
 		
@@ -688,6 +719,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	
 	
 	$("#toggle-ente").on("click", () => {
+		
+		$("#show-simmilar").show();
+		
 		// let segment_select_display = window.tokens.toLowerCase();
 		let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
 		
