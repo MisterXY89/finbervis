@@ -175,32 +175,15 @@
               </button>
             </div>
  
-            <!-- <div class="col-6 self-attention-collapse">
-              <button class="btn btn-outline-primary btn-block" type="button" data-toggle="collapse" data-target="#collapseSelfAttention" aria-expanded="false" aria-controls="collapseSelfAttention">
+            <div class="col-6 self-attention-collapse">
+              <button class="btn btn-outline-primary btn-block" id="self-attention-collapse-btn" type="button" data-toggle="collapse" data-target="#collapseSelfAttention" aria-expanded="false" aria-controls="collapseSelfAttention">
                 Detail self-attention
               </button>
-            </div> -->
-          </div>
-            
-            
-          </div>
-          
-          <div id="show-simmilar">          
-            <br />
-            <a href="#show-simmilar" id="toggle_ents_sim_sents">Toggle Entities |</a>
-            <a href="#toggle-identical-words" id="toggle_identical_words_sim_sents_button">Toggle identical words |</a>
-            <a href="#toggle-mean-attention" id="toggle_mean_attention">Toggle attention | </a> 
-            <a href="#toggle-gradients" id="toggle_gradients">Toggle Integrates gradients</a>
-            <br />
-            <hr />
-            <div id="similar-sents-display">
-              
             </div>
-            <div id="similar-sents-ents-display">
-              
-            </div>            
+          </div>                    
+            
+            
           </div>
-          
           
           <div class="collapse" id="collapseSelfAttention">
             <br />
@@ -226,7 +209,7 @@
                 </div>
               </div>
               <br />
-              <div class="row">
+              <!-- <div class="row">
                 <div class="col-6">
                   <label for="explore-neighbours">Show self-attention heatmaps datapoints near the selected</label>
                 </div>
@@ -235,20 +218,33 @@
                     <div class="col-6">
                       <input class="form-control" type="number" min="1" max="12" id="layer_input_neighbours" name="layer_input_neighbours" value="1" aria-describedby="layer_input_neighbours_help"/>
                       <small id="layer_input_neighbours_help" class="form-text text-muted">Layer (1-12)</small>
-                    </div>
-                    <div class="col-6">
-                      <input class="form-control" type="number" min="1" max="12" id="head_input_neighbours" name="head_input_neighbours" value="1" aria-describedby="head_input_neighbours_help"/>
-                      <small id="head_input_neighbours_help" class="form-text text-muted">Head (1-12)</small>
-                    </div>
+                    </div>                    
                   </div>
                   <br />
                   <a class="btn btn-warning" href="#explore-neighbours" id="explore-neighbours" name="explore-neighbours">Neighbourhood Self-Attention</a>
                 </div>
-              </div>
+              </div> -->
               
             </div>
             
           </div>
+          
+          <div id="show-simmilar">          
+            <br />
+            <a href="#show-simmilar" id="toggle_ents_sim_sents">Toggle Entities |</a>
+            <a href="#toggle-identical-words" id="toggle_identical_words_sim_sents_button">Toggle identical words |</a>
+            <a href="#toggle-mean-attention" id="toggle_mean_attention">Toggle attention | </a> 
+            <a href="#toggle-gradients" id="toggle_gradients">Toggle Integrates gradients</a>
+            <br />
+            <hr />
+            <div id="similar-sents-display">
+              
+            </div>
+            <div id="similar-sents-ents-display">
+              
+            </div>            
+          </div>
+          
           <!-- <hr /> -->
           
         </div>

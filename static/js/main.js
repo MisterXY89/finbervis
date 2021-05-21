@@ -25,6 +25,7 @@ function toggle_attention_select() {
     var sent_attention = to_array(window.d["deRoseAttention"]);
     Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
         if (span.style.borderTop == "" || span.style.borderTop == undefined || span.style.borderTop == "unset") {
+            $("#attention-info").show();
             var max_val = d3.max(sent_attention);
             var min_val = d3.min(sent_attention);
             var color = d3.scaleLinear()
@@ -41,6 +42,7 @@ function toggle_attention_select() {
         }
         else {
             span.style.borderTop = "unset";
+            $("#attention-info").hide();
         }
     });
 }
@@ -58,18 +60,27 @@ function split_select_sentence() {
                 .then(function (json) {
                 var split_points = json.result;
                 console.log(split_points);
-                var split_html = "<div>";
-                split_points.forEach(function (el) {
-                    split_html += "<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-10\">" + el.segment + "</div>\n\t\t\t\t\t\t<div class='col-2'>\n\t\t\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\n\t\t\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div><hr><br>";
-                });
-                split_html += "</div></hr>";
-                $("#select-splits").html(split_html);
-                $("#select-splits").show();
+                if (!split_points) {
+                    toast_msg("No splits found!");
+                    $("#select-splits").hide();
+                }
+                else {
+                    var split_html_1 = "<div> <strong>Splits</strong><br><small>Splits can be toggled by clicking again on 'Split'</small><hr>";
+                    split_points.forEach(function (el) {
+                        split_html_1 += "<div class=\"row\">\n\t\t\t\t\t\t\t<div class=\"col-10\">" + el.segment + "</div>\n\t\t\t\t\t\t\t<div class='col-2'>\n\t\t\t\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div><hr><br>";
+                        // ${get_sentiment_html(el.truth_label)} <br>
+                    });
+                    split_html_1 += "</div></hr>";
+                    $("#select-splits").html(split_html_1);
+                    $("#select-splits").show();
+                }
             });
         }
     }
 }
 function toggle_ents() {
+    $("#grad-info").hide();
+    $("#attention-info").hide();
     if ($("#selected-segment-ents").text() != "Loading" && !$("#selected-segment-ents").is(":visible")) {
         $("#selected-segment-ents").show();
         $("#selected-segment").hide();
@@ -355,13 +366,12 @@ function extract_ents_json(html, res) {
 function toggle_grads() {
     $("#selected-segment").hide();
     $("#selected-segment-ents").hide();
-    $("#selected-segment-tokens").show();
     var sent = document.getElementById("selected-segment-tokens");
     Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
         var sal_scores = window.d["saliency_score"];
         sal_scores = to_array(sal_scores);
         var opacity = Math.abs(sal_scores[span_i]);
-        var token_grad_color = "58,100,229"; // negative values
+        var token_grad_color = "252,186,3"; // negative values
         if (sal_scores[span_i] > 0) {
             token_grad_color = "221,89,100";
         }
@@ -372,15 +382,18 @@ function toggle_grads() {
         // if (span.classList.contains("identical-token-stopword")) {
         // 	span.classList.remove("identical-token-stopword");
         // }
-        if (span.classList.contains("saliency-active")) {
+        if (span.classList.contains("saliency-active") && $("#selected-segment-tokens").is(":visible")) {
             span.style.backgroundColor = "transparent";
             span.classList.remove("saliency-active");
+            $("#grad-info").hide();
         }
         else {
+            $("#grad-info").show();
             span.style.backgroundColor = color;
             span.classList.add("saliency-active");
         }
     });
+    $("#selected-segment-tokens").show();
     // sent += '<span id="info-grad"><br /> <i class="material-icons">info_outline</i> Red indicated importance for predicted label</span>';
 }
 function toggle_plain_sent() {
@@ -398,6 +411,7 @@ function toggle_plain_sent() {
 }
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("show-similar").disabled = true;
+    document.getElementById("self-attention-collapse-btn").disabled = true;
     search_data("=all");
     $('.toast').toast({
         delay: 12500
@@ -451,14 +465,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     toggle_gradients_button.on("click", function () {
         $("#show-simmilar").show();
-        $("#similar-sents-display").show();
         $("#similar-sents-ents-display").hide();
         Array.from(document.getElementsByClassName("sim-sentence")).forEach(function (sent, sent_i) {
             Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
                 var sal_scores = window.sim_res[sent_i]["saliency_score"];
                 sal_scores = to_array(sal_scores);
                 var opacity = Math.abs(sal_scores[span_i]);
-                var token_grad_color = "58,100,229"; // negative values
+                var token_grad_color = "252,186,3"; // negative values
                 if (sal_scores[span_i] > 0) {
                     token_grad_color = "221,89,100";
                 }
@@ -469,16 +482,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (span.classList.contains("identical-token-stopword")) {
                     span.classList.remove("identical-token-stopword");
                 }
-                if (span.classList.contains("saliency-active")) {
+                if (span.classList.contains("saliency-active") && $("#similar-sents-display").is(":visible")) {
                     span.style.backgroundColor = "transparent";
                     span.classList.remove("saliency-active");
+                    $("#grad-info").hide();
                 }
                 else {
                     span.style.backgroundColor = color;
                     span.classList.add("saliency-active");
+                    $("#grad-info").show();
                 }
             });
         });
+        $("#similar-sents-display").show();
     });
     show_similar_sents_button.on("click", function () {
         $("#show-simmilar").show();
@@ -515,7 +531,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 var new_origin = json.origin_sent_ent_html;
                 var sim_sent_html_1 = "";
                 res.forEach(function (el) {
-                    sim_sent_html_1 += "<div class='row'>\n\t\t\t\t\t<div class='sim-sentence col-10'> \n\t\t\t\t\t\t" + el.tokens.map(function (tok) { return "<span>" + tok + "</span> "; }).join(" ") + " \n\t\t\t\t\t</div>\n\t\t\t\t\t<div class='col-2'>\n\t\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\n\t\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr/>";
+                    console.log(el);
+                    sim_sent_html_1 += "<div class='row'>\n\t\t\t\t\t<div class='sim-sentence col-10'> \n\t\t\t\t\t\t" + el.tokens.map(function (tok) { return "<span>" + tok + "</span> "; }).join(" ") + " \n\t\t\t\t\t</div>\n\t\t\t\t\t<div class='col-2'>\n\t\t\t\t\t\t<span class='text-muted'>ID: #" + el.id + "</span> <br>\n\t\t\t\t\t\t" + get_sentiment_html(el.sentiment) + " <br>\n\t\t\t\t\t\t<span class='text-muted'>" + get_max_value(el.props, true) + "</span> <br>\n\t\t\t\t\t\t" + get_sentiment_html(el.truth_label) + " <br>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<hr/>";
                 });
                 $("#similar-sents-display").html(sim_sent_html_1);
                 $("#selected-segment-ents").html(new_origin);
@@ -536,6 +553,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     toggle_ents_sim_sents_button.on("click", function () {
         $("#show-simmilar").show();
+        $("#grad-info").hide();
+        $("#attention-info").hide();
         $("#similar-sents-display").toggle();
         $("#similar-sents-ents-display").toggle();
         // let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
@@ -600,10 +619,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 // console.log(color_val);
                 // console.log(color_val);
                 if (span.style.borderTop == "none" || span.style.borderTop == "") {
+                    $("#attention-info").show();
                     span.style.borderTop = "3px solid " + color_val;
                 }
                 else {
                     span.style.borderTop = "none";
+                    $("#attention-info").hide();
                 }
             });
         });

@@ -32,6 +32,8 @@ function toggle_attention_select() {
 		
 		if (span.style.borderTop == "" || span.style.borderTop == undefined || span.style.borderTop == "unset") {
 			
+			$("#attention-info").show();
+			
 			let max_val = d3.max(sent_attention);
 			let min_val = d3.min(sent_attention);
 			
@@ -49,6 +51,7 @@ function toggle_attention_select() {
 			span.style.borderTop = `3px ${color_val} solid`;
 		} else {
 			span.style.borderTop = "unset";
+			$("#attention-info").hide();
 		}
 				
 			
@@ -73,22 +76,28 @@ function split_select_sentence() {
 			fetch(url)
 			.then(resp => resp.json())
 			.then(json => {
-				let split_points = json.result;			
+				let split_points = json.result;
 				console.log(split_points);
-				let split_html = "<div>";
-				split_points.forEach(el => {
-					split_html += `<div class="row">
-						<div class="col-10">${el.segment}</div>
-						<div class='col-2'>
-							<span class='text-muted'>ID: #${el.id}</span> <br>
-							<span class='text-muted'>${get_max_value(el.props, true)}</span> <br>
-							${get_sentiment_html(el.sentiment)} <br>
-						</div>
-					</div><hr><br>`;
-				});
-				split_html += "</div></hr>";
-				$("#select-splits").html(split_html);
-				$("#select-splits").show();
+				if (!split_points) {
+					toast_msg("No splits found!")
+					$("#select-splits").hide();
+				}	else {
+					let split_html = "<div> <strong>Splits</strong><br><small>Splits can be toggled by clicking again on 'Split'</small><hr>";
+					split_points.forEach(el => {
+						split_html += `<div class="row">
+							<div class="col-10">${el.segment}</div>
+							<div class='col-2'>
+								<span class='text-muted'>ID: #${el.id}</span> <br>
+								${get_sentiment_html(el.sentiment)} <br>
+								<span class='text-muted'>${get_max_value(el.props, true)}</span> <br>								
+							</div>
+						</div><hr><br>`;
+						// ${get_sentiment_html(el.truth_label)} <br>
+					});
+					split_html += "</div></hr>";
+					$("#select-splits").html(split_html);
+					$("#select-splits").show();
+				}
 			});
 			
 		}		
@@ -96,7 +105,10 @@ function split_select_sentence() {
 	}
 }
 
-function toggle_ents() {	
+function toggle_ents() {
+	
+	$("#grad-info").hide();
+	$("#attention-info").hide();	
 	
 	if ($("#selected-segment-ents").text() != "Loading" && !$("#selected-segment-ents").is(":visible")) {
 		$("#selected-segment-ents").show();
@@ -405,15 +417,14 @@ function extract_ents_json(html, res) {
 function toggle_grads() {
 	
 	$("#selected-segment").hide();
-	$("#selected-segment-ents").hide();
-	$("#selected-segment-tokens").show();
+	$("#selected-segment-ents").hide();	
 		
 	let sent = document.getElementById("selected-segment-tokens");
 	Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
 		let sal_scores = window.d["saliency_score"];
 		sal_scores = to_array(sal_scores);
 		let opacity = Math.abs(sal_scores[span_i]);
-		let token_grad_color = "58,100,229"; // negative values
+		let token_grad_color = "252,186,3"; // negative values
 		if (sal_scores[span_i] > 0) {			
 			token_grad_color = "221,89,100";
 		}
@@ -426,16 +437,19 @@ function toggle_grads() {
 		// if (span.classList.contains("identical-token-stopword")) {
 		// 	span.classList.remove("identical-token-stopword");
 		// }
-		
-		if (span.classList.contains("saliency-active")) {
+				
+		if (span.classList.contains("saliency-active") && $("#selected-segment-tokens").is(":visible")) {
 			span.style.backgroundColor = "transparent";
 			span.classList.remove("saliency-active");
-		} else {					
+			$("#grad-info").hide();
+		} else {
+			$("#grad-info").show();
 			span.style.backgroundColor = color;		
 			span.classList.add("saliency-active");			
-		}
+		}		
 			
 	});
+	$("#selected-segment-tokens").show();
 	// sent += '<span id="info-grad"><br /> <i class="material-icons">info_outline</i> Red indicated importance for predicted label</span>';
 }
 
@@ -455,6 +469,7 @@ function toggle_plain_sent() {
 document.addEventListener("DOMContentLoaded", () => {
 	
 	document.getElementById("show-similar").disabled = true;
+	document.getElementById("self-attention-collapse-btn").disabled = true;	
 		
 	search_data("=all");
 	$('.toast').toast({
@@ -518,8 +533,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	toggle_gradients_button.on("click", () => {
 		
 		$("#show-simmilar").show();
-		
-		$("#similar-sents-display").show();
+				
 		$("#similar-sents-ents-display").hide();
 		
 		Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
@@ -527,7 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				let sal_scores = window.sim_res[sent_i]["saliency_score"];
 				sal_scores = to_array(sal_scores);
 				let opacity = Math.abs(sal_scores[span_i]);
-				let token_grad_color = "58,100,229"; // negative values
+				let token_grad_color = "252,186,3"; // negative values
 				if (sal_scores[span_i] > 0) {			
 					token_grad_color = "221,89,100";
 				}
@@ -541,15 +555,18 @@ document.addEventListener("DOMContentLoaded", () => {
 					span.classList.remove("identical-token-stopword");
 				}
 				
-				if (span.classList.contains("saliency-active")) {
+				if (span.classList.contains("saliency-active") && $("#similar-sents-display").is(":visible")) {
 					span.style.backgroundColor = "transparent";
 					span.classList.remove("saliency-active");
+					$("#grad-info").hide();
 				} else {					
 					span.style.backgroundColor = color;		
 					span.classList.add("saliency-active");
+					$("#grad-info").show();
 				}
 			});
 		});
+		$("#similar-sents-display").show();
 	});
 
 
@@ -593,15 +610,17 @@ document.addEventListener("DOMContentLoaded", () => {
 				let new_origin = json.origin_sent_ent_html;			
 				let sim_sent_html = "";
 				
-				res.forEach(el => {				
+				res.forEach(el => {
+					console.log(el);
 					sim_sent_html += `<div class='row'>
 					<div class='sim-sentence col-10'> 
 						${el.tokens.map(tok => `<span>${tok}</span> `).join(" ")} 
 					</div>
 					<div class='col-2'>
 						<span class='text-muted'>ID: #${el.id}</span> <br>
-						<span class='text-muted'>${get_max_value(el.props, true)}</span> <br>
 						${get_sentiment_html(el.sentiment)} <br>
+						<span class='text-muted'>${get_max_value(el.props, true)}</span> <br>
+						${get_sentiment_html(el.truth_label)} <br>
 					</div>
 				</div>
 				<hr/>`;
@@ -632,7 +651,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	toggle_ents_sim_sents_button.on("click", () => {
 		
 		$("#show-simmilar").show();
-		
+		$("#grad-info").hide();
+		$("#attention-info").hide();
 		$("#similar-sents-display").toggle();
 		$("#similar-sents-ents-display").toggle();
 		
@@ -703,9 +723,11 @@ document.addEventListener("DOMContentLoaded", () => {
 				// console.log(color_val);
 				// console.log(color_val);
 				if (span.style.borderTop == "none" || span.style.borderTop == "") {
+					$("#attention-info").show();
 					span.style.borderTop = `3px solid ${color_val}`;					
 				} else {
 					span.style.borderTop = "none";
+					$("#attention-info").hide();
 				}
 				
 			});
