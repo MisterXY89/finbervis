@@ -21,6 +21,7 @@ class Dist:
         self.df = pd.read_csv(NEW_EMBS_FILE)
         self.dist_matrix = self.get_dist_matrix(self.df)
         self.similiar_sents = self.dist_matrix[self.dist_matrix < self.DIST_THRESHOLD].stack().reset_index()
+        print(self.similiar_sents)
 
     def get_dist_matrix(self, df):
 
@@ -52,7 +53,9 @@ class Dist:
         # via head & tail cut of self-dist = 0
         # print(self.similiar_sents)
         # print(self.similiar_sents.query(f"level_0 == {id}"))
-        sents_index = list(self.similiar_sents.query(f"level_0 == {id}").head(n+1).sort_values(by=0).tail(n).level_1)
+        print(self.similiar_sents.query(f"level_0 == {id}").head(n+1))
+        print(self.similiar_sents.query(f"level_0 == {id}").sort_values(by=0).head(n+1))
+        sents_index = list(self.similiar_sents.query(f"level_0 == {id}").sort_values(by=0).head(n+1).level_1)
         # print(sents_index)
         if return_sents:
             full_sents = []
