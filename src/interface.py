@@ -85,19 +85,18 @@ class Interface:
 
     def prep_for_d3_plot(self, attention_list, segment):
         """
-        TODO: check for error
-        (2.4943597316741943,
-         4.123290061950684)
         """
         csv_string = "token_x,token_y,value\n"
-        doc = self.nlp(segment)
-        tokens = ["[CLS]"] + [token.text for token in doc] + ["[SEP]"]
-        print(tokens)
+        tokens = self.get_tokens(segment)        
         for y, row in enumerate(attention_list):
             for x, col in enumerate(row):
                 try:
                     token_y = tokens[int(y)]
                     token_x = tokens[int(x)]
+                    if token_x == ",":
+                        token_x = "COMMA"
+                    if token_y == ",":
+                        token_y = "COMMA"
                     csv_string += f"{token_x},{token_y},{float(attention_list[y][x])}\n"
                 except:
                     print("ERROR:")
@@ -185,20 +184,6 @@ class Interface:
         # wie viele heads attended CLS? mit a > 0.5        
         
         tokens = self.get_tokens(segment)
-        # print(tokens)
-        
-        # def get_tok(li, w):
-        #     layer_att = at[li-1]
-        #     alpha = 0
-        #     num_alpha = 0
-        #     for head in range(12):
-        #         head_att = layer_att[head]
-        #         w_i = tokens.index(w)
-        #         for tok_h in head_att:
-        #             alpha += tok_h[w_i]
-        #             num_alpha += 1
-        #     # return [at[li-1][h][tokens.index(w)] for h in range(12)][tokens.index(w)]
-        #     return alpha#/num_alpha
         
         def c(l, w):
             attention_for_l = [self.get_attention_for_segment(segment, layer=l-1, head=head) for head in range(12)]
@@ -206,18 +191,18 @@ class Interface:
             # w_L = [self.get_attention_for_segment(segment, layer=11, head=head) for head in range(12)]
             for head in attention_for_l:
                 # from w to w' 
-                w_index = tokens.index(w)                
+                w_index = tokens.index(w)       
                 num = list(filter(lambda x: x > 0.65, head[w_index]))
                 if num:
-                    count += len(num) # len            
-            if count > 5: # clamp to 5
-                return 5                                
+                    count += 1                          
             return count
     
         def infl(w, l=1):
             last_layer = 12
             summe = sum([math.pow(0.5, (last_layer-li))*c(li, w) for li in range(1, last_layer+1)])
-            return 1/(last_layer-l+1) * summe
+            score = 1/(last_layer-l+1) * summe
+            if score > 5:
+                return 5
         
         infl_toks = [infl(tok) for tok in tokens]        
         # print(infl_toks)
@@ -276,6 +261,8 @@ class Interface:
 
     def pred_split(self, splits):
         preds = []
+        if not splits:
+            return False
         for e, split in enumerate(splits):
             props = self.sent_pred.predict([split], pretty=False)
             preds.append({
@@ -287,6 +274,7 @@ class Interface:
                 "new": True,
                 "id": len(self.dist.df)+e,
                 "deRoseAttention": [],
+                # "truth_label": ""
             })
             
         embs = list(map(lambda x: x["embeddings"], preds))

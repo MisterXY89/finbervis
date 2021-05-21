@@ -44,7 +44,6 @@ def split_rule():
 		seg_id = int(req_data["seg_id"])
 		print(seg_id)
 		splits = interface.get_splits(seg_id)
-		print(splits)
 		result = interface.pred_split(splits)		
 		# print(result)
 		success = True
@@ -208,7 +207,7 @@ def get_entities():
 		seq_id = req_data["seq_id"]
 		result = interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")], dict=False)
 		status = True
-
+ 
 	return jsonify({
 		"status": status,
 		"result": result,
