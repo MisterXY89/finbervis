@@ -67,7 +67,8 @@ class Dist:
                     "saliency_score": row["saliency_score"],
                     "tokens": row["tokens"],
                     "mean_attention": row["mean_attention"],
-                    "deRoseAttention": row["deRoseAttention"]
+                    "deRoseAttention": row["deRoseAttention"],
+                    "truth_label": row["truth_label"],
                 })
             return full_sents
         return sents_index
