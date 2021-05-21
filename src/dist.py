@@ -21,7 +21,6 @@ class Dist:
         self.df = pd.read_csv(NEW_EMBS_FILE)
         self.dist_matrix = self.get_dist_matrix(self.df)
         self.similiar_sents = self.dist_matrix[self.dist_matrix < self.DIST_THRESHOLD].stack().reset_index()
-        print(self.similiar_sents)
 
     def get_dist_matrix(self, df):
 
@@ -51,17 +50,17 @@ class Dist:
 
     def get_similar_sents_for(self, id=0, n=5, return_sents=False):
         # via head & tail cut of self-dist = 0
-        # print(self.similiar_sents)
-        # print(self.similiar_sents.query(f"level_0 == {id}"))
-        print(self.similiar_sents.query(f"level_0 == {id}").head(n+1))
-        print(self.similiar_sents.query(f"level_0 == {id}").sort_values(by=0).head(n+1))
-        sents_index = list(self.similiar_sents.query(f"level_0 == {id}").sort_values(by=0).head(n+1).level_1)
+        sents_index = list(self.similiar_sents.query(f"level_0 == {id}").sort_values(by=0).head(n*2).level_1)
         # print(sents_index)
+        all_segments = []
         if return_sents:
             full_sents = []
             for sent_index in sents_index:
                 row = self.df.iloc[sent_index]
+                if str(row["segment"]) in all_segments:
+                    continue
                 print(sent_index)
+                all_segments.append(str(row["segment"]))
                 full_sents.append({
                     "id": int(row["id"]),
                     "segment": row["segment"],
@@ -73,8 +72,8 @@ class Dist:
                     "deRoseAttention": row["deRoseAttention"],
                     "truth_label": row["truth_label"],
                 })
-            return full_sents
-        return sents_index
+            return full_sents[:5]
+        return sents_index[:5]
 
 
     def distance_matrix(self, values):
