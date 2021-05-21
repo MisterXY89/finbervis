@@ -7,6 +7,10 @@ function toast_msg(msg) {
     $("#toast-msg").html(msg);
     $('.toast').toast("show");
 }
+function unzoom() {
+    window.zoom = false;
+    // click_point(window.d);
+}
 function get_sentiment_html(sent, truth_label, is_truth_label) {
     truth_label = truth_label == undefined ? "" : truth_label;
     is_truth_label = is_truth_label == undefined ? false : is_truth_label;
@@ -52,8 +56,10 @@ function tok_to_array(string) {
 }
 function click_point(d) {
     document.getElementById("show-similar").disabled = false;
+    document.getElementById("self-attention-collapse-btn").disabled = false;
     $("#similar-sents-display").css("opacity", 0.5);
     $("#similar-sents-ents-display").css("opacity", 0.5);
+    $("#select-splits").hide();
     console.log(d);
     var current_target;
     if (typeof d == "number" || d3.event == null) {
@@ -74,7 +80,7 @@ function click_point(d) {
     attention_interaction_group.style("opacity", 1);
     d3.select("#user-classification").style("display", "block");
     d3.select("#point_id_display").html("#<span id='point_id'>" + d.id + "</span>");
-    var split_html = '<span> | <a href="#split" id="split-rule" onclick="split_select_sentence()">Split</a></span>';
+    var split_html = '<span> | <span href="#split" id="split-rule" onclick="split_select_sentence()" class="text-info">Split</span></span>';
     var sal_html = '<span> | <a href="#toggleGrads" id="saliency-show-selected-segment" onclick="toggle_grads()">Integrated Gradients</a></span>';
     var plain_sent_html = '<span> | <a href="#plainSent" id="show-plain-selected-sent" onclick="toggle_plain_sent()">Toggle Plain/Token</a></span>';
     var attention_sent_html = '<span> | <a href="#toggle-attention-select" id="toggle-attention-select" onclick="toggle_attention_select()">Toggle Attention</a></span>';
@@ -103,7 +109,9 @@ function click_point(d) {
         + '</tr>'
         + '</table>'
         + '<hr />'
-        + ("<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span> " + split_html + " " + sal_html + " " + attention_sent_html + " " + plain_sent_html + "<br />")
+        + ("<strong>Segment:</strong><span clas='right text-right'><a href='#selected_segement' onclick=\"toggle_ents();\">Toggle Entities</a></span> " + sal_html + " " + attention_sent_html + " " + plain_sent_html + " " + split_html + "<br /> <hr>")
+        + "<span id=\"grad-info\" class=\"text-muted\"><i class=\"material-icons small\">info_outline</i> \n\t\t\t\tColor indicates importance for classification of predicted class, with <span class=\"color-grad-positive\"></span> \n\t\t\t\tcorresponding to predicted class and <span class=\"color-grad-negative\"></span> to the other classes.<br></span>"
+        + "<span id=\"attention-info\" class=\"text-muted\"><i class=\"material-icons small\">info_outline</i> \n\t\t\t\tColor indicates influence of a token 'w' with <span class=\"color-attention-max\"></span> \n\t\t\t\trepresenting a high incluence.<br></span>"
         + ("<p id='selected-segment'>" + d.segment + "</p>")
         + ("<p id='selected-segment-tokens'>" + tok_to_array(d.tokens).map(function (tok) { return "<span>" + tok + "</span> "; }).join(" ") + " </p>")
         + "<p id='selected-segment-ents'>Loading</p>");

@@ -61,7 +61,7 @@ var y = d3.scaleLinear()
 function create_heatmap(segment, layer, head) {
     var csv_url = "/get-attention?layer=" + layer + "&head=" + head + "&segment=" + segment;
     // set the dimensions and margins of the graph
-    var margin = { top: 80, right: 25, bottom: 30, left: 40 }, width = 450 - margin.left - margin.right, height = 450 - margin.top - margin.bottom;
+    var margin = { top: 125, right: 30, bottom: 80, left: 80 }, width = 650 - margin.left - margin.right, height = 650 - margin.top - margin.bottom;
     // append the svg object to the body of the page
     var svg = d3.select("#self-attention-heatmap")
         .append("svg")
@@ -72,24 +72,51 @@ function create_heatmap(segment, layer, head) {
     //Read the data
     d3.csv(csv_url, function (data) {
         console.log(data);
+        var segment_tokens = tok_to_array(d.tokens);
+        segment_tokens = segment_tokens.map(function (element) {
+            if (element == ",") {
+                return "COMMA";
+            }
+            return element;
+        });
+        console.log(segment_tokens);
         // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
-        var token_xs = d3.map(data, function (d) { return d.token_x; }).keys();
-        var token_ys = d3.map(data, function (d) { return d.token_y; }).keys();
+        var token_xs = segment_tokens;
+        var token_ys = segment_tokens;
+        console.log(token_xs);
+        console.log(token_ys);
         // Build X scales and axis:
         var x = d3.scaleBand()
             .range([0, width])
             .domain(token_xs)
-            .padding(0.05);
+            .padding(0.01);
         svg.append("g")
             .style("font-size", 15)
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x).tickSize(0))
-            .select(".domain").remove();
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)")
+            .style("padding-bottom", "2em");
+        // .select(".domain").remove();
+        // .padding(1);
+        // svg.append("g")
+        //   .attr("class", "x axis")
+        //   .attr("transform", "translate(0," + height + ")")
+        //   .call(d3.axisBottom(x))
+        // .selectAll("text")
+        //   .attr("y", 0)
+        //   .attr("x", 9)
+        //   // .attr("dy", ".35em")
+        //   .attr("transform", "rotate(90)")
+        //   .style("text-anchor", "start");
         // Build Y scales and axis:
         var y = d3.scaleBand()
             .range([height, 0])
             .domain(token_ys)
-            .padding(0.05);
+            .padding(0.01);
         svg.append("g")
             .style("font-size", 15)
             .call(d3.axisLeft(y).tickSize(0))
@@ -105,31 +132,28 @@ function create_heatmap(segment, layer, head) {
             .style("opacity", 0)
             .attr("class", "tooltip")
             .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "2px")
-            .style("border-radius", "5px")
             .style("padding", "5px");
         // Three function that change the tooltip when user hover / move / leave a cell
-        var mouseover = function (d) {
-            tooltip
-                .style("opacity", 1);
-            d3.select(this)
-                .style("stroke", "black")
-                .style("opacity", 1);
-        };
-        var mousemove = function (d) {
-            tooltip
-                .html("The exact value of<br>this cell is: " + Number(d.value))
-                .style("left", (d3.mouse(this)[0] + 70) + "px")
-                .style("top", (d3.mouse(this)[1]) + "px");
-        };
-        var mouseleave = function (d) {
-            tooltip
-                .style("opacity", 0);
-            d3.select(this)
-                .style("stroke", "none")
-                .style("opacity", 0.8);
-        };
+        // var mouseover = function(d) {
+        //   tooltip
+        //     .style("opacity", 1)
+        //   d3.select(this)
+        //     .style("stroke", "black")
+        //     .style("opacity", 1)
+        // }
+        // var mousemove = function(d) {
+        //   tooltip
+        //     .html("The exact value of<br>this cell is: " + Number(d.value))
+        //     .style("left", (d3.mouse(this)[0]+70) + "px")
+        //     .style("top", (d3.mouse(this)[1]) + "px")
+        // }
+        // var mouseleave = function(d) {
+        //   tooltip
+        //     .style("opacity", 0)
+        //   d3.select(this)
+        //     .style("stroke", "none")
+        //     .style("opacity", 0.8)
+        // }
         // add the squares
         svg.selectAll()
             .data(data, function (d) { return d.token_x + ':' + d.token_y; })
@@ -137,38 +161,43 @@ function create_heatmap(segment, layer, head) {
             .append("rect")
             .attr("x", function (d) { return x(d.token_x); })
             .attr("y", function (d) { return y(d.token_y); })
-            .attr("rx", 4)
-            .attr("ry", 4)
+            // .attr("rx", 4)
+            // .attr("ry", 4)
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
             .style("fill", function (d) {
             // console.log(Number(d.value));
             return heatmap_get_color(Number(d.value));
-        })
-            .style("stroke-width", 4)
-            .style("stroke", "none")
-            .style("opacity", 0.8)
-            .on("mouseover", mouseover)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave);
+        });
+        // .style("stroke-width", 4)
+        // .style("stroke", "none")
+        // .style("opacity", 0.8)
+        // .on("mouseover", mouseover)
+        // .on("mousemove", mousemove)
+        // .on("mouseleave", mouseleave)
     });
     // Add title to graph
     svg.append("text")
         .attr("x", 0)
-        .attr("y", -50)
+        .attr("y", -65)
         .attr("text-anchor", "left")
         .style("font-size", "22px")
-        .text("Layer " + (layer + 1) + ", head " + (head + 1));
+        .text("Self-Attention: Layer " + (layer + 1) + ", head " + (head + 1));
     // Add subtitle to graph
     svg.append("text")
         .attr("x", 0)
-        .attr("y", -20)
+        .attr("y", -35)
         .attr("text-anchor", "left")
         .style("font-size", "14px")
         .style("fill", "grey")
-        .style("max-width", 500)
-        .style("min-height", 50)
-        .html("Self-Attention heatmap of the respective token, in layer " + (layer + 1) + " and head " + (head + 1) + ".<br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>");
+        .html("Self-Attention heatmap of the respective token, in layer " + (layer + 1) + " and head " + (head + 1) + ". <br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>");
+    svg.append("text")
+        .attr("x", 0)
+        .attr("y", -15)
+        .attr("text-anchor", "left")
+        .style("font-size", "14px")
+        .style("fill", "grey")
+        .html("Y-Axis tokens attend to X-Axis tokens, Scale from black to blue to yellow.");
 }
 function create_scatter_plot(data) {
     // d3.select(PLOT_ID).select("svg").remove();
@@ -204,7 +233,8 @@ function create_scatter_plot(data) {
         y.domain([-15, 20]);
         var t = container.transition().duration(700);
         container.selectAll("circle").transition(t).attr("r", 3);
-        window.zoom = false;
+        unzoom();
+        // click_point(window.d);
     }
     function brushended() {
         var s = d3.event.selection;
@@ -220,6 +250,10 @@ function create_scatter_plot(data) {
             y.domain([s[1][1], s[0][1]].map(y.invert, y));
             container.select(".brush").call(brush.move, null);
         }
+        // let s_radius = SELECT_RADIUS;
+        // if (window.zoom) {
+        // 	s_radius += 5;
+        // }
         zoom(restore_b);
         d3.select(window.last_target)
             .attr("r", SELECT_RADIUS)

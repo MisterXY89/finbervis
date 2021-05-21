@@ -106,7 +106,9 @@
 #toggle_gradients,
 #selected-segment-tokens,
 #select-splits,
-#show-simmilar
+#show-simmilar,
+#grad-info,
+#attention-info
 {
   display: none;
 }
@@ -176,4 +178,35 @@
   padding-bottom: 40px !important;
 }
 
-/* .show-similar */
+#self-attention-heatmap {
+  min-height: 500px;
+}
+
+.color-grad-positive,
+.color-grad-negative,
+.color-attention-max {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+}
+
+.color-grad-positive {
+  background-color: rgb(221,89,100);
+}
+
+.color-attention-max {
+  background-color: #ff5921;
+}
+
+.color-grad-negative {
+  background-color: rgb(252,186,3);
+}
+
+#split-rule:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.x_axis_heatmap {
+  padding-bottom: 1em !important;
+}
