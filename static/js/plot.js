@@ -67,6 +67,7 @@ function create_heatmap(segment, layer, head) {
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
+        .attr("id", "hm" + d.id)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     //Read the data
@@ -79,17 +80,22 @@ function create_heatmap(segment, layer, head) {
             }
             return element;
         });
-        console.log(segment_tokens);
+        // console.log(segment_tokens);
         // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
-        var token_xs = segment_tokens;
-        var token_ys = segment_tokens;
+        // console.log(data.map(e => e.token_x));
+        var token_data = data.map(function (e) { return e.token_x; });
+        var b_tokens = token_data.slice(0, token_data.indexOf("[SEP]") + 1);
+        var token_xs = b_tokens;
+        var token_ys = b_tokens;
+        // var token_xs = segment_tokens;
+        // var token_ys = segment_tokens;
         console.log(token_xs);
         console.log(token_ys);
         // Build X scales and axis:
         var x = d3.scaleBand()
             .range([0, width])
             .domain(token_xs)
-            .padding(0.01);
+            .padding(0.02);
         svg.append("g")
             .style("font-size", 15)
             .attr("transform", "translate(0," + height + ")")
@@ -116,7 +122,7 @@ function create_heatmap(segment, layer, head) {
         var y = d3.scaleBand()
             .range([height, 0])
             .domain(token_ys)
-            .padding(0.01);
+            .padding(0.02);
         svg.append("g")
             .style("font-size", 15)
             .call(d3.axisLeft(y).tickSize(0))
@@ -190,14 +196,20 @@ function create_heatmap(segment, layer, head) {
         .attr("text-anchor", "left")
         .style("font-size", "14px")
         .style("fill", "grey")
-        .html("Self-Attention heatmap of the respective token, in layer " + (layer + 1) + " and head " + (head + 1) + ". <br><a href='#hide-heatmap' id='hide-heatmap'>Hide</a>");
+        .html("Self-Attention heatmap of the respective token, in layer " + (layer + 1) + " and head " + (head + 1) + ".");
     svg.append("text")
         .attr("x", 0)
         .attr("y", -15)
         .attr("text-anchor", "left")
         .style("font-size", "14px")
         .style("fill", "grey")
-        .html("Y-Axis tokens attend to X-Axis tokens, Scale from black to blue to yellow.");
+        .html("Y-Axis tokens attend to X-Axis tokens, Scale from black to blue to yellow. <a href='#hide-heatmap' onclick='hide_heatmap(\"hm" + d.id + "\")'>Hide</a>");
+}
+function hide_heatmap(hm_id) {
+    $("#" + hm_id).hide();
+    if (Array.from($("#self-attention-heatmap g")).length <= 0) {
+        $(".modal").first().modal("hide");
+    }
 }
 function create_scatter_plot(data) {
     // d3.select(PLOT_ID).select("svg").remove();

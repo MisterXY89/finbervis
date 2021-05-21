@@ -63,6 +63,7 @@ function tok_to_array(string) {
 
 function click_point(d: any) {
 	
+	$("#self-attention-heatmap svg").remove();
 	document.getElementById("show-similar").disabled = false;
 	document.getElementById("self-attention-collapse-btn").disabled = false;
 	$("#similar-sents-display").css("opacity", 0.5);

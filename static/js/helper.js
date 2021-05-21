@@ -55,6 +55,7 @@ function tok_to_array(string) {
     return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(function (el) { return el.slice(0, -1); });
 }
 function click_point(d) {
+    $("#self-attention-heatmap svg").remove();
     document.getElementById("show-similar").disabled = false;
     document.getElementById("self-attention-collapse-btn").disabled = false;
     $("#similar-sents-display").css("opacity", 0.5);
