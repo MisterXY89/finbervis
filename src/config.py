@@ -18,7 +18,7 @@ BATCH_SIZE = 32
 
 # Set the maximum sequence length;
 # 153 is max length of all sentences
-MAX_LEN = 180
+MAX_LEN = 195
 
 # SETTING TEST SIZE TO 10%
 TEST_SIZE = 0.1
@@ -90,7 +90,27 @@ def get_tokenizer():
                                          do_lower_case=True)
 
 
-def load_bert():
+def drop_layers_for_model(model, layer_i_list):
+    """
+    remove all layers in layer_i_list:
+    see https://github.com/huggingface/transformers/issues/2483
+    """
+    oldModuleList = model.bert.encoder.layer
+    newModuleList = nn.ModuleList()
+
+    # Now iterate over all layers, only keepign only the relevant layers.
+    for i in range(0, len(num_layers_to_keep)):
+        newModuleList.append(oldModuleList[i])
+
+    # create a copy of the model, modify it with the new list, and return
+    copyOfModel = copy.deepcopy(model)
+    copyOfModel.bert.encoder.layer = newModuleList
+
+    return copyOfModel
+
+
+
+def load_bert(drop_layer=False):
     """
 	Load BertForSequenceClassification, the pretrained BERT model with a single
 	linear classification layer on top.
@@ -105,4 +125,6 @@ def load_bert():
         output_attentions=True,  # return attentions weights?
         output_hidden_states=True,  # return all hidden-states?
     )
+    if drop_layer:
+        model = drop_layers_for_model(model, drop_layer)
     return model
