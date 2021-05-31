@@ -58,7 +58,11 @@ function tok_to_array(string) {
 		}
 		return string;
 	}
-	return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(el => el.slice(0, -1))	
+	// return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(el => el.slice(0, -1))	
+	string = string.split("', '");
+	string[0] = "[CLS]";
+	string[string.length-1] = "[SEP]";
+	return string;
 }
 
 function click_point(d: any) {
