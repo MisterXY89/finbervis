@@ -211,11 +211,6 @@ function saliecy_is_computed(el) {
     return el.parentElement.parentElement.getElementsByTagName("div")[0].getElementsByClassName("sal-text")[0] !== undefined;
 }
 function get_saliency_scores(el, seg_id) {
-    if (saliecy_is_computed(el)) {
-        console.log("SAL IS COMPUTED");
-        toggle_sal_plain(el);
-        return 1;
-    }
     // console.log(el);
     var spinner = el.getElementsByClassName("saliency-calc-spinner")[0];
     // let graph_icon = el.getElementById("graph_icon")[0];
@@ -226,9 +221,10 @@ function get_saliency_scores(el, seg_id) {
         .then(function (resp) { return resp.json(); })
         .then(function (json) {
         var res = json.result;
+        console.log(res);
         // graph_icon.style.display = "block";
         spinner.style.display = "none";
-        visualize_saliency(res, el);
+        // visualize_saliency(res, el);	
     });
     return 1;
 }
