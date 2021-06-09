@@ -300,7 +300,7 @@ function create_scatter_plot(data) {
         return x(d.x);
     })
         .attr("cy", function (d) { return y(d.y); })
-        .attr("id", function (d) { return d.id; })
+        .attr("id", function (d) { return "" + d.id; })
         .attr("r", function (d) { return get_radius(d.new); })
         .style("opacity", function (d) { return get_max_value(d.props, false); })
         .style('fill', function (d) {

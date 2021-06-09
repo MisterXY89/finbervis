@@ -16,8 +16,8 @@ from torch.utils.data import (
     TensorDataset
 )
 
-from .bert_preprocess import BertPreprocessor
-from .config import (
+from bert_preprocess import BertPreprocessor
+from config import (
     load_bert,
     BATCH_SIZE,
     LABEL_VALUES,
@@ -56,8 +56,9 @@ class SentimentPredictor:
         # state_dict = torch.load(f"{MODEL_DIR}/pytorch_model.bin")
         # self.model = load_bert()
         # self.model.load_state_dict(state_dict)
-        # self.model.from_pretrained(f"{MODEL_DIR}/pytorch_model.bin")
+        # self.model.from_pretrained(f"{MODEL_DIR}/pytorch_model.bin")        
         self.model = torch.load(self.latest_model_filename)
+        # self.model = torch.load(f"{MODEL_DIR}/fine-tuned-model_08-04-2021_23-42.pt")
         # self.model.eval()
 
     def _prettify_probabilities(self,
@@ -172,10 +173,10 @@ test_segments = [
 ]
 
 
-# sent_pred = SentimentPredictor()
-# sent_pred.load_model()
-# predictions = sent_pred.predict([test_segments[0]], pretty=False, shorten=False)
+sent_pred = SentimentPredictor()
+sent_pred.load_model()
+predictions = sent_pred.predict([SENTENCE_5a], pretty=True, shorten=False)
 # predictions = sent_pred.predict([test_segments[0]], pretty=True, shorten=False)
 # 
-# print(predictions)
+print(predictions)
 # print(sent_pred._prettify_probabilities([predictions]))

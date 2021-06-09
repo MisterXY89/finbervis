@@ -25,8 +25,8 @@ class Trainer:
     Training code is based on the `run_glue.py` script here:
     https://github.com/huggingface/transformers/blob/5bfcd0485ece086ebcbed2d008813037968a9e58/examples/run_glue.py#L128
     """
-    def __init__(self):
-        self.model = load_bert()
+    def __init__(self, drop_layers = False):
+        self.model = load_bert(drop_layers = drop_layers)
         self.bert_processor = BertPreprocessor()
         self.bert_processor.preprocess()
         # self.model.cuda()
@@ -217,5 +217,5 @@ class Trainer:
         self._train_report(avg_train_loss, t0)
 
 
-trainer = Trainer()
+trainer = Trainer(drop_layers = [7])
 trainer.train_and_validate()

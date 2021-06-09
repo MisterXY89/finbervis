@@ -5,8 +5,10 @@
 specifying constants and som general config
 """
 import os
+import copy
 import datetime
 import pandas as pd
+import torch.nn as nn
 from transformers import BertTokenizer, BertForSequenceClassification
 
 # GENERAL CONSTANTS
@@ -99,9 +101,12 @@ def drop_layers_for_model(model, layer_i_list):
     newModuleList = nn.ModuleList()
 
     # Now iterate over all layers, only keepign only the relevant layers.
-    for i in range(0, len(layer_i_list)):
+    for i in range(0, 12):
         if not i in layer_i_list:
+            print(f"adding layer: {i}")
             newModuleList.append(oldModuleList[i])
+        else:
+            print(f"Dropping layer: {i}")
 
     # create a copy of the model, modify it with the new list, and return
     copyOfModel = copy.deepcopy(model)
@@ -111,7 +116,7 @@ def drop_layers_for_model(model, layer_i_list):
 
 
 
-def load_bert(drop_layer=False):
+def load_bert(drop_layers=False):
     """
 	Load BertForSequenceClassification, the pretrained BERT model with a single
 	linear classification layer on top.
@@ -126,6 +131,8 @@ def load_bert(drop_layer=False):
         output_attentions=True,  # return attentions weights?
         output_hidden_states=True,  # return all hidden-states?
     )
-    if drop_layer:
-        model = drop_layers_for_model(model, drop_layer)
+    print(drop_layers)
+    if drop_layers:
+        print("hhhh")
+        model = drop_layers_for_model(model, drop_layers)
     return model

@@ -362,7 +362,7 @@ function create_scatter_plot(data: Iterable<unknown>) {
 			return x(d.x);
 		})
 		.attr("cy", (d: any) => y(d.y))
-		.attr("id", (d: any) => d.id)
+		.attr("id", (d: any) => `${d.id}`)
 		.attr("r", (d: any) => get_radius(d.new))
 		.style("opacity", (d: any) => get_max_value(d.props, false))
 		.style('fill', (d:any) => {

@@ -25,7 +25,12 @@
   "model_type": "bert",
   "num_attention_heads": 12,
   "num_hidden_layers": 12,
+  "output_attentions": true,
+  "output_hidden_states": true,
   "pad_token_id": 0,
+  "position_embedding_type": "absolute",
+  "transformers_version": "4.4.2",
   "type_vocab_size": 2,
+  "use_cache": true,
   "vocab_size": 30522
 }
