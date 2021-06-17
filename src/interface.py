@@ -19,17 +19,17 @@ from tqdm import tqdm
 import spacy
 from spacy import displacy
 
-from .predict import SentimentPredictor
-from .bert_preprocess import BertPreprocessor
-from .config import (
+from predict import SentimentPredictor
+from bert_preprocess import BertPreprocessor
+from config import (
     EMBEDDINGS_DATASET_FILE, 
     DATA_DIR,
     LABEL_VALUES, 
     get_tokenizer
 )
-from .dist import Dist
+from dist import Dist
 
-from .saliency_calc import SaliencyCalculator
+from saliency_calc import SaliencyCalculator
 
 
 class Interface:

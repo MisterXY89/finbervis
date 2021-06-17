@@ -1,0 +1,80 @@
+(env) dragonfly@iphone-von-dave:~/Documents/Uni/WS201/project/src$ py train.py 
+2021-06-16 21:37:07.907127: W tensorflow/stream_executor/platform/default/dso_loader.cc:60] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2021-06-16 21:37:07.907160: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+Loading BERT Model for sequence classification
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+False
+Downloading BERT-Tokenizer...
+     sentiment                                            segment    id
+0     positive  The project identified an overall project outc...     0
+1     positive  It subsequently identified four outputs: • The...     1
+2     positive  In its spirit and function it is thus in line ...     2
+3     positive  There is empirical evidence that technical and...     3
+4     positive  Learning from such support has been beneficial...     4
+...        ...                                                ...   ...
+3831  negative  One of the major challenges the UHC‐P faced du...  3831
+3832  negative  Nevertheless, there are some key questions tha...  3832
+3833  negative  Roadmaps were sometimes ambitious for the cris...  3833
+3834  negative  Support to HSS and HF require senior candidate...  3834
+3835  negative  We would recommend to increase full‐mode TA fo...  3835
+
+[3836 rows x 3 columns]
+Tokenizing segments...
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3836/3836 [00:02<00:00, 1669.33it/s]
+Padding/truncating all sentences to 195 values...
+Padding token: '[PAD]',ID: {self.tokenizer.pad_token_id}
+
+======== Epoch 1 / 4 ========
+Training...
+train.py:192: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  outputs = self.model(torch.tensor(b_input_ids).to(
+  Batch    40  of    108.    Elapsed: 0:22:05.
+  Batch    80  of    108.    Elapsed: 0:40:53.
+
+  Average training loss: 0.74
+  Training epoch took: 0:54:13
+
+Running Validation...
+  Accuracy: 0.81
+  Validation took: 0:01:51
+
+======== Epoch 2 / 4 ========
+Training...
+  Batch    40  of    108.    Elapsed: 0:20:06.
+  Batch    80  of    108.    Elapsed: 0:38:56.
+
+  Average training loss: 0.39
+  Training epoch took: 0:52:20
+
+Running Validation...
+  Accuracy: 0.81
+  Validation took: 0:01:51
+
+======== Epoch 3 / 4 ========
+Training...
+  Batch    40  of    108.    Elapsed: 0:19:50.
+  Batch    80  of    108.    Elapsed: 0:38:54.
+
+  Average training loss: 0.25
+  Training epoch took: 0:52:22
+
+Running Validation...
+  Accuracy: 0.82
+  Validation took: 0:01:55
+
+======== Epoch 4 / 4 ========
+Training...
+  Batch    40  of    108.    Elapsed: 0:21:10.
+  Batch    80  of    108.    Elapsed: 0:40:50.
+
+  Average training loss: 0.18
+  Training epoch took: 0:54:45
+
+Running Validation...
+  Accuracy: 0.82
+  Validation took: 0:01:56
+Training complete!

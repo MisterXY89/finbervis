@@ -61,6 +61,9 @@ NEW_EMBS_FILE = f"{DATA_DIR}/{NEW_EMBS_FILENAME}"
 NEW_DATA_FILENAME = "new_training_data.csv"
 NEW_DATA_FILE = f"{DATA_DIR}/{NEW_DATA_FILENAME}"
 
+DEZENTRALIZED_DATA = "decentralized_training_data.csv"
+DEZENTRALIZED_DATA_FILE = f"{DATA_DIR}/{DEZENTRALIZED_DATA}"
+
 def get_model_filename():
     """
     use current date as verison for possible multiple different models
@@ -94,6 +97,8 @@ def get_tokenizer():
 
 def drop_layers_for_model(model, layer_i_list):
     """
+    todo: re-init of layer?
+    ----
     remove all layers in layer_i_list:
     see https://github.com/huggingface/transformers/issues/2483
     """

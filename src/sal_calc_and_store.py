@@ -40,8 +40,8 @@ def calc_sal(df):
     df["saliency_score"] = saliency_scores
 
 
-    df.to_csv(NEW_EMBS_FILE, index=False)
+    df.to_csv("../data/drop_4_data.csv", index=False)
 
 
-df = pd.read_csv("drop_4_data.csv")
+df = pd.read_csv("../data/drop_4_data.csv")
 sal_calc(df)

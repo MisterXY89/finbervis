@@ -14,7 +14,11 @@ import torch
 
 from train_helper import get_optimizer, flat_accuracy, format_time, get_scheduler, plot_loss, save_model
 from bert_preprocess import BertPreprocessor
-from config import load_bert
+from config import (
+    load_bert,
+    DEZENTRALIZED_DATA_FILE,
+    NEW_DATA_FILE
+)
 
 # Tell pytorch to run this model on the GPU.
 # model.cuda()
@@ -25,9 +29,10 @@ class Trainer:
     Training code is based on the `run_glue.py` script here:
     https://github.com/huggingface/transformers/blob/5bfcd0485ece086ebcbed2d008813037968a9e58/examples/run_glue.py#L128
     """
-    def __init__(self, drop_layers = False):
+    def __init__(self, drop_layers = False, data_file=NEW_DATA_FILE):
         self.model = load_bert(drop_layers = drop_layers)
-        self.bert_processor = BertPreprocessor()
+        self.bert_processor = BertPreprocessor(data_file=data_file)
+        print(self.bert_processor.data_frame)
         self.bert_processor.preprocess()
         # self.model.cuda()
         # Number of training epochs (authors recommend between 2 and 4)
@@ -217,5 +222,5 @@ class Trainer:
         self._train_report(avg_train_loss, t0)
 
 
-trainer = Trainer(drop_layers = [7])
+trainer = Trainer(data_file=DEZENTRALIZED_DATA_FILE)
 trainer.train_and_validate()

@@ -24,14 +24,15 @@ from torch.utils.data import (
     RandomSampler
 )
 
-from .config import (
+from config import (
     get_tokenizer, 
     BATCH_SIZE, 
     CLEANED_DATASET_FILE, 
     LABEL_VALUES,
     MAX_LEN, 
     NEW_DATA_FILE,
-    TEST_SIZE
+    TEST_SIZE,
+    DEZENTRALIZED_DATA_FILE
 )
 
 
@@ -39,9 +40,9 @@ class BertPreprocessor():
     """
     docstring for BertPreprocessor.
     """
-    def __init__(self):
+    def __init__(self, data_file=NEW_DATA_FILE):
         # data loading & parsing
-        self.data_frame = pd.read_csv(NEW_DATA_FILE)
+        self.data_frame = pd.read_csv(data_file)
         self.labels = self.data_frame.sentiment.values
         # getting BERT-tokenizer
         self.tokenizer = get_tokenizer()
