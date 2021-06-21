@@ -72,7 +72,9 @@ def attention():
 
 	return resp
 
-
+@app.route("/test")
+def test():
+	return render_template("test.html")
 
 @app.route("/test_user_data")
 def test_user_data():
