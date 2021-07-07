@@ -17,7 +17,8 @@ from bert_preprocess import BertPreprocessor
 from config import (
     load_bert,
     DEZENTRALIZED_DATA_FILE,
-    NEW_DATA_FILE
+    NEW_DATA_FILE,
+    COMBI_FILE
 )
 
 # Tell pytorch to run this model on the GPU.
@@ -222,5 +223,5 @@ class Trainer:
         self._train_report(avg_train_loss, t0)
 
 
-trainer = Trainer(data_file=DEZENTRALIZED_DATA_FILE)
+trainer = Trainer(data_file=COMBI_FILE)
 trainer.train_and_validate()
