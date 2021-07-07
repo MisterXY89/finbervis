@@ -64,6 +64,9 @@ NEW_DATA_FILE = f"{DATA_DIR}/{NEW_DATA_FILENAME}"
 DEZENTRALIZED_DATA = "decentralized_training_data.csv"
 DEZENTRALIZED_DATA_FILE = f"{DATA_DIR}/{DEZENTRALIZED_DATA}"
 
+COMBI_FILENAME = "combi_training_data.csv"
+COMBI_FILE = f"{DATA_DIR}/{COMBI_FILENAME}"
+
 def get_model_filename():
     """
     use current date as verison for possible multiple different models
