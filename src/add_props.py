@@ -2,14 +2,16 @@
 import numpy as np
 import pandas as pd
 
-from config import NEW_EMBS_FILE
+from config import MODEL_DIR, DATA_DIR
 from predict import SentimentPredictor
 
+FILENAME = "drop_8_data.csv"
+FILE = f"{DATA_DIR}/{FILENAME}"
 
 sent_pred = SentimentPredictor()
 sent_pred.load_model()
 
-df = pd.read_csv(NEW_EMBS_FILE)
+df = pd.read_csv(FILE)
 df["props"] = list(range(0, len(df)))
 
 ds = 0
@@ -51,14 +53,7 @@ for index, row in df.iterrows():
 print(len(prop_list))
 df.loc[:, "props"] = prop_list
 df.loc[:, "sentiment"] = prediction_label_list
-df.to_csv(NEW_EMBS_FILE, index=False)
+df.to_csv(FILE, index=False)
 
 print(f"{ec=}")
 print(f"{ds=}")
-
-# ec=12
-# ds=307
-# ec=12
-# ds=307
-# ec=12
-# ds=307

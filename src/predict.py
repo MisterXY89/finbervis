@@ -57,8 +57,9 @@ class SentimentPredictor:
         # self.model = load_bert()
         # self.model.load_state_dict(state_dict)
         # self.model.from_pretrained(f"{MODEL_DIR}/pytorch_model.bin")        
-        # self.model = torch.load(self.latest_model_filename)
-        self.model = torch.load(f"{MODEL_DIR}/fine-tuned-model_08-04-2021_23-42.pt")
+        # self.model = torch.load(self.latest_model_filename)        
+        self.model = torch.load(f"{MODEL_DIR}/fine-tuned-model_drop_layer_8.pt", map_location=torch.device('cpu'))
+        # self.model = torch.load(f"{MODEL_DIR}/fine-tuned-model_08-04-2021_23-42.pt")
         # self.model.eval()
 
     def _prettify_probabilities(self,
@@ -68,6 +69,9 @@ class SentimentPredictor:
         get the index with the highest prob and return corresponding label
         """
         print(probabilities)
+        print(type(probabilities))
+        if isinstance(probabilities, list):
+            probabilities = probabilities[0]
         cut_index = len(LABEL_VALUES[np.argmax(LABEL_VALUES)])
         if shorten:
             cut_index = 3
