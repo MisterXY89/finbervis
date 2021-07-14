@@ -226,14 +226,6 @@ function visualize_saliency(res, el) {
 	// return token_html;
 }
 
-function visualize_attention(el) {
-	
-}
-
-function get_sal_div(el) {
-	return el.parentElement.parentElement.getElementsByClassName("sal-text")[0];
-}
-
 function toggle_sal_plain(el) {
 	let parent = el.parentElement.parentElement.getElementsByTagName("div")[0];
 	// console.log(parent);
@@ -249,9 +241,6 @@ function toggle_sal_plain(el) {
 	}
 }
 
-function saliecy_is_computed(el) {	
-	return el.parentElement.parentElement.getElementsByTagName("div")[0].getElementsByClassName("sal-text")[0] !== undefined;
-}
 
 function get_saliency_scores(el, seg_id) {
 	// console.log(el);
@@ -464,10 +453,14 @@ function toggle_plain_sent() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	
+	load_pixel_vis_data().then(data => {
+		pixelVis = new PixelVis(data, "#pixelVis");
+	})
+	
 	document.getElementById("show-similar").disabled = true;
-	document.getElementById("self-attention-collapse-btn").disabled = true;	
+	document.getElementById("self-attention-collapse-btn").disabled = true;		
 		
-	search_data("=all");
+	// search_data("=all");
 	$('.toast').toast({
 		delay: 12500
 	});

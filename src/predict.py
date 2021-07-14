@@ -16,8 +16,8 @@ from torch.utils.data import (
     TensorDataset
 )
 
-from bert_preprocess import BertPreprocessor
-from config import (
+from .bert_preprocess import BertPreprocessor
+from .config import (
     load_bert,
     BATCH_SIZE,
     LABEL_VALUES,
@@ -57,8 +57,8 @@ class SentimentPredictor:
         # self.model = load_bert()
         # self.model.load_state_dict(state_dict)
         # self.model.from_pretrained(f"{MODEL_DIR}/pytorch_model.bin")        
-        self.model = torch.load(self.latest_model_filename)
-        # self.model = torch.load(f"{MODEL_DIR}/fine-tuned-model_08-04-2021_23-42.pt")
+        # self.model = torch.load(self.latest_model_filename)
+        self.model = torch.load(f"{MODEL_DIR}/fine-tuned-model_08-04-2021_23-42.pt")
         # self.model.eval()
 
     def _prettify_probabilities(self,
@@ -141,10 +141,8 @@ class SentimentPredictor:
         """
         dataloader = self._make_predictable(segment_list)
         if self.model is None:
-            self.load_model()        
-        probabilities = self._get_probabilies(dataloader)
-        print("#################")
-        print(probabilities)
+            self.load_model()
+        probabilities = self._get_probabilies(dataloader)        
         if pretty:
             return self._prettify_probabilities(probabilities, shorten=shorten)
         return probabilities

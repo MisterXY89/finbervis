@@ -61,8 +61,8 @@ const margins = {
 // type aliases
 type SVGSelect = d3.Selection<SVGElement, any, HTMLElement, any> ;
 
-const width:number = 800;
-const height:number = 750;
+const width:number = 700;
+const height:number = 650;
 const visWidth:number = width - margins.left - margins.right;
 const visHeight:number = height - margins.top - margins.bottom;
 

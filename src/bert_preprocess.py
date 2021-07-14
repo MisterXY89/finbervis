@@ -24,7 +24,7 @@ from torch.utils.data import (
     RandomSampler
 )
 
-from config import (
+from .config import (
     get_tokenizer, 
     BATCH_SIZE, 
     CLEANED_DATASET_FILE, 

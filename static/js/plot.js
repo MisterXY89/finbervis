@@ -46,8 +46,8 @@ var margins = {
     bottom: 5,
     left: 5
 };
-var width = 800;
-var height = 750;
+var width = 700;
+var height = 650;
 var visWidth = width - margins.left - margins.right;
 var visHeight = height - margins.top - margins.bottom;
 // append the svg object to the body of the page
