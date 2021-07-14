@@ -1,6 +1,37 @@
 
 // see https://observablehq.com/@mbostock/the-impact-of-vaccines
 
+function transform_data(data) {
+	data.map(row => {
+		row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens) : [];
+		row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
+		row.embeddings = (row.embeddings != undefined) ? to_array(row.embeddings) : [];
+		row.cls_embs = (row.cls_embs != undefined) ? to_array(row.cls_embs) : [];
+		row.props = (row.props != undefined) ? to_array(row.props) : [];
+		row.x = (row.x != undefined) ? Number(x) : 0;
+		row.y = (row.y != undefined) ? Number(y) : 0;
+	})
+	console.log(data);
+	return data;
+}
+
+async function load_pixel_vis_data() {
+	const papa_config = {delimiter: ",", header: true};
+	let data1 = await fetch("/data/data_copy.csv")
+		.then(resp => resp.text())
+		.then(t => Papa.parse(t, papa_config))
+		.then(data1 => {
+    	return transform_data(data1.data);
+  	});
+  let data2 = await fetch("/data/drop_4_data.csv")
+  	.then(resp => resp.text())
+  	.then(t => Papa.parse(t, papa_config))
+  	.then(data2 => {
+    	return transform_data(data2.data);
+  	});
+  return { data1, data2 }
+}
+
 class PixelVis {
 	
 	constructor(data, div_id) {
@@ -17,56 +48,6 @@ class PixelVis {
 	}
 	
 	draw() {
-			
-		chart = {
-			const svg = d3.create("svg")
-					.attr("viewBox", [0, 0, width, innerHeight + margin.top + margin.bottom])
-					.attr("font-family", "sans-serif")
-					.attr("font-size", 10);
-
-			svg.append("g")
-					.call(xAxis);
-
-			svg.append("g")
-					.call(yAxis);
-
-			svg.append("g")
-				.selectAll("g")
-				.data(data.values)
-				.join("g")
-					.attr("transform", (d, i) => `translate(0,${y(data.names[i])})`)
-				.selectAll("rect")
-				.data(d => d)
-				.join("rect")
-					.attr("x", (d, i) => x(data.years[i]) + 1)
-					.attr("width", (d, i) => x(data.years[i] + 1) - x(data.years[i]) - 1)
-					.attr("height", y.bandwidth() - 1)
-					.attr("fill", d => isNaN(d) ? "#eee" : d === 0 ? "#fff" : color(d))
-				.append("title")
-					.text((d, i) => `${format(d)} per 100,000 people in ${data.years[i]}`);
-
-			return svg.node();
-		}
-
-
-		data = {
-			const names = ["Alaska", "Ala.", "Ark.", "Ariz.", "Calif.", "Colo.", "Conn.", "D.C.", "Del.", "Fla.", "Ga.", "Hawaii", "Iowa", "Idaho", "Ill.", "Ind.", "Kan.", "Ky.", "La.", "Mass.", "Md.", "Maine", "Mich.", "Minn.", "Mo.", "Miss.", "Mont.", "N.C.", "N.D.", "Neb.", "N.H.", "N.J.", "N.M", "Nev.", "N.Y.", "Ohio", "Okla.", "Ore.", "Pa.", "R.I.", "S.C.", "S.D.", "Tenn.", "Texas", "Utah", "Va.", "Vt.", "Wash.", "Wis.", "W.Va.", "Wyo."];
-			const data = await FileAttachment("vaccines.json").json();
-			const values = [];
-			const year0 = d3.min(data[0].data.values.data, d => d[0]);
-			const year1 = d3.max(data[0].data.values.data, d => d[0]);
-			const years = d3.range(year0, year1 + 1);
-			for (const [year, i, value] of data[0].data.values.data) {
-				if (value == null) continue;
-				(values[i] || (values[i] = []))[year - year0] = value;
-			}
-			return {
-				values,
-				names,
-				years,
-				year: data[0].data.chart_options.vaccine_year
-			};
-		}
 			
 	}
 }
