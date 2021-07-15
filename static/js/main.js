@@ -398,8 +398,11 @@ function toggle_plain_sent() {
     }
 }
 document.addEventListener("DOMContentLoaded", function () {
-    load_pixel_vis_data().then(function (data) {
-        pixelVis = new PixelVis(data, "#pixelVis");
+    load_pixel_vis_data("data_copy.csv", "drop_8_data.csv").then(function (data) {
+        var pixelVis1 = new PixelVis(data.data1, "#pixelVis1");
+        pixelVis1.draw();
+        var pixelVis2 = new PixelVis(data.data2, "#pixelVis2");
+        pixelVis2.draw();
     });
     document.getElementById("show-similar").disabled = true;
     document.getElementById("self-attention-collapse-btn").disabled = true;

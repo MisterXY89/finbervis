@@ -43,28 +43,30 @@ function transform_data(data) {
         row.embeddings = (row.embeddings != undefined) ? to_array(row.embeddings) : [];
         row.cls_embs = (row.cls_embs != undefined) ? to_array(row.cls_embs) : [];
         row.props = (row.props != undefined) ? to_array(row.props) : [];
-        row.x = (row.x != undefined) ? Number(x) : 0;
-        row.y = (row.y != undefined) ? Number(y) : 0;
+        row.x = (row.x != undefined) ? Number(row.x) : 0;
+        row.y = (row.y != undefined) ? Number(row.y) : 0;
+        row.id = (row.id != undefined) ? Number(row.id) : -1;
     });
     console.log(data);
     return data;
 }
-function load_pixel_vis_data() {
+function load_pixel_vis_data(fi1, fi2) {
     return __awaiter(this, void 0, void 0, function () {
         var papa_config, data1, data2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     papa_config = { delimiter: ",", header: true };
-                    return [4 /*yield*/, fetch("/data/data_copy.csv")
+                    return [4 /*yield*/, fetch("/data/" + fi1)
                             .then(function (resp) { return resp.text(); })
                             .then(function (t) { return Papa.parse(t, papa_config); })
                             .then(function (data1) {
+                            console.log("pre trans ", data1);
                             return transform_data(data1.data);
                         })];
                 case 1:
                     data1 = _a.sent();
-                    return [4 /*yield*/, fetch("/data/drop_4_data.csv")
+                    return [4 /*yield*/, fetch("/data/" + fi2)
                             .then(function (resp) { return resp.text(); })
                             .then(function (t) { return Papa.parse(t, papa_config); })
                             .then(function (data2) {
@@ -83,14 +85,108 @@ var PixelVis = /** @class */ (function () {
         this.div_id = div_id;
         this.margin = {
             top: 20,
-            right: 1,
-            bottom: 40,
+            right: 40,
+            bottom: 100,
             left: 40
         };
-        this.width = 500;
-        this.height = 400;
+        this.width = 900;
+        this.height = 1100;
+        this.color_scale = d3.scaleLinear()
+            .range(["blue", "white", "red"])
+            .domain([-1, 0, 1]);
     }
+    PixelVis.prototype.prep_data_for_vis = function () {
+        var matrix = [];
+        var y_labels = [];
+        var x_labels = [];
+        this.data.slice(0, 100).forEach(function (row) {
+            var y = row.id;
+            y_labels.push(y);
+            // console.log(row.saliency_score);
+            row.saliency_score.forEach(function (score, i) {
+                if (!x_labels.includes(i)) {
+                    x_labels.push(i);
+                }
+                // console.log(score, i, y)
+                matrix.push({
+                    x: i,
+                    y: y,
+                    z: score,
+                    token: row.tokens[i],
+                    segment: row.segment,
+                    sentiment: row.sentiment
+                });
+            });
+        });
+        return { matrix: matrix, x_labels: x_labels, y_labels: y_labels };
+    };
     PixelVis.prototype.draw = function () {
+        var _this = this;
+        // append the svg object to the body of the page
+        var container = d3.select(this.div_id)
+            .append("svg")
+            .attr("width", this.width + this.margin.left + this.margin.right)
+            .attr("height", this.height + this.margin.top + this.margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        var rd = this.prep_data_for_vis();
+        console.log(rd);
+        var vis_data = rd.matrix;
+        // Labels of row and columns
+        var x_axis_labels = rd.x_labels;
+        var y_axis_labels = rd.y_labels;
+        // Build X scales and axis:
+        var x = d3.scaleBand()
+            .range([0, this.width])
+            .domain(x_axis_labels)
+            .padding(0.01);
+        container.append("g")
+            .attr("transform", "translate(0," + this.height + ")")
+            .call(d3.axisBottom(x));
+        // Build X scales and axis:
+        var y = d3.scaleBand()
+            .range([this.height, 0])
+            .domain(y_axis_labels)
+            .padding(0.01);
+        container.append("g")
+            .call(d3.axisLeft(y));
+        var tooltip = d3.select(this.div_id)
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px");
+        var mouseover = function (d) {
+            tooltip.style("opacity", 1);
+        };
+        var mousemove = function (d) {
+            tooltip
+                .html("Tokens: " + d.token + " <br> Saliency score: " + d.z + " <br> Segment: " + d.segment)
+                .style("left", (d3.mouse(this)[0] + 70) + "px")
+                .style("top", (d3.mouse(this)[1]) + "px");
+        };
+        var mouseleave = function (d) {
+            tooltip.style("opacity", 0);
+        };
+        var click = function (d) {
+            console.log(d);
+        };
+        container.selectAll()
+            .data(vis_data, function (d) { return d.x + ':' + d.y; })
+            .enter()
+            .append("rect")
+            .attr("x", function (d) { return x(d.x); })
+            .attr("y", function (d) { return y(d.y); })
+            .attr("width", x.bandwidth())
+            .attr("height", y.bandwidth())
+            .style("fill", function (d) { return _this.color_scale(d.z); })
+            .on("click", click)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave)
+            .on("mouseover", mouseover);
     };
     return PixelVis;
 }());

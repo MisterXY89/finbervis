@@ -1,5 +1,5 @@
 "use strict";
-var PLOT_ID = "#plot";
+var PLOT_ID = "#projection_model_1";
 // const SELECT_COLOR:string = "#ce0c0f"; // red
 var SELECT_COLOR = "rgb(255, 108, 0)";
 var SELECT_RADIUS = 8;

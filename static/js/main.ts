@@ -453,8 +453,11 @@ function toggle_plain_sent() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	
-	load_pixel_vis_data().then(data => {
-		pixelVis = new PixelVis(data, "#pixelVis");
+	load_pixel_vis_data("data_copy.csv", "drop_8_data.csv").then(data => {
+		let pixelVis1 = new PixelVis(data.data1, "#pixelVis1");
+		pixelVis1.draw();
+		let pixelVis2 = new PixelVis(data.data2, "#pixelVis2");
+		pixelVis2.draw();
 	})
 	
 	document.getElementById("show-similar").disabled = true;
