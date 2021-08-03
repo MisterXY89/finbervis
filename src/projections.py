@@ -51,7 +51,7 @@ for e in embs:
     print(e)
     print(type(e))
     x_vals.append(e[0])
-    y_vals.append(e[0])
+    y_vals.append(e[1])
     
 data["x"] = x_vals
 data["y"] = y_vals
@@ -78,29 +78,16 @@ data.to_csv(NEW_EMBS_FILE, index=False)
 #     print(map)
 #     print(type(map))
 # 
-# reducer_embs = reducer.embeddings_
-# reducer.embeddings_ = []
-# 
-# print(type(reducer_embs[0]))
-# print(reducer_embs[0])
-# print(type(reducer_embs[0][0]))
-# print(reducer_embs[0][0])
-# print(type(reducer_embs[0][0][0]))
-# print(reducer_embs[0][0][0])
-# 
-# reducer_embs_list = [list(rel) for rel in list(reducer_embs)]
-# 
-# print(type(reducer_embs_list))
-# print(type(reducer_embs_list[0]))
-# print(type(reducer_embs_list[0][0]))
-# print(type(reducer_embs_list[0][0][0]))
-# 
-# with open(f"{DATA_DIR}/reducer.pk", "wb") as file:
-#     pickle.dump(reducer, file) # protocol=pickle.HIGHEST_PROTOCOL
-# 
-# with open(f"{DATA_DIR}/reducer_embs.pk", "wb") as file:
-#     pickle.dump(reducer_embs_list, file)
+reducer_embs = reducer.embeddings_
+reducer.embeddings_ = []
+
+reducer_embs_list = [list(rel) for rel in list(reducer_embs)]
 
 
+with open(f"{DATA_DIR}/reducer_drop_8.pk", "wb") as file:
+    pickle.dump(reducer, file) # protocol=pickle.HIGHEST_PROTOCOL
+
+with open(f"{DATA_DIR}/reducer_drop_8_embs.pk", "wb") as file:
+    pickle.dump(reducer_embs_list, file)
     
     
