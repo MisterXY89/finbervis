@@ -18,7 +18,7 @@ spacy_tokens = [token.text.lower() for token in nlp(segment)]
 print(spacy_tokens)
 print(bert_tokens)
 
-a2b, b2a = tokenizations.get_alignments(bert_tokens, spacy_tokens)
+a2b,b2a = tokenizations.get_alignments(bert_tokens, spacy_tokens)
 print(a2b)
 
 
@@ -111,12 +111,12 @@ def mk_list(s_arr, tok=False, spacy=False):
         arr = [*map(float, arr)]
     return arr
 
-def get_max_sal_indicies(merged_saliency, n=3):
+def get_max_sal_indicies(merged_saliency, n=5):
     index_max_scores = []
     for i in range(0, n):
         max_el = max(merged_saliency)
         i_max_el = merged_saliency.index(max_el)
-        index_max_scores.append(i_max_el)
+        index_max_scores.append((i_max_el-1, i_max_el))
         merged_saliency[i_max_el] = -2
     return index_max_scores
         
@@ -141,7 +141,8 @@ def inspect_pos_tags(i, log = False):
         print(len(clean_tokens), len(pos_tags))
     max_pos_tags = []
     for mi in max_sal_indicies:
-        max_pos_tags.append(pos_tags[mi])            
+        pos_tuple = (pos_tags[mi[0]], pos_tags[mi[1]])
+        max_pos_tags.append(pos_tuple)
         # print(clean_tokens[mi], "\t: ", pos_tags[mi])
     return max_pos_tags
 
@@ -170,9 +171,12 @@ def get_relevant_pos_tags(index_list=None, random_idx_list_size = 100):
     return high_sal_pos_tags, e_counter
 
 # index_list = [1029, 3078, 4109, 3601, 2072, 1049, 5149, 36, 4651, 2611, 5175, 55, 1593, 63, 3659, 1104, 3164, 3167, 99, 2148, 6247, 1131, 4716, 2166, 120, 5254, 6279, 4744, 5262, 145, 5265, 4763, 6303, 1192, 4270, 692, 4789, 3770, 5833, 2776, 220, 734, 432, 9, 6381, 1791, 2304, 2822, 3335, 4360, 3340, 1805, 2320, 3350, 5917, 5409, 2340, 294, 4902, 5929, 301, 5422, 307, 823, 6464, 5953, 3394, 4423, 1357, 5966, 2894, 4433, 4435, 4958, 1380, 3429, 363, 3439, 6514, 370, 5492, 1918, 2947, 1415, 908, 4, 495, 1425, 6546, 5012, 5015, 922, 1947, 6048, 2976, 2469, 1462, 1979, 3006, 446, 6591, 4032]
-# 
-# relevant_pos_tags, e_counter = get_relevant_pos_tags(random_idx_list_size = 6000)#, index_list=index_list)
-# relevant_pos_tags = dict(sorted(relevant_pos_tags.items(), key=lambda x:x[1]))
-# print(relevant_pos_tags)
-# print(e_counter)
-    
+# random_idx_list_size = 6000
+
+index_list = list(df.query("sentiment == truth_label").index)
+relevant_pos_tags, e_counter = get_relevant_pos_tags(index_list=index_list)
+relevant_pos_tags = dict(sorted(relevant_pos_tags.items(), key=lambda x:x[1]))
+print(relevant_pos_tags)
+print(e_counter)
+
+
