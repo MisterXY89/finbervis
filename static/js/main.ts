@@ -454,9 +454,11 @@ function toggle_plain_sent() {
 document.addEventListener("DOMContentLoaded", () => {
 	
 	load_pixel_vis_data("data_copy.csv", "drop_8_data.csv").then(data => {
-		let pixelVis1 = new PixelVis(data.data1, "#pixelVis1");
+		let pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
+		window.pixelVis1 = pixelVis1;
 		pixelVis1.draw();
-		let pixelVis2 = new PixelVis(data.data2, "#pixelVis2");
+		let pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
+		window.pixelVis2 = pixelVis2;
 		pixelVis2.draw();
 	})
 	
@@ -470,7 +472,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		
 	// $('#toast').toast('hide');
 	
-	scatter_plot({}, false);
+	scatter_plot({}, false, DATA_FILE_ONE, "#projection_model_1");
+	scatter_plot({}, false, DATA_FILE_TWO, "#projection_model_2");	
 
 	const test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States."
 	// "taking office at a moment of profound economic, health and political crises with a promise to seek unity after a tumultuous four years that tore at the fabric of American society.";
@@ -802,13 +805,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		// show heatmap for selected node
 		let layer = Number(layer_input.property("value"))-1;
 		let head = Number(head_input.property("value"))-1;
-		create_heatmap(window.segment, layer, head);
+		create_heatmap(window.segment, layer, head, "#self-attention-heatmap");
 	});
 
 	explore_neighbours_button.on("click", () => {
 		let layer = Number(layer_input_neighbours.property("value"))-1;
 		let head = Number(head_input_neighbours.property("value"))-1;
-		create_heatmap(window.segment, layer, head);
+		create_heatmap(window.segment, layer, head, "#self-attention-heatmap");
 	});
 
 	hide_heatmap_button.on("click", () => {

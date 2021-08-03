@@ -4,25 +4,38 @@
 <!-- STOP WORDS -->
 <script type="text/javascript" src="{{ url_for('static', filename='js/stop_words.js') }}"></script>
 <!-- JQUERY.JS -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/jquery-3.4.1.min.js') }}"></script>
 <!-- JQUERY UI -->
 <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <!-- POPPER .JS -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/popper.min.js') }}"></script>
 <!-- BOOTSTRAP.JS -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/bootstrap.min.js') }}"></script>
 <!-- D3.JS -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/d3.v4.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/d3.v4.min.js') }}"></script>
+<!-- COLORS -->
+<script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
 <!-- SIMPLE SLIDER -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/d3.slider.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/d3.slider.min.js') }}"></script>
 <!-- PAPA PARSE -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/papaparse.min.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/papaparse.min.js')}}"></script>
+<!-- CUSTOM JS + COMPONENTS -->
+<!-- CONFIG JS -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/config.js') }}"></script>
 <!-- HELPER JS -->
 <script type="text/javascript" src="{{ url_for('static', filename='js/helper.js') }}"></script>
+<!-- EVENTS JS -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/events.js') }}"></script>
 <!-- PLOT JS -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/plot.js') }}" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/plot.js') }}" defer></script> -->
+<!-- SCATTER-PLOT JS -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/components/scatterPlot.js') }}" defer></script>
+<!-- HEATMAP JS -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/components/heatmap.js') }}" defer></script>
 <!-- PIXELVIS JS -->
-<script type="text/javascript" src="{{ url_for('static', filename='js/pixelVis.js') }}" defer></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/components/pixelVis.js') }}" defer></script>
 <!-- Custom JS -->
 <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
 

@@ -52,9 +52,7 @@ for index, row in df.iterrows():
     # print(int(row.id))
     if not int(row.id) in error_ids:
         print(sal_scores[sal_i])
-        if condition:
-            pass
-        if 1<2: break
+            if 1<2: break
         saliency_scores.append(sal_scores[sal_i][0])
         tokens.append(sal_scores[sal_i][1])
         sal_i += 1

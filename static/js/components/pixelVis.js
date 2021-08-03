@@ -79,8 +79,27 @@ function load_pixel_vis_data(fi1, fi2) {
         });
     });
 }
+function create_sentence_view(data, is_one) {
+    var div_id = "#pixel-sentence-view";
+    if (is_one) {
+        var data1 = data;
+        var data2 = window.pixelVis2.data[data.y];
+        console.log("data2", data2);
+    }
+    else {
+        var data1 = window.pixelVis1.data[data.y];
+        var data2 = data;
+        console.log("data1", data1);
+    }
+    data = [data1, data2];
+    console.log("- data - ", data);
+    var sentence_pixel_vis = new PixelVis(data, div_id, false);
+    sentence_pixel_vis.draw();
+}
 var PixelVis = /** @class */ (function () {
-    function PixelVis(data, div_id) {
+    function PixelVis(data, div_id, name, is_one) {
+        this.is_one = (is_one == undefined) ? true : is_one;
+        this.name = name;
         this.data = data;
         this.div_id = div_id;
         this.margin = {
@@ -89,18 +108,24 @@ var PixelVis = /** @class */ (function () {
             bottom: 100,
             left: 40
         };
-        this.width = 900;
-        this.height = 1100;
-        this.color_scale = d3.scaleLinear()
-            .range(["blue", "white", "red"])
-            .domain([-1, 0, 1]);
+        this.width = 800;
+        this.height = 1000;
+        // this.color_scale = d3.scaleLinear()
+        //   .range(["blue","white", "red"])
+        //   .domain([-1, 0, 1]);
     }
+    PixelVis.prototype.color_scale = function (x) {
+        var sc = d3.scaleLinear().domain([-1, 1]).range([0, 1]);
+        return d3.interpolateBrBG(sc(x));
+    };
     PixelVis.prototype.prep_data_for_vis = function () {
         var matrix = [];
         var y_labels = [];
         var x_labels = [];
-        this.data.slice(0, 100).forEach(function (row) {
-            var y = row.id;
+        var to_value = this.data.length == 2 ? 2 : 100;
+        this.data.slice(0, to_value).forEach(function (row, index) {
+            // let y = (row.id == undefined) ? index : row.id;
+            var y = index;
             y_labels.push(y);
             // console.log(row.saliency_score);
             row.saliency_score.forEach(function (score, i) {
@@ -114,6 +139,10 @@ var PixelVis = /** @class */ (function () {
                     z: score,
                     token: row.tokens[i],
                     segment: row.segment,
+                    sentiment: row.sentiment,
+                    tokens: row.tokens,
+                    saliency_score: row.saliency_score,
+                    truth_label: row.truth_label,
                     sentiment: row.sentiment
                 });
             });
@@ -164,7 +193,7 @@ var PixelVis = /** @class */ (function () {
         };
         var mousemove = function (d) {
             tooltip
-                .html("Tokens: " + d.token + " <br> Saliency score: " + d.z + " <br> Segment: " + d.segment)
+                .html("Tokens: " + d.token + " <br> Saliency score: " + d.z + " <br> Segment: " + d.segment + " <br> truth_label: " + d.truth_label + " <br> sentiment: " + d.sentiment)
                 .style("left", (d3.mouse(this)[0] + 70) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px");
         };
@@ -173,6 +202,7 @@ var PixelVis = /** @class */ (function () {
         };
         var click = function (d) {
             console.log(d);
+            create_sentence_view(d, this.is_one);
         };
         container.selectAll()
             .data(vis_data, function (d) { return d.x + ':' + d.y; })

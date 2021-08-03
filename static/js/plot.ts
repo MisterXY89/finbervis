@@ -1,54 +1,5 @@
 
 
-const DATA_DIR:string = "./data";
-// const DATA_FILE:string = `${DATA_DIR}/projection_with_full_sents_SENT_PROPS.csv`;
-const DATA_FILE:string = `${DATA_DIR}/data_copy.csv`;
-
-// const COLORS = ["#440154", "#3CBB75", "#DCE319"];
-const COLORS = ['#abe564', '#64abe5', '#9e64e5'];
-
-
-// "#336338" = more medium sea blue
-// "#67001F" = dark red
-// "#6ece58" = april green
-// "#440154" = dark purple
-// "#fde725" = yellow
-// "#3e4989" = medium sea blue
-// "#26828e" = more turqoise medium sea blue
-// "#1f9e89" = turqoise
-// "#482878" = light purple
-// "#424047" = gray
-
-
-const SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
-
-const RADIUS = 2;
-const ZOOM_RADIUS = 5;
-
-function get_color(el: string|number, new_point: boolean|undefined) {
-	// console.log(new_point);
-	if(new_point) {
-		return SELECT_COLOR;
-	}
-	if (typeof el == "string") {
-		return COLORS[SENTIMENT_CLASSES.indexOf(el)];
-	}
-	return COLORS[el];
-}
-
-function get_color_truth(d: any) {
-	if (d.sentiment != d.truth_label) {
-		return "black";
-	}
-	return get_color(d.sentiment, d.new);
-}
-
-function get_radius(new_point: boolean|undefined) {
-	if (new_point) {
-		return SELECT_RADIUS;
-	}
-	return RADIUS;
-}
 
 // set the dimensions and margins of the graph
 const margins = {
@@ -80,7 +31,7 @@ const y = d3.scaleLinear()
 	.domain([-15, 20])
 	.range([height, 0]);
 
-function create_heatmap(segment: string, layer: number, head: number) {
+function _create_heatmap_(segment: string, layer: number, head: number) {
 
 	let csv_url = `/get-attention?layer=${layer}&head=${head}&segment=${segment}`;
 
@@ -257,11 +208,11 @@ function hide_heatmap(hm_id) {
 	}
 }
 
-function create_scatter_plot(data: Iterable<unknown>) {
+function create_scatter_plot(data: Iterable<unknown>, div_id) {
 	// d3.select(PLOT_ID).select("svg").remove();
-	d3.select("svg").remove();
+	// d3.select("svg").remove();
 
-	const container: SVGSelect = d3.select(PLOT_ID)
+	const container: SVGSelect = d3.select(div_id)
 	  .append("svg")
 	    .attr("width", width + margins.left + margins.right)
 	    .attr("height", height + margins.top + margins.bottom)
@@ -384,10 +335,10 @@ function create_scatter_plot(data: Iterable<unknown>) {
 }
 
 
-function scatter_plot(custom_data, click) {
+function scatter_plot(custom_data, click, data_file, div_id) {
 		custom_data = (custom_data == undefined) ? false : custom_data;
 		click = (click == undefined) ? false : click;
-		d3.csv(DATA_FILE, (data: any) => {
+		d3.csv(data_file, (data: any) => {
 				
 				console.log("custom_data", custom_data)
 				if (Array.from(custom_data).length != 0) {
@@ -396,7 +347,7 @@ function scatter_plot(custom_data, click) {
 				
 				console.log(data);
 				
-				create_scatter_plot(data);
+				create_scatter_plot(data, div_id);
 				
 				if (!$(".slider").is(":visible")) {
 					const slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1]

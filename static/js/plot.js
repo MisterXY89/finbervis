@@ -1,44 +1,4 @@
 "use strict";
-var DATA_DIR = "./data";
-// const DATA_FILE:string = `${DATA_DIR}/projection_with_full_sents_SENT_PROPS.csv`;
-var DATA_FILE = DATA_DIR + "/data_copy.csv";
-// const COLORS = ["#440154", "#3CBB75", "#DCE319"];
-var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
-// "#336338" = more medium sea blue
-// "#67001F" = dark red
-// "#6ece58" = april green
-// "#440154" = dark purple
-// "#fde725" = yellow
-// "#3e4989" = medium sea blue
-// "#26828e" = more turqoise medium sea blue
-// "#1f9e89" = turqoise
-// "#482878" = light purple
-// "#424047" = gray
-var SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
-var RADIUS = 2;
-var ZOOM_RADIUS = 5;
-function get_color(el, new_point) {
-    // console.log(new_point);
-    if (new_point) {
-        return SELECT_COLOR;
-    }
-    if (typeof el == "string") {
-        return COLORS[SENTIMENT_CLASSES.indexOf(el)];
-    }
-    return COLORS[el];
-}
-function get_color_truth(d) {
-    if (d.sentiment != d.truth_label) {
-        return "black";
-    }
-    return get_color(d.sentiment, d.new);
-}
-function get_radius(new_point) {
-    if (new_point) {
-        return SELECT_RADIUS;
-    }
-    return RADIUS;
-}
 // set the dimensions and margins of the graph
 var margins = {
     top: 5,
@@ -58,7 +18,7 @@ var x = d3.scaleLinear()
 var y = d3.scaleLinear()
     .domain([-15, 20])
     .range([height, 0]);
-function create_heatmap(segment, layer, head) {
+function _create_heatmap_(segment, layer, head) {
     var csv_url = "/get-attention?layer=" + layer + "&head=" + head + "&segment=" + segment;
     // set the dimensions and margins of the graph
     var margin = { top: 125, right: 30, bottom: 80, left: 80 }, width = 650 - margin.left - margin.right, height = 650 - margin.top - margin.bottom;
@@ -211,10 +171,10 @@ function hide_heatmap(hm_id) {
         $(".modal").first().modal("hide");
     }
 }
-function create_scatter_plot(data) {
+function create_scatter_plot(data, div_id) {
     // d3.select(PLOT_ID).select("svg").remove();
-    d3.select("svg").remove();
-    var container = d3.select(PLOT_ID)
+    // d3.select("svg").remove();
+    var container = d3.select(div_id)
         .append("svg")
         .attr("width", width + margins.left + margins.right)
         .attr("height", height + margins.top + margins.bottom)
@@ -319,16 +279,16 @@ function create_scatter_plot(data) {
         // .on('mouseleave', mouseleave)
         .on('click', click);
 }
-function scatter_plot(custom_data, click) {
+function scatter_plot(custom_data, click, data_file, div_id) {
     custom_data = (custom_data == undefined) ? false : custom_data;
     click = (click == undefined) ? false : click;
-    d3.csv(DATA_FILE, function (data) {
+    d3.csv(data_file, function (data) {
         console.log("custom_data", custom_data);
         if (Array.from(custom_data).length != 0) {
             data.push(custom_data);
         }
         console.log(data);
-        create_scatter_plot(data);
+        create_scatter_plot(data, div_id);
         if (!$(".slider").is(":visible")) {
             var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
             var sliderRange = d3
