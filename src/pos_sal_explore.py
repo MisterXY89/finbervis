@@ -7,20 +7,10 @@ import pandas as pd
 import tokenizations
 
 nlp = spacy.load("en_core_web_sm")
-df = pd.read_csv("../data/data_copy.csv")
-
-
-row = df.loc[1]
-bert_tokens = row.tokens
-segment = row.segment
-pos_tags = [token.pos_ for token in nlp(segment)]
-spacy_tokens = [token.text.lower() for token in nlp(segment)]
-print(spacy_tokens)
-print(bert_tokens)
-
-a2b,b2a = tokenizations.get_alignments(bert_tokens, spacy_tokens)
-print(a2b)
-
+# df = pd.read_csv("../data/data_copy.csv")
+df = pd.read_csv("../data/drop_8_data.csv")
+print(df.keys())
+print(df.loc[0].tokens)
 
 
 def merge_bert_tokens(tokens, spacy=False):
@@ -99,7 +89,11 @@ def merge_saliency(saliency_score, tokens, spacy=True):
                 
 
 def mk_list(s_arr, tok=False, spacy=False):
-    if tok:
+    if s_arr == None:
+        return []
+    if isinstance(s_arr, list):
+        return s_arr
+    if tok:        
         arr = s_arr.split("', '")
     else:
         s_arr = s_arr[1:-1]
@@ -170,13 +164,79 @@ def get_relevant_pos_tags(index_list=None, random_idx_list_size = 100):
             
     return high_sal_pos_tags, e_counter
 
+
+# row = df.loc[1]
+# bert_tokens = mk_list(row.tokens, tok=True)
+# segment = row.segment
+# pos_tags = [token.pos_ for token in nlp(segment)]
+# spacy_tokens = [token.text.lower() for token in nlp(segment)]
+# print(spacy_tokens)
+# print(bert_tokens)
+
+# 
+# print(b2a)
+# print(len(bert_tokens))
+# print(b2a[0])
+# print(spacy_tokens[0] == bert_tokens[b2a[0][0]])
+# print(spacy_tokens[0])
+# print(bert_tokens[b2a[0][0]])
+
+pos_tags = []
+
+for index, row in df.iterrows():
+    print(index)
+    if str(row.tokens) == "nan":
+        pos_tags.append([])
+        continue
+    bert_tokens = mk_list(row.tokens, tok=True)
+    segment = row.segment
+    row_pos_tags = [token.pos_ for token in nlp(segment)]
+    spacy_tokens = [token.text.lower() for token in nlp(segment)]
+    
+    bert_token_pos = ["CLS"]
+    a2b, b2a = tokenizations.get_alignments(bert_tokens, spacy_tokens)
+    for b2a_index, index_list in enumerate(b2a):
+        for el in index_list:   
+            bert_token_pos.append(row_pos_tags[b2a_index])
+            
+    bert_token_pos.append("SEP")
+    pos_tags.append(bert_token_pos)
+    
+    
+df["pos_tags"] = pos_tags
+        
+# df.to_csv("../data/data_copy.csv", index=False)
+df.to_csv("../data/drop_8_data.csv", index=False)
+
+
 # index_list = [1029, 3078, 4109, 3601, 2072, 1049, 5149, 36, 4651, 2611, 5175, 55, 1593, 63, 3659, 1104, 3164, 3167, 99, 2148, 6247, 1131, 4716, 2166, 120, 5254, 6279, 4744, 5262, 145, 5265, 4763, 6303, 1192, 4270, 692, 4789, 3770, 5833, 2776, 220, 734, 432, 9, 6381, 1791, 2304, 2822, 3335, 4360, 3340, 1805, 2320, 3350, 5917, 5409, 2340, 294, 4902, 5929, 301, 5422, 307, 823, 6464, 5953, 3394, 4423, 1357, 5966, 2894, 4433, 4435, 4958, 1380, 3429, 363, 3439, 6514, 370, 5492, 1918, 2947, 1415, 908, 4, 495, 1425, 6546, 5012, 5015, 922, 1947, 6048, 2976, 2469, 1462, 1979, 3006, 446, 6591, 4032]
 # random_idx_list_size = 6000
 
-index_list = list(df.query("sentiment == truth_label").index)
-relevant_pos_tags, e_counter = get_relevant_pos_tags(index_list=index_list)
-relevant_pos_tags = dict(sorted(relevant_pos_tags.items(), key=lambda x:x[1]))
-print(relevant_pos_tags)
-print(e_counter)
-
-
+# index_list = list(df.query("sentiment == truth_label").index)
+# relevant_pos_tags, e_counter = get_relevant_pos_tags(index_list=index_list)
+# relevant_pos_tags = dict(sorted(relevant_pos_tags.items(), key=lambda x:x[1]))
+# print(relevant_pos_tags)
+# print(e_counter)
+# 
+# sents = ["negative", "neutral", "positive"]
+# 
+# wrong = df.query("sentiment != truth_label")
+# corr = df.query("sentiment == truth_label")
+# 
+# print("% ID %")
+# for s in sents:
+#     corr_pred_perc = len(df.query(f"truth_label == '{s}' and sentiment == '{s}'"))/len(df.query(f"truth_label == '{s}'"))
+#     print(f"% {s} {corr_pred_perc}")
+# print("------")
+# 
+# def label_check(df_):
+#     for s in sents:
+#         print(f"% diff {s}: ", len(df_.query(f"sentiment == '{s}'"))/len(df_))            
+#     print("---")
+# 
+# 
+# 
+# print("- wrong -")
+# label_check(wrong)
+# print("- corr -")
+# label_check(corr)
