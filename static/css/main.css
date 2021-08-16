@@ -215,3 +215,36 @@
   min-height: 50px;
   /* background: #2d2d2d; */
 }  
+
+#filters {
+  padding-bottom: 2em !important;
+}
+
+#draggable-cards {
+  position: absolute;
+  top: 4em;
+  right: 2em;
+}
+
+.matrix-background {
+  fill: #eee;
+}
+
+text.active {
+  fill: red;
+  font-weight: bold;
+}
+
+.matrix-line {
+  stroke: #fff;
+}
+
+.matrix-label {
+  font: 300 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #2f2f2f;
+}
+
+/* .matrix-column {
+  
+} */
+
