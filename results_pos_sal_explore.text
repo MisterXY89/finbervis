@@ -1,5 +1,15 @@
 ## MAX (top 3)
 
+- wrong -
+% diff negative:  0.39324556382369774
+% diff neutral:  0.32283915283342873
+% diff positive:  0.2770463651974814
+---
+- corr -
+% diff negative:  0.39483923817325417
+% diff neutral:  0.2537374564816711
+% diff positive:  0.35142330534507477
+
 # correct
 {
     'SYM': 6,
@@ -171,3 +181,82 @@ N', 'AUX'): 3, ('ADJ', 'PART'): 3, ('PART', 'ADJ'): 4, ('ADP', 'AUX'): 4, ('ADP'
 DV'): 142, ('PUNCT', 'VERB'): 144, ('VERB', 'NOUN'): 150, ('NOUN', 'NUM'): 152, ('DET', 'ADJ'): 176, ('ADV', 'VERB'): 187, ('PRON', 'AUX'): 205, ('NUM', 'PUNCT'): 269, ('PU
 NCT', 'NOUN'): 336, ('ADP', 'NOUN'): 351, ('VERB', 'DET'): 361, ('VERB', 'ADP'): 365, ('NOUN', 'VERB'): 417, ('NOUN', 'NOUN'): 421, ('NOUN', 'ADP'): 463, ('ADJ', 'NOUN'): 4
 68, ('AUX', 'VERB'): 494, ('DET', 'NOUN'): 578, ('PUNCT', 'DET'): 640, ('NOUN', 'AUX'): 852, ('ADP', 'DET'): 857, ('NOUN', 'PUNCT'): 1171}
+
+
+## Tuples top 5 min
+# correct
+{('ADP', 'PART'): 3, ('PART', 'DET'): 3, ('CCONJ', 'AUX'): 3, ('PART', 'NOUN'): 3, ('VERB', 'AUX'): 3, ('SCONJ', 'VERB'): 3, ('CCONJ', 'NUM'): 3, ('NOUN', 'INTJ'): 3, ('DET', 'DET'): 3, ('VERB', 'PROPN'): 3, ('SCONJ', 'NUM'): 3, ('NUM', 'ADV'): 3, ('SCONJ', 'ADV'): 3, ('NUM', 'NUM'): 3, ('ADP', 'CCONJ'): 3, ('PROPN', 'ADP'): 3, ('AUX', 'PRON'): 3, ('DET', 'PUNCT'): 3, ('ADV', 'PRON'): 3, ('X', 'VERB'): 3, ('ADP', 'PUNCT'): 6, ('CCONJ', 'PUNCT'): 6, ('ADP', 'PRON'): 6, ('NUM', 'VERB'): 6, ('AUX', 'SCONJ'): 6, ('ADV', 'NUM'): 6, ('PUNCT', 'PROPN'): 6, ('PUNCT', 'INTJ'): 6, ('PRON', 'ADV'): 6, ('ADP', 'SCONJ'): 6, ('ADJ', 'AUX'): 6, ('PROPN', 'AUX'): 6, ('ADV', 'AUX'): 9, ('CCONJ', 'PART'): 9, ('PART', 'ADJ'): 9, ('VERB', 'SCONJ'): 9, ('CCONJ', 'ADP'): 9, ('CCONJ', 'PRON'): 9, ('VERB', 'CCONJ'): 9, ('ADP', 'ADP'): 9, ('X', 'PUNCT'): 9, ('ADJ', 'CCONJ'): 9, ('PART', 'PART'): 9, ('DET', 'NUM'): 9, ('ADP', 'PROPN'): 9, ('ADV', 'SCONJ'): 12, ('ADJ', 'ADV'): 12, ('SCONJ', 'PART'): 12, ('NOUN', 'DET'): 12, ('SCONJ', 'ADJ'): 12, ('PUNCT', 'X'): 12, ('AUX', 'ADP'): 12, ('NOUN', 'X'): 12, ('PUNCT', 'NUM'): 12, ('ADJ', 'VERB'): 12, ('PART', 'AUX'): 15, ('SCONJ', 'NOUN'): 15, ('PUNCT', 'PART'): 15, ('SCONJ', 'DET'): 15, ('PUNCT', 'AUX'): 15, ('ADV', 'NOUN'): 18, ('CCONJ', 'DET'): 18, ('PRON', 'ADJ'): 18, ('ADV', 'ADP'): 18, ('ADV', 'PUNCT'): 18, ('NUM', 'ADJ'): 18, ('NOUN', 'SCONJ'): 21, ('VERB', 'PUNCT'): 21, ('PUNCT', 'PUNCT'): 21, ('NOUN', 'ADJ'): 24, ('VERB', 'PRON'): 24, ('ADP', 'ADV'): 27, ('ADJ', 'PART'): 27, ('PUNCT', 'PRON'): 27, ('AUX', 'NOUN'): 27, ('ADJ', 'SCONJ'): 27, ('ADP', 'NUM'): 27, ('PRON', 'VERB'): 30, ('AUX', 'AUX'): 30, ('ADV', 'DET'): 30, ('PRON', 'AUX'): 36, ('VERB', 'NUM'): 36, ('PUNCT', 'ADP'): 39, ('ADV', 'ADV'): 39, ('NOUN', 'PART'): 45, ('ADV', 'PART'): 45, ('CCONJ', 'ADV'): 45, ('DET', 'AUX'): 48, ('PUNCT', 'CCONJ'): 51, ('PRON', 'NOUN'): 51, ('ADJ', 'ADP'): 54, ('PART', 'ADV'): 54, ('ADJ', 'PUNCT'): 57, ('DET', 'ADV'): 63, ('AUX', 'DET'): 69, ('VERB', 'VERB'): 69, ('CCONJ', 'ADJ'): 72, ('PUNCT', 'DET'): 72, ('ADJ', 'ADJ'): 78, ('VERB', 'PART'): 81, ('PUNCT', 'SCONJ'): 84, ('NUM', 'NOUN'): 93, ('CCONJ', 'VERB'): 114, ('NOUN', 'ADV'): 114, ('ADP', 'DET'): 117, ('DET', 'VERB'): 117, ('NOUN', 'CCONJ'): 117, ('NUM', 'PUNCT'): 120, ('VERB', 'DET'): 129, ('PUNCT', 'VERB'): 132, ('CCONJ', 'NOUN'): 159, ('VERB', 'ADV'): 162, ('VERB', 'ADP'): 162, ('NOUN', 'AUX'): 165, ('ADP', 'VERB'): 180, ('NOUN', 'PUNCT'): 201, ('ADP', 'ADJ'): 234, ('PUNCT', 'ADJ'): 234, ('PUNCT', 'NOUN'): 237, ('AUX', 'ADV'): 282, ('AUX', 'ADJ'): 285, ('ADV', 'ADJ'): 294, ('NOUN', 'ADP'): 312, ('NOUN', 'NUM'): 369, ('PART', 'VERB'): 381, ('ADV', 'VERB'): 393, ('VERB', 'NOUN'): 405, ('DET', 'ADJ'): 471, ('VERB', 'ADJ'): 498, ('ADP', 'NOUN'): 525, ('PUNCT', 'ADV'): 546, ('NOUN', 'VERB'): 552, ('AUX', 'VERB'): 612, ('AUX', 'PART'): 723, ('NOUN', 'NOUN'): 723, ('DET', 'NOUN'): 1125, ('ADJ', 'NOUN'): 1143}
+
+
+# wrong
+
+{('AUX', 'SCONJ'): 3, ('ADV', 'NOUN'): 3, ('SCONJ', 'VERB'): 3, ('NUM', 'ADV'): 3, ('PRON', 'PRON'): 3, ('ADV', 'NUM'): 3, ('PROPN', 'NOUN'): 3, ('NUM', 'ADP'): 3, ('SCONJ', 'ADP'): 3, ('NUM', 'SCONJ'): 3, ('DET', 'DET'): 3, ('SYM', 'INTJ'): 3, ('ADV', 'PUNCT'): 3, ('ADJ', 'DET'): 3, ('PROPN', 'PUNCT'): 3, ('PUNCT', 'PROPN'): 3, ('NUM', 'DET'): 3, ('CCONJ', 'AUX'): 3, ('PROPN', 'VERB'): 3, ('ADP', 'AUX'): 3, ('X', 'CCONJ'): 3, ('ADP', 'NUM'): 3, ('AUX', 'AUX'): 3, ('X', 'PUNCT'): 3, ('PUNCT', 'PART'): 3, ('PUNCT', 'AUX'): 3, ('PART', 'DET'): 3, ('ADV', 'PART'): 3, ('NUM', 'PUNCT'): 3, ('NUM', 'VERB'): 3, ('NOUN', 'ADJ'): 3, ('VERB', 'PUNCT'): 6, ('PART', 'AUX'): 6, ('ADV', 'ADP'): 6, ('VERB', 'AUX'): 6, ('PART', 'NOUN'): 6, ('SCONJ', 'NOUN'): 6, ('ADV', 'PRON'): 6, ('SCONJ', 'ADJ'): 6, ('CCONJ', 'ADP'): 6, ('DET', 'X'): 6, ('PART', 'ADJ'): 6, ('ADJ', 'PART'): 9, ('PUNCT', 'PRON'): 9, ('PUNCT', 'NUM'): 9, ('ADV', 'DET'): 9, ('ADJ', 'VERB'): 9, ('CCONJ', 'DET'): 9, ('AUX', 'NOUN'): 12, ('PART', 'ADV'): 12, ('VERB', 'SCONJ'): 12, ('NOUN', 'DET'): 12, ('DET', 'AUX'): 12, ('PRON', 'VERB'): 12, ('ADJ', 'CCONJ'): 15, ('SCONJ', 'DET'): 15, ('VERB', 'PRON'): 15, ('NUM', 'ADJ'): 15, ('VERB', 'VERB'): 15, ('CCONJ', 'VERB'): 18, ('ADP', 'ADV'): 18, ('NUM', 'NOUN'): 18, ('PRON', 'AUX'): 18, ('NOUN', 'SCONJ'): 18, ('PUNCT', 'ADP'): 18, ('NOUN', 'PART'): 18, ('ADJ', 'PUNCT'): 21, ('ADJ', 'ADP'): 21, ('ADV', 'ADV'): 21, ('AUX', 'DET'): 21, ('CCONJ', 'ADV'): 21, ('ADV', 'SCONJ'): 24, ('ADJ', 'SCONJ'): 24, ('VERB', 'DET'): 24, ('DET', 'VERB'): 27, ('VERB', 'PART'): 30, ('PUNCT', 'DET'): 30, ('DET', 'ADV'): 30, ('PRON', 'NOUN'): 30, ('CCONJ', 'ADJ'): 30, ('PUNCT', 'CCONJ'): 33, ('ADJ', 'ADJ'): 33, ('PUNCT', 'SCONJ'): 33, ('ADP', 'DET'): 39, ('CCONJ', 'NOUN'): 42, ('ADP', 'VERB'): 42, ('NOUN', 'CCONJ'): 51, ('NOUN', 'NUM'): 54, ('PUNCT', 'VERB'): 57, ('PUNCT', 'ADJ'): 60, ('VERB', 'ADP'): 60, ('VERB', 'ADV'): 63, ('PUNCT', 'NOUN'): 63, ('NOUN', 'ADV'): 66, ('NOUN', 'PUNCT'): 78, ('AUX', 'ADJ'): 81, ('AUX', 'ADV'): 90, ('AUX', 'PART'): 108, 
+('NOUN', 'ADP'): 111, ('NOUN', 'AUX'): 111, ('ADV', 'VERB'): 117, 
+('ADP', 'ADJ'): 123, ('VERB', 'ADJ'): 129, ('ADV', 'ADJ'): 129, 
+('VERB', 'NOUN'): 141, ('PART', 'VERB'): 201, ('ADP', 'NOUN'): 207, 
+('DET', 'ADJ'): 210, ('PUNCT', 'ADV'): 219, ('NOUN', 'VERB'): 243, 
+('AUX', 'VERB'): 303, 
+('NOUN', 'NOUN'): 321, ('DET', 'NOUN'): 339, ('ADJ', 'NOUN'): 360}
+
+## Tuples top 2 max
+# wrong 
+{('CCONJ', 'INTJ'): 1, ('NOUN', 'PRON'): 1, ('X', 'X'): 1, ('PROPN', 'NOUN'): 1, ('ADP', 'SCONJ'): 1, ('NUM', 'ADJ'): 1, ('PRON', 'ADJ'): 1, ('SCONJ', 'CCONJ'): 1, ('AUX', 'PUNCT'): 1, ('NUM', 'ADP'): 1, ('ADP', 'CCONJ'): 1, ('INTJ', 'VERB'):
+1, ('PROPN', 'NUM'): 1, ('CCONJ', 'PART'): 1, ('PART', 'PART'): 1, ('NUM', 'DET'): 1, ('DET', 'CCONJ'): 1, ('DET', 'ADP'): 1, ('ADV', 'PART'): 1, ('PRON', 'ADV'): 1, ('X', 'PUNCT'): 1, ('AUX', 'CCONJ'): 1, ('VERB', 'NUM'): 1, ('PRON', 'DET'):
+1, ('DET', 'DET'): 1, ('PART', 'ADJ'): 1, ('ADV', 'PROPN'): 1, ('ADJ', 'NUM'): 2, ('INTJ', 'NOUN'): 2, ('INTJ', 'AUX'): 2, ('NUM', 'VERB'): 2, ('AUX', 'SCONJ'): 2, ('PUNCT', 'PART'): 2, ('ADV', 'NUM'): 2, ('AUX', 'NUM'): 2, ('SCONJ', 'ADP'): 2
+, ('ADJ', 'ADV'): 2, ('PART', 'NOUN'): 2, ('PROPN', 'PUNCT'): 2, ('ADV', 'PRON'): 2, ('DET', 'PUNCT'): 2, ('DET', 'ADV'): 2, ('ADJ', 'AUX'): 2, ('NUM', 'AUX'): 3, ('AUX', 'PART'): 3, ('SCONJ', 'PROPN'): 3, ('VERB', 'AUX'): 3, ('DET', 'PROPN'):
+ 3, ('ADV', 'NOUN'): 3, ('PRON', 'CCONJ'): 3, ('PRON', 'PUNCT'): 3, ('SCONJ', 'PRON'): 3, ('PROPN', 'AUX'): 3, ('AUX', 'ADP'): 3, ('PUNCT', 'X'): 3, ('PART', 'ADV'): 4, ('PUNCT', 'INTJ'): 4, ('SCONJ', 'ADJ'): 4, ('PUNCT', 'PROPN'): 4, ('ADP',
+'PROPN'): 4, ('CCONJ', 'PRON'): 4, ('ADV', 'SCONJ'): 4, ('CCONJ', 'NUM'): 5, ('PART', 'DET'): 5, ('ADP', 'PUNCT'): 5, ('NUM', 'NUM'): 5, ('ADJ', 'SCONJ'): 5, ('CCONJ', 'ADP'): 5, ('PART', 'AUX'): 6, ('DET', 'NUM'): 6, ('SCONJ', 'VERB'): 6, ('A
+DJ', 'VERB'): 6, ('ADJ', 'CCONJ'): 6, ('ADV', 'AUX'): 6, ('SYM', 'NUM'): 7, ('PUNCT', 'CCONJ'): 7, ('ADP', 'PRON'): 7, ('ADV', 'DET'): 8, ('NOUN', 'ADJ'): 8, ('CCONJ', 'AUX'): 8, ('SCONJ', 'NOUN'): 9, ('CCONJ', 'ADV'): 9, ('PRON', 'NOUN'): 10,
+ ('ADV', 'ADP'): 10, ('ADP', 'ADP'): 10, ('VERB', 'CCONJ'): 10, ('VERB', 'VERB'): 11, ('ADP', 'VERB'): 11, ('ADP', 'ADV'): 11, ('PUNCT', 'NUM'): 12, ('ADV', 'ADV'): 14, ('NOUN', 'SCONJ'): 14, ('VERB', 'PRON'): 14, ('PUNCT', 'AUX'): 15, ('CCONJ
+', 'ADJ'): 16, ('VERB', 'PART'): 17, ('NOUN', 'PART'): 17, ('AUX', 'DET'): 17, ('NUM', 'NOUN'): 18, ('PUNCT', 'PUNCT'): 19, ('SCONJ', 'DET'): 19, ('NOUN', 'NUM'): 20, ('AUX', 'ADJ'): 21, ('PRON', 'VERB'): 21, ('ADP', 'NUM'): 21, ('ADJ', 'ADJ'): 22, 
+('CCONJ', 'DET'): 23, ('ADJ', 'ADP'): 24, ('PUNCT', 'SCONJ'): 24, ('ADJ', 'PUNCT'): 24, ('VERB', 'ADV'): 24, ('ADV', 'PUNCT'): 24, ('ADV', 'ADJ'): 25, ('NOUN', 'ADV'): 25, ('VERB', 'SCONJ'): 25, ('CCONJ', 'VERB'): 26, ('PUNCT', 'PRON'):
+28, ('NOUN', 'DET'): 29, ('AUX', 'AUX'): 33, ('PUNCT', 'VERB'): 35, ('DET', 'VERB'): 38, ('PUNCT', 'ADV'): 39, ('DET', 'AUX'): 40, ('PUNCT', 'ADJ'): 42, ('NUM', 'PUNCT'): 43, ('VERB', 'PUNCT'): 44, ('PART', 'VERB'): 44, ('CCONJ', 'NOUN'): 45,
+('PUNCT', 'ADP'): 47, ('AUX', 'ADV'): 49, ('NOUN', 'CCONJ'): 52, ('ADP', 'ADJ'): 62, ('PRON', 'AUX'): 62, ('VERB', 'ADJ'): 64, ('ADV', 'VERB'): 70, ('VERB', 'NOUN'): 91, ('DET', 'ADJ'): 108, ('PUNCT', 'NOUN'): 112, ('VERB', 'ADP'): 115, ('VERB
+', 'DET'): 120, ('NOUN', 'VERB'): 141, ('ADP', 'NOUN'): 169, ('NOUN', 'NOUN'): 175, ('NOUN', 'ADP'): 187, ('PUNCT', 'DET'): 194, ('AUX', 'VERB'): 206, ('ADP', 'DET'): 233, ('NOUN', 'AUX'): 248, 
+('ADJ', 'NOUN'): 253, ('DET', 'NOUN'): 302, ('NOUN', 'PUNCT'): 321}
+
+
+## Triples (-1, +1)
+# wrong 
+('VERB', 'VERB', 'NOUN'): 4, ('VERB', 'ADV', 'ADJ'): 4, ('ADP', 'ADP', 'NUM'): 4, ('NUM', 'NOUN', 'ADP'): 4, ('DET', 'AUX', 'DET'): 4, ('DET', 'NUM', 'NOUN'): 4, ('VERB', 'ADP', 'PRON'): 4, ('ADP', 'DET', 'DET'): 4, ('PRON',
+'AUX', 'ADP'): 4, ('CCONJ', 'DET', 'ADJ'): 4, ('ADJ', 'NOUN', 'PART'): 4, ('ADP', 'ADV', 'DET'): 4, ('ADV', 'VERB', 'PART'): 4, ('PUNCT', 'SCONJ', 'ADP'): 4, ('NOUN', 'PUNCT', 'AUX'): 4, ('ADV', 'DET', 'NOUN'): 5, ('VERB', 'PART', 'AUX'): 5, (
+'ADV', 'ADV', 'VERB'): 5, ('ADJ', 'NOUN', 'DET'): 5, ('CCONJ', 'AUX', 'VERB'): 5, ('SCONJ', 'DET', 'NOUN'): 5, ('DET', 'ADJ', 'ADJ'): 5, ('DET', 'AUX', 'ADV'): 5, ('SYM', 'NUM', 'PUNCT'): 5, ('DET', 'VERB', 'ADP'): 5, ('ADV', 'VERB', 'SCONJ'):
+ 5, ('NOUN', 'ADP', 'PROPN'): 5, ('DET', 'NOUN', 'ADV'): 5, ('AUX', 'ADV', 'AUX'): 5, ('ADP', 'DET', 'PUNCT'): 5, ('CCONJ', 'VERB', 'ADJ'): 5, ('PUNCT', 'AUX', 'VERB'): 5, ('DET', 'VERB', 'ADJ'): 5, ('AUX', 'ADV', 'ADV'): 5, ('AUX', 'ADJ', 'AD
+P'): 5, ('PUNCT', 'ADV', 'DET'): 5, ('CCONJ', 'NOUN', 'ADP'): 5, ('PART', 'VERB', 'ADP'): 6, ('PUNCT', 'SCONJ', 'DET'): 6, ('NOUN', 'CCONJ', 'ADJ'): 6, ('NOUN', 'SCONJ', 'NOUN'): 6, ('DET', 'NOUN', 'DET'): 6, ('AUX', 'VERB', 'NOUN'): 6, ('CCON
+J', 'NOUN', 'AUX'): 6, ('ADP', 'NUM', 'PUNCT'): 6, ('PRON', 'AUX', 'DET'): 6, ('ADV', 'ADJ', 'ADP'): 6, ('DET', 'VERB', 'VERB'): 6, ('ADP', 'NOUN', 'NUM'): 6, ('NOUN', 'DET', 'VERB'): 6, ('PUNCT', 'DET', 'ADV'): 6, ('VERB', 'CCONJ', 'VERB'): 6
+, ('VERB', 'PRON', 'NOUN'): 6, ('ADV', 'VERB', 'ADJ'): 6, ('NOUN', 'VERB', 'ADJ'): 7, ('NOUN', 'PUNCT', 'DET'): 7, ('ADP', 'ADJ', 'ADJ'): 7, ('NOUN', 'NOUN', 'PART'): 7, ('ADV', 'ADJ', 'NOUN'): 7, ('NOUN', 'ADP', 'VERB'): 7, ('ADP', 'NOUN', 'A
+UX'): 7, ('PUNCT', 'NOUN', 'VERB'): 7, ('PART', 'VERB', 'NOUN'): 7, ('SCONJ', 'DET', 'ADJ'): 7, ('DET', 'NOUN', 'PART'): 7, ('NOUN', 'VERB', 'PUNCT'): 8, ('PART', 'VERB', 'ADJ'): 8, ('NOUN', 'DET', 'AUX'): 8, ('AUX', 'VERB', 'SCONJ'): 8, 
+('NOUN', 'AUX', 'PART'): 8, ('ADP', 'ADJ', 'CCONJ'): 8, ('PUNCT', 'VERB', 'NOUN'): 8, ('PUNCT', 'VERB', 'DET'): 8, ('NOUN', 'ADP', 'PRON'): 8, ('AUX', 'ADV', 'ADJ'): 8, ('VERB', 'PART', 'VERB'): 8, ('PUNCT', 'NOUN', 'CCONJ'): 9, ('NOUN', 'NOUN', 'V
+ERB'): 9, ('NOUN', 'PUNCT', 'ADP'): 9, ('VERB', 'ADV', 'ADP'): 9, ('CCONJ', 'DET', 'NOUN'): 9, ('VERB', 'ADJ', 'PUNCT'): 9, ('PART', 'VERB', 'DET'): 9, ('PUNCT', 'VERB', 'ADP'): 9, ('CCONJ', 'VERB', 'ADP'): 9, ('VERB', 'NOUN', 'CCONJ'): 9, ('N
+OUN', 'PUNCT', 'ADJ'): 10, ('ADV', 'VERB', 'DET'): 10, ('VERB', 'ADJ', 'ADP'): 10, ('PRON', 'AUX', 'ADJ'): 10, ('PRON', 'AUX', 'VERB'): 10, ('CCONJ', 'ADJ', 'NOUN'): 11, ('ADJ', 'ADP', 'DET'): 11, ('VERB', 'NOUN', 'PUNCT'): 11, ('VERB', 'SCONJ
+', 'DET'): 11, ('CCONJ', 'NOUN', 'NOUN'): 11, ('DET', 'NOUN', 'CCONJ'): 11, ('NOUN', 'AUX', 'DET'): 12, ('NOUN', 'PUNCT', 'VERB'): 12, ('PUNCT', 'ADP', 'NOUN'): 12, ('VERB', 'DET', 'VERB'): 12, ('AUX', 'DET', 'ADJ'): 12, ('NOUN', 'PUNCT', 'NOU
+N'): 13, ('NOUN', 'AUX', 'AUX'): 13, ('DET', 'VERB', 'NOUN'): 13, ('PUNCT', 'ADP', 'DET'): 13, ('ADP', 'NOUN', 'VERB'): 13, ('PRON', 'AUX', 'ADV'): 13, ('DET', 'AUX', 'VERB'): 13, ('ADJ', 'ADJ', 'NOUN'): 14, ('NOUN', 'VERB', 'PART'): 14, ('NOU
+N', 'NOUN', 'CCONJ'): 14, ('NOUN', 'ADV', 'VERB'): 14, ('PUNCT', 'NOUN', 'AUX'): 14, ('PUNCT', 'NOUN', 'PUNCT'): 14, ('CCONJ', 'NOUN', 'PUNCT'): 14, ('ADJ', 'NOUN', 'CCONJ'): 15, ('PUNCT', 'NOUN', 'ADP'): 15, ('NOUN', 'PUNCT', 'CCONJ'): 15, ('
+ADP', 'NOUN', 'CCONJ'): 15, ('NOUN', 'PART', 'VERB'): 15, ('AUX', 'VERB', 'ADV'): 15, ('PUNCT', 'PRON', 'AUX'): 15, ('AUX', 'VERB', 'PART'): 15, ('PUNCT', 'DET', 'VERB'): 16, ('NOUN', 'VERB', 'NOUN'): 16, ('NOUN', 'VERB', 'DET'): 19, ('AUX', '
+VERB', 'ADJ'): 19, ('AUX', 'VERB', 'DET'): 20, ('ADJ', 'NOUN', 'VERB'): 20, ('PUNCT', 'NOUN', 'NOUN'): 20, ('PUNCT', 'ADV', 'PUNCT'): 20, ('VERB', 'NOUN', 'NOUN'): 20, ('NOUN', 'NOUN', 'AUX'): 21, ('VERB', 'ADP', 'ADJ'): 21, ('ADJ', 'NOUN', 'N
+OUN'): 21, ('NOUN', 'AUX', 'ADJ'): 21, ('NOUN', 'CCONJ', 'NOUN'): 22, ('NOUN', 'ADP', 'ADJ'): 22, ('PUNCT', 'ADJ', 'NOUN'): 22, ('DET', 'NOUN', 'AUX'): 23, ('ADV', 'VERB', 'ADP'): 23, ('AUX', 'VERB', 'PUNCT'): 24, ('PUNCT', 'DET', 'AUX'): 24,
+('VERB', 'ADJ', 'NOUN'): 24, ('ADJ', 'NOUN', 'AUX'): 24, ('VERB', 'NOUN', 'ADP'): 25, ('NOUN', 'NOUN', 'NOUN'): 25, ('AUX', 'ADV', 'VERB'): 25, ('AUX', 'AUX', 'VERB'): 25, ('NOUN', 'NOUN', 'ADP'): 26, ('VERB', 'DET', 'ADJ'): 27, ('ADP', 'NOUN'
+, 'ADP'): 29, ('VERB', 'ADP', 'NOUN'): 29, ('ADP', 'NOUN', 'NOUN'): 30, ('DET', 'NOUN', 'PUNCT'): 33, ('ADP', 'ADJ', 'NOUN'): 33, ('PUNCT', 'DET', 'ADJ'): 33, ('DET', 'NOUN', 'NOUN'): 35, ('VERB', 'ADP', 'DET'): 35, ('NOUN', 'AUX', 'ADV'): 37,
+ ('ADP', 'NOUN', 'PUNCT'): 38, ('DET', 'NOUN', 'VERB'): 39, ('NOUN', 'NOUN', 'PUNCT'): 44, ('ADP', 'DET', 'ADJ'): 50, ('NOUN', 'ADP', 'DET'): 50, ('NOUN', 'ADP', 'NOUN'): 51, ('VERB', 'DET', 'NOUN'): 51, ('NOUN', 'VERB', 'ADP'): 52, ('ADJ', 'N
+OUN', 'PUNCT'): 56, ('PUNCT', 'DET', 'NOUN'): 70, ('AUX', 'VERB', 'ADP'): 71, ('ADJ', 'NOUN', 'ADP'): 72, ('DET', 'ADJ', 'NOUN'): 86, ('NOUN', 'AUX', 'VERB'): 109, ('DET', 'NOUN', 'ADP'): 109, ('ADP', 'DET', 'NOUN'): 123}
+
+# correct
+('VERB', 'PRON', 'NOUN'): 11, ('NUM', 'PUNCT', 'NUM'): 12, ('ADV', 'ADJ', 'PUNCT'): 12, ('DET', 'VERB', 'DET'): 12, ('VERB', 'CCONJ', 'VERB'): 12, ('VERB', 'SCONJ', 'DET'): 12, ('PRON', 'VERB', 'ADP'): 12, ('PUNCT', 'AUX', 'DET'
+): 12, ('ADV', 'AUX', 'DET'): 12, ('ADP', 'NOUN', 'PART'): 13, ('NOUN', 'VERB', 'VERB'): 13, ('ADJ', 'ADP', 'DET'): 13, ('VERB', 'ADV', 'PUNCT'): 13, ('ADP', 'VERB', 'DET'): 13, ('NOUN', 'PUNCT', 'PUNCT'): 13, ('VERB', 'DET', 'VERB'): 13, ('PU
+NCT', 'VERB', 'NOUN'): 13, ('PUNCT', 'ADV', 'ADJ'): 13, ('ADV', 'DET', 'NOUN'): 14, ('DET', 'NUM', 'NOUN'): 14, ('CCONJ', 'VERB', 'ADJ'): 14, ('CCONJ', 'DET', 'ADJ'): 14, ('ADP', 'PRON', 'NOUN'): 14, ('ADJ', 'NOUN', 'PART'): 14, ('VERB', 'ADJ'
+, 'PUNCT'): 15, ('PUNCT', 'PRON', 'VERB'): 15, ('CCONJ', 'NOUN', 'PUNCT'): 15, ('PUNCT', 'ADP', 'ADJ'): 15, ('ADP', 'NUM', 'PUNCT'): 15, ('ADV', 'VERB', 'NOUN'): 16, ('DET', 'NOUN', 'ADV'): 16, ('ADP', 'VERB', 'NOUN'): 16, ('NOUN', 'DET', 'AUX
+'): 16, ('ADP', 'DET', 'VERB'): 17, ('PART', 'VERB', 'ADJ'): 17, ('AUX', 'VERB', 'CCONJ'): 17, ('CCONJ', 'NOUN', 'NOUN'): 17, ('ADV', 'VERB', 'ADJ'): 17, ('PUNCT', 'NOUN', 'CCONJ'): 17, ('ADJ', 'CCONJ', 'ADJ'): 18, ('ADP', 'NOUN', 'VERB'): 18,
+ ('NOUN', 'PUNCT', 'ADP'): 18, ('NOUN', 'PUNCT', 'DET'): 18, ('CCONJ', 'NOUN', 'ADP'): 19, ('NOUN', 'ADP', 'VERB'): 19, ('VERB', 'ADP', 'VERB'): 19, ('DET', 'ADJ', 'ADJ'): 20, ('PART', 'VERB', 'ADP'): 20, ('NOUN', 'VERB', 'ADV'): 20, ('NOUN',
+'PUNCT', 'ADJ'): 20, ('PUNCT', 'VERB', 'ADP'): 20, ('PART', 'VERB', 'NOUN'): 20, ('AUX', 'ADV', 'ADJ'): 20, ('NOUN', 'NOUN', 'ADV'): 20, ('NOUN', 'ADP', 'NUM'): 20, ('PUNCT', 'NOUN', 'VERB'): 21, ('PUNCT', 'ADV', 'AUX'): 21, ('CCONJ', 'ADJ', '
+NOUN'): 21, ('NOUN', 'DET', 'VERB'): 21, ('PUNCT', 'ADV', 'PUNCT'): 21, ('PRON', 'AUX', 'ADJ'): 22, ('PUNCT', 'NOUN', 'ADP'): 22, ('NOUN', 'PUNCT', 'CCONJ'): 22, ('PUNCT', 'VERB', 'DET'): 22, ('NOUN', 'VERB', 'PART'): 22, ('NOUN', 'AUX', 'AUX'
+): 22, ('ADP', 'NOUN', 'AUX'): 22, ('ADV', 'ADJ', 'NOUN'): 23, ('NOUN', 'PUNCT', 'VERB'): 23, ('PART', 'VERB', 'DET'): 24, ('ADV', 'AUX', 'VERB'): 24, ('PRON', 'AUX', 'ADV'): 25, ('VERB', 'NOUN', 'NOUN'): 25, ('ADV', 'VERB', 'DET'): 25, ('PUNC
+T', 'ADP', 'NOUN'): 25, ('AUX', 'VERB', 'NOUN'): 25, ('ADJ', 'NOUN', 'AUX'): 26, ('ADP', 'NOUN', 'CCONJ'): 26, ('DET', 'NOUN', 'CCONJ'): 26, ('DET', 'VERB', 'NOUN'): 28, ('AUX', 'VERB', 'ADV'): 28, ('PUNCT', 'NOUN', 'NOUN'): 28, ('PUNCT', 'NOU
+N', 'PUNCT'): 29, ('ADJ', 'NOUN', 'VERB'): 29, ('NOUN', 'VERB', 'NOUN'): 29, ('SCONJ', 'DET', 'NOUN'): 30, ('AUX', 'DET', 'NOUN'): 31, ('ADJ', 'NOUN', 'CCONJ'): 31, ('VERB', 'NOUN', 'PUNCT'): 31, ('NOUN', 'NOUN', 'NOUN'): 31, ('DET', 'AUX', 'V
+ERB'): 32, ('PRON', 'AUX', 'VERB'): 32, ('NOUN', 'NOUN', 'CCONJ'): 32, ('NOUN', 'NOUN', 'VERB'): 33, ('VERB', 'ADP', 'ADJ'): 34, ('ADJ', 'ADJ', 'NOUN'): 35, ('NOUN', 'ADV', 'VERB'): 35, ('NOUN', 'VERB', 'ADJ'): 36, ('AUX', 'DET', 'ADJ'): 36, (
+'VERB', 'ADJ', 'NOUN'): 36, ('PUNCT', 'NOUN', 'AUX'): 37, ('NOUN', 'PART', 'VERB'): 37, ('AUX', 'VERB', 'PUNCT'): 39, ('NOUN', 'ADP', 'ADJ'): 39, ('PUNCT', 'ADJ', 'NOUN'): 39, ('CCONJ', 'DET', 'NOUN'): 39, ('PUNCT', 'DET', 'VERB'): 40, ('NOUN'
+, 'CCONJ', 'NOUN'): 40, ('PUNCT', 'DET', 'AUX'): 41, ('AUX', 'VERB', 'ADJ'): 41, ('VERB', 'PART', 'VERB'): 43, ('VERB', 'NOUN', 'ADP'): 44, ('AUX', 'VERB', 'DET'): 45, ('PRON', 'AUX', 'DET'): 49, ('DET', 'NOUN', 'AUX'): 49, ('AUX', 'VERB', 'PART'): 50, 
+('PUNCT', 'ADP', 'DET'): 50, ('NOUN', 'NOUN', 'AUX'): 50, ('PUNCT', 'PRON', 'AUX'): 52, ('NOUN', 'PUNCT', 'NOUN'): 53, ('ADJ', 'NOUN', 'NOUN'): 56, ('ADP', 'NOUN', 'NOUN'): 56, ('ADV', 'VERB', 'ADP'): 56, ('NOUN', 'NOUN', 'ADP'): 61,
+ ('DET', 'NOUN', 'NOUN'): 61, ('NOUN', 'AUX', 'PART'): 62, ('NOUN', 'VERB', 'DET'): 62, ('DET', 'NOUN', 'VERB'): 62, ('ADP', 'NOUN', 'ADP'): 63, ('NOUN', 'AUX', 'DET'): 63, ('ADP', 'NOUN', 'PUNCT'): 65, ('AUX', 'ADV', 'VERB'): 66, ('NOUN', 'AU
+X', 'ADJ'): 67, ('DET', 'NOUN', 'PUNCT'): 68, ('ADP', 'ADJ', 'NOUN'): 69, ('VERB', 'ADP', 'NOUN'): 79, ('AUX', 'AUX', 'VERB'): 80, ('ADJ', 'NOUN', 'PUNCT'): 86, ('PUNCT', 'DET', 'ADJ'): 87, ('VERB', 'DET', 'ADJ'): 88, ('NOUN', 'NOUN', 'PUNCT')
+: 90, ('NOUN', 'AUX', 'ADV'): 96, ('NOUN', 'ADP', 'DET'): 106, ('NOUN', 'VERB', 'ADP'): 111, ('DET', 'ADJ', 'NOUN'): 113, ('VERB', 'ADP', 'DET'): 114, ('ADJ', 'NOUN', 'ADP'): 116, ('AUX', 'VERB', 'ADP'): 137, ('ADP', 'DET', 'ADJ'): 143, ('NOUN
+', 'ADP', 'NOUN'): 150, ('VERB', 'DET', 'NOUN'): 163, ('DET', 'NOUN', 'ADP'): 170, ('NOUN', 'AUX', 'VERB'): 285, ('PUNCT', 'DET', 'NOUN'): 295, ('ADP', 'DET', 'NOUN'): 465}
