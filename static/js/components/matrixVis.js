@@ -1,28 +1,56 @@
 "use strict";
 var MatrixVis = /** @class */ (function () {
     function MatrixVis(data, div_id, name) {
-        this.data = data;
-        this.div_id = div_id;
-        this.name = name;
-        this.margin = {
-            top: 80,
-            right: 100,
-            bottom: 0,
-            left: 40
-        };
-        this.width = 770;
-        this.height = 800;
         this.POS_TAGS = ['ADJ', 'ADV', 'INTJ', 'NOUN', 'PROPN', 'VERB', 'ADP', 'AUX', 'CONJ', 'DET', 'NUM', 'PART', 'PRON', 'SCONJ', 'PUNCT', 'SYM', 'X'];
         this.pos_classes_dict = {
             "open": ["ADJ", "ADV", "INTJ", "NOUN", "PROPN", "VERB"],
             "closed": ["ADP", "AUX", "CONJ", "DET", "NUM", "PART", "PRON", "SCONJ"],
             "other": ["PUNCT", "SYM", "X"]
         };
+        this.data = data;
+        this.div_id = div_id;
         this.one_hot_patterns = {};
         this.matrix = this.prep_data_for_vis();
         this.nodes = this.make_nodes();
         console.log("nodes: ", this.nodes);
+        this.name = name;
+        this.margin = {
+            top: 80,
+            right: 80,
+            bottom: 0,
+            left: 40
+        };
+        this.width = 600;
+        this.height = this.nodes.length * 15;
+        this.stats = this.compute_stats();
+        console.log(this.stats);
     }
+    MatrixVis.prototype.compute_stats = function () {
+        var _this = this;
+        var no_pattern_count = this.one_hot_patterns["00000000000000000"].elements.length;
+        var pattern_idx = Object.keys(this.one_hot_patterns).filter(function (key) { return key != "00000000000000000"; }).map(function (key) { return _this.one_hot_patterns[key].elements; }).flat();
+        var pattern_found_count = pattern_idx.length;
+        var wrongly_classified = pattern_idx.filter(function (i) { return _this.data[i].truth_label != _this.data[i].sentiment; }).length;
+        var props = pattern_idx.map(function (i) {
+            return {
+                type: _this.data[i].sentiment,
+                value: d3.max(_this.data[i].props)
+            };
+        });
+        var saliency_scores = pattern_idx.map(function (i) { return _this.data[i].saliency_score; });
+        var pattern_amount = Object.keys(this.one_hot_patterns).length - 1;
+        var distribution_plot = DistributionPlot(props, "#distribution_plot_" + this.div_id.slice(-1), "distribution over predicted sentiments propabilities");
+        distribution_plot.draw();
+        // let avg_saliency = 
+        return {
+            no_pattern_count: no_pattern_count,
+            pattern_found_count: pattern_found_count,
+            wrongly_classified: wrongly_classified,
+            pattern_amount: pattern_amount,
+            props: props,
+            saliency_scores: saliency_scores
+        };
+    };
     MatrixVis.prototype.make_nodes = function () {
         var _this = this;
         var nodes = [];
@@ -67,7 +95,7 @@ var MatrixVis = /** @class */ (function () {
                         });
                     });
                     matrix.push(row_matrix_1);
-                    vis_index++;
+                    // vis_index ++;
                     _this.one_hot_patterns[str_one_hot_pattern] = {
                         elements: [],
                     };
@@ -96,7 +124,7 @@ var MatrixVis = /** @class */ (function () {
         var x = d3.scaleBand()
             .range([0, width])
             .domain(myGroups)
-            .padding(0.02);
+            .padding(0.1);
         this.container.append("g")
             .attr("transform", "translate(0," + 0 + ")")
             .call(d3.axisTop(x))
@@ -152,41 +180,65 @@ var MatrixVis = /** @class */ (function () {
             console.log(d, p);
             console.log(d3.select(this));
         });
-        // TODO: sort open/closed (alle von open/closed/mixed) + cluster				
-        // create vis new everytime
-        this.sort("cluster");
-    };
-    MatrixVis.prototype.sort = function (type) {
-        // Features of the annotation
-        // let annotations = [
-        //   {
-        //     note: {
-        //       label: "Here is the annotation label",
-        //       title: "Annotation title",
-        // 			padding: 10,
-        // 			wrap: 200
-        //     },
-        // 		type: d3.annotationCalloutRect,
-        //     x: 600,
-        //     y: 100,
-        //     dy: 100,
-        //     dx: 100
-        //   }
-        // ]
-        // 
+        var annotations = [
+            {
+                note: {
+                    // label: "Here is the annotation label",
+                    label: "",
+                    title: "Closed class",
+                    padding: 10,
+                    wrap: 100
+                },
+                subject: {
+                    width: 245,
+                    height: 50
+                },
+                type: d3.annotationCalloutRect,
+                x: 0,
+                y: -50,
+                dy: 50,
+                dx: -40
+            },
+            {
+                note: {
+                    // label: "based on the universal dependencies .org",
+                    label: "",
+                    title: "Open class",
+                    padding: 10,
+                    wrap: 100
+                },
+                subject: {
+                    width: 360,
+                    height: 50
+                },
+                type: d3.annotationCalloutRect,
+                x: 260,
+                y: -50,
+                dy: 50,
+                dx: 400
+            }
+        ];
         // // Add annotation to the chart
         // let makeAnnotations = d3.annotation()
         //   .annotations(annotations)
         // this.container
         //   .append("g")
         //   .call(makeAnnotations)
+        // TODO: sort open/closed (alle von open/closed/mixed) + cluster				
+        // create vis new everytime
+        // this.sort("cluster");
+    };
+    MatrixVis.prototype.sort = function (type) {
+        // Features of the annotation		
         this.container.selectAll(".matrix-row").sort(function (a, b) {
+            console.log("sort!", type);
             if (type == "cluster") {
                 return d3.ascending(Number(a[0].c), Number(b[0].c));
             }
             return d3.ascending(Number(a[0].c), Number(b[0].c));
         })
             .attr("transform", function (d, i) {
+            console.log(y(i));
             return "translate(0, " + y(i) + ")";
         });
     };
