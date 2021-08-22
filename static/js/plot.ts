@@ -315,7 +315,8 @@ function create_scatter_plot(data: Iterable<unknown>, div_id) {
 		.attr("cy", (d: any) => y(d.y))
 		.attr("id", (d: any) => `${d.id}`)
 		.attr("r", (d: any) => get_radius(d.new))
-		.style("opacity", (d: any) => get_max_value(d.props, false))
+    // .style("opacity", (d: any) => get_max_value(d.props, false))
+		.style("opacity", (d: any) => d3.max(d.props))
 		.style('fill', (d:any) => {
 			// console.log(d.new);
 			return get_color(d.sentiment, d.new);
@@ -335,66 +336,67 @@ function create_scatter_plot(data: Iterable<unknown>, div_id) {
 }
 
 
-function scatter_plot(custom_data, click, data_file, div_id) {
-		custom_data = (custom_data == undefined) ? false : custom_data;
+function scatter_plot(data, click, data_file, div_id) {
+		// custom_data = (custom_data == undefined) ? false : custom_data;
 		click = (click == undefined) ? false : click;
-		d3.csv(data_file, (data: any) => {
 				
-				console.log("custom_data", custom_data)
-				if (Array.from(custom_data).length != 0) {
-						data.push(custom_data);
-				}
-				
-				console.log(data);
-				
-				create_scatter_plot(data, div_id);
-				
-				if (!$(".slider").is(":visible")) {
-					const slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1]
-					const sliderRange = d3
-						.sliderBottom()
-						.min(d3.min(slider_data_vals))
-						.max(d3.max(slider_data_vals))
-						.width(600)
-						.tickFormat(d3.format('.2%'))
-						.ticks(5)
-						.default([0.70, 1])
-						.fill('#2196f3')
-						.on('onchange', val => {
-							d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));
-							console.log(val);
-							d3.selectAll("circle").style("display", "none");
-							d3.selectAll("circle").transition()
-								 .filter(function() {
-									 let point_val = Number(this.style.opacity);
-									 // console.log(point_val);
-									 // console.log(point_val >= val[0]);
-									 return point_val >= val[0] && point_val <= val[1];
-								 })
-								 .duration(300)
-								 .style("display", "block");
-						});
+		// console.log("custom_data", custom_data)
+		// if (Array.from(custom_data).length != 0) {
+		// 		data.push(custom_data);
+		// }
+    // 
+		// console.log(data);
+		
+		create_scatter_plot(data, div_id);
+		
+		if (!$(".slider").is(":visible")) {
+			const slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1]
+			const sliderRange = d3
+				.sliderBottom()
+				.min(d3.min(slider_data_vals))
+				.max(d3.max(slider_data_vals))
+				.width(600)
+				.tickFormat(d3.format('.2%'))
+				.ticks(5)
+				.default([0.70, 1])
+				.fill('#2196f3')
+				.on('onchange', val => {
+					d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));
+					console.log(val);
+					d3.selectAll("circle")
+            // .style("display", "none");
+            .attr("display", "none");
+					d3.selectAll("circle")
+             // .transition()
+						 .filter(function () {
+							 let point_val = Number(this.style.opacity);									 
+               // console.log(point_val >= val[0]);
+               return point_val >= val[0] && point_val <= val[1];
+             })
+             .attr("display", "block");
+						 // .duration(100)
+						 // .style("display", "block");
+				});
 
-					const gRange = d3
-						.select('div#slider-range')
-						.append('svg')
-						.attr('width', 700)
-						.attr('height', 100)
-						.append('g')
-						.attr('transform', 'translate(30,30)');
+			const gRange = d3
+				.select('div#slider-range')
+				.append('svg')
+				.attr('width', 700)
+				.attr('height', 100)
+				.append('g')
+				.attr('transform', 'translate(30,30)');
 
-					gRange.call(sliderRange);
-					d3.select('p#value-range').text(
-						sliderRange
-							.value()
-							.map(d3.format('.2%'))
-							.join('-')
-					);
-				}	
-				
-				if(click) {
-					console.log("click_point", click);
-					click_point(custom_data);
-				}
-		});
+			gRange.call(sliderRange);
+			d3.select('p#value-range').text(
+				sliderRange
+					.value()
+					.map(d3.format('.2%'))
+					.join('-')
+			);
+		}	
+		
+		if(click) {
+			console.log("click_point", click);
+			click_point(custom_data);
+		}
 }
