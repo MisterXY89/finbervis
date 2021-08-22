@@ -69,10 +69,19 @@ function transform_data(data) {
 	return data;
 }
 
+function get_sentiment_color(sentiment) {
+	let color_sent_dict = {
+		neutral: "#64abe5",
+		negative: "#9e64e5",
+		positive: "#abe564"
+	}
+	return color_sent_dict[sentiment];
+}
+
 
 
 function create_heatmap(segment, layer, head, div_id) {
-	load_attention_heatmap_data().then(data => {
+	load_attention_heatmap_data(segment, layer, head).then(data => {
 		new Heatmap(data, div_id)
 	})
 }

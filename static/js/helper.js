@@ -111,8 +111,16 @@ function transform_data(data) {
     console.log("transformed_data:", data);
     return data;
 }
+function get_sentiment_color(sentiment) {
+    var color_sent_dict = {
+        neutral: "#64abe5",
+        negative: "#9e64e5",
+        positive: "#abe564"
+    };
+    return color_sent_dict[sentiment];
+}
 function create_heatmap(segment, layer, head, div_id) {
-    load_attention_heatmap_data().then(function (data) {
+    load_attention_heatmap_data(segment, layer, head).then(function (data) {
         new Heatmap(data, div_id);
     });
 }
