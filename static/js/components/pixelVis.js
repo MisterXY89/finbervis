@@ -1,84 +1,22 @@
 "use strict";
 // see https://observablehq.com/@mbostock/the-impact-of-vaccines
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-function transform_data(data) {
-    data.map(function (row) {
-        row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens) : [];
-        row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
-        row.embeddings = (row.embeddings != undefined) ? to_array(row.embeddings) : [];
-        row.cls_embs = (row.cls_embs != undefined) ? to_array(row.cls_embs) : [];
-        row.props = (row.props != undefined) ? to_array(row.props) : [];
-        row.x = (row.x != undefined) ? Number(row.x) : 0;
-        row.y = (row.y != undefined) ? Number(row.y) : 0;
-        row.id = (row.id != undefined) ? Number(row.id) : -1;
-    });
-    console.log(data);
-    return data;
-}
-function load_pixel_vis_data(fi1, fi2) {
-    return __awaiter(this, void 0, void 0, function () {
-        var papa_config, data1, data2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    papa_config = { delimiter: ",", header: true };
-                    return [4 /*yield*/, fetch("/data/" + fi1)
-                            .then(function (resp) { return resp.text(); })
-                            .then(function (t) { return Papa.parse(t, papa_config); })
-                            .then(function (data1) {
-                            console.log("pre trans ", data1);
-                            return transform_data(data1.data);
-                        })];
-                case 1:
-                    data1 = _a.sent();
-                    return [4 /*yield*/, fetch("/data/" + fi2)
-                            .then(function (resp) { return resp.text(); })
-                            .then(function (t) { return Papa.parse(t, papa_config); })
-                            .then(function (data2) {
-                            return transform_data(data2.data);
-                        })];
-                case 2:
-                    data2 = _a.sent();
-                    return [2 /*return*/, { data1: data1, data2: data2 }];
-            }
-        });
-    });
-}
+// async function load_pixel_vis_data(fi1, fi2) {
+// 	const papa_config = {delimiter: ",", header: true};
+// 	let data1 = await fetch(`/data/${fi1}`)
+// 		.then(resp => resp.text())
+// 		.then(t => Papa.parse(t, papa_config))
+// 		.then(data1 => {
+// 			console.log("pre trans ", data1);
+//     	return transform_data(data1.data);
+//   	});
+//   let data2 = await fetch(`/data/${fi2}`)
+//   	.then(resp => resp.text())
+//   	.then(t => Papa.parse(t, papa_config))
+//   	.then(data2 => {
+//     	return transform_data(data2.data);
+//   	});
+//   return { data1, data2 }
+// }
 function create_sentence_view(data, is_one) {
     var div_id = "#pixel-sentence-view";
     if (is_one) {
@@ -93,23 +31,32 @@ function create_sentence_view(data, is_one) {
     }
     data = [data1, data2];
     console.log("- data - ", data);
-    var sentence_pixel_vis = new PixelVis(data, div_id, false);
+    var dims = {
+        height: 100,
+        width: 700
+    };
+    var sentence_pixel_vis = new PixelVis(data, div_id, "Sentence View", false, dims);
     sentence_pixel_vis.draw();
 }
 var PixelVis = /** @class */ (function () {
-    function PixelVis(data, div_id, name, is_one) {
+    function PixelVis(data, div_id, name, is_one, dims) {
+        console.log(dims);
+        this.sentence_view = (div_id == "#pixel-sentence-view") ? true : false;
+        this.dims = (dims == undefined) ? {} : dims;
         this.is_one = (is_one == undefined) ? true : is_one;
         this.name = name;
         this.data = data;
         this.div_id = div_id;
         this.margin = {
             top: 20,
-            right: 40,
-            bottom: 100,
-            left: 40
+            right: 20,
+            bottom: 120,
+            left: 0
         };
-        this.width = 800;
-        this.height = 1000;
+        console.log(this.sentence_view);
+        console.log(this.dims);
+        this.width = (this.dims.width == undefined) ? 600 : this.dims.width;
+        this.height = (this.dims.height == undefined) ? 600 : this.dims.height;
         // this.color_scale = d3.scaleLinear()
         //   .range(["blue","white", "red"])
         //   .domain([-1, 0, 1]);
@@ -162,16 +109,45 @@ var PixelVis = /** @class */ (function () {
         console.log(rd);
         var vis_data = rd.matrix;
         // Labels of row and columns
-        var x_axis_labels = rd.x_labels;
+        console.log(this.sentence_view);
+        if (this.sentence_view) {
+            console.log("HEHEH");
+            var x_axis_labels = rd.matrix[0].tokens;
+        }
+        else {
+            console.log("UGUGUGUGU");
+            var x_axis_labels = rd.x_labels;
+        }
+        var x_axis_labels_domain = rd.x_labels;
         var y_axis_labels = rd.y_labels;
         // Build X scales and axis:
         var x = d3.scaleBand()
             .range([0, this.width])
-            .domain(x_axis_labels)
+            .domain(x_axis_labels_domain)
             .padding(0.01);
+        // .tickFormat(function(d) { console.log("dd", d)})
         container.append("g")
             .attr("transform", "translate(0," + this.height + ")")
-            .call(d3.axisBottom(x));
+            .style("text-anchor", "start")
+            .attr("class", "x-axis")
+            .call(d3.axisBottom(x)
+            .tickFormat(function (d) {
+            // console.log(d);
+            if (_this.sentence_view) {
+                return x_axis_labels[d];
+            }
+            else {
+                return d;
+            }
+            // transform: translate(-90)
+        }));
+        if (this.sentence_view) {
+            container.select(".x-axis")
+                .selectAll("text")
+                // .attr("transform", "")
+                .style("text-anchor", "end")
+                .attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")");
+        }
         // Build X scales and axis:
         var y = d3.scaleBand()
             .range([this.height, 0])
@@ -209,6 +185,7 @@ var PixelVis = /** @class */ (function () {
             .enter()
             .append("rect")
             .attr("x", function (d) { return x(d.x); })
+            // .attr("class", `row_${d.y}`)
             .attr("y", function (d) { return y(d.y); })
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
@@ -217,6 +194,40 @@ var PixelVis = /** @class */ (function () {
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)
             .on("mouseover", mouseover);
+        container.append("text")
+            .attr("class", "pixelVisHeader")
+            .attr("x", 0)
+            .attr("y", -65)
+            .attr("text-anchor", "left")
+            .style("font-size", "22px")
+            .text(this.name);
+        // #saliency-filter-value-range
+        if (!$("#saliency-filter-value-range").is(":visible")) {
+            var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
+            var saliencySliderRange = d3
+                .sliderBottom()
+                .min(d3.min(slider_data_vals))
+                .max(d3.max(slider_data_vals))
+                .width(600)
+                .tickFormat(d3.format('.2%'))
+                .ticks(5)
+                .default(0.70)
+                .fill('#2196f3')
+                .on('onchange', function (val) {
+                console.log(val);
+                d3.select('p#saliency-filter-value-range').text(d3.format('.1%')(val));
+            });
+            var saliency_gRange = d3
+                .select('div#saliency-filter-slider-range')
+                .append('svg')
+                .attr('width', 700)
+                .attr('height', 100)
+                .append('g')
+                .attr('transform', 'translate(30,30)');
+            saliency_gRange.call(saliencySliderRange);
+            d3.select('p#saliency-filter-value-range').text(d3.format('.1%')(saliencySliderRange
+                .value()));
+        }
     };
     return PixelVis;
 }());

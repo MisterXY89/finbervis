@@ -142,17 +142,6 @@ function toggle_ents() {
 		
 }
 
-function to_array(string) {
-	// console.log(string);
-	if (typeof string == "object") {
-		return string;
-	}
-	if (string == undefined) {
-		return [];
-	}
-	return string.slice(1, -1).split(", ").map(el => Number(el));
-}
-
 function get_segment_html(seg) {
 	// type="button" class="btn btn-secondary"
 	return `<div class="search-seg" title="${seg}">
@@ -316,88 +305,6 @@ function search_data(search_q) {
 	});
 }
 
-function extract_ents_json(html, res) {
-	let json = [];
-	var doc = document.createElement('html');
-	doc.innerHTML = html;
-	let ents = Array.from(doc.getElementsByClassName("entities"))//.slice(1);
-	console.log(ents);
-	console.log(ents.length);
-	// html = 
-	ents.forEach((ent_sent, i) => {
-		console.log("#### SENT ", i);
-		let curr_i = 0;
-		Array.from(ent_sent.getElementsByTagName("mark")).forEach((el, mark_i) => {
-			console.log("-----");
-			let el_toks = el.textContent;
-			let el_style = el.style;
-			let el_ent_type = el.getElementsByTagName("span")[0].textContent;
-			el_toks = el_toks.replace(el_ent_type, "").replace(/\n/g, "").replace(/\s\s+/g, " ");
-			el_toks = (el_toks[0] == " ") ? el_toks.slice(1) : el_toks;
-			el_toks = (el_toks[el_toks.length-1][-1] == " ") ? el_toks.slice(-1) : el_toks;
-			el_toks = el_toks.split(" ").filter(el => el.length > 0);
-			let el_toks_copy = [];
-			el_toks.forEach(et => {
-				if(et.includes(",")) {
-					let ets = et.split(",");
-					el_toks_copy.push(ets[0]);
-					el_toks_copy.push(",");
-					el_toks_copy.push(ets[1]);
-				} else {
-					el_toks_copy.push(et);
-				}				
-			});
-			el_toks = el_toks_copy;
-			// let el_tok_index = ent_sent.textContent.slice(curr_i, Number(ent_sent.textContent.slice(curr_i).indexOf(el_toks.join(" "))) +el_toks.join(" ").length+curr_i).split(" ").map(el => el.replace(/\n/g, "")).filter(el => el.length > 0).length-el_toks.length-6;
-			let split_index_end = ent_sent.textContent.slice(curr_i).indexOf(el_toks.join(" "));
-			if (split_index_end == -1) {
-				split_index_end = ent_sent.textContent.slice(curr_i).indexOf(el_toks[0]);
-			}
-			split_index_end += el_toks.join(" ").length
-			let el_tok_index = ent_sent.textContent.slice(0, split_index_end).split(" ").map(el => el.replace(/\n/g, "")).filter(el => el.length > 0).length -5;
-			curr_i = el_tok_index;
-			console.log(el_toks);
-			console.log(el_tok_index);
-			el_toks = el_toks.map(s => s.toLowerCase());
-			// console.log(el_ent_type);
-			// console.log(el_toks);
-			
-			let count = el_toks.length;
-			
-			if (res[i]["entity_styles"] == undefined) {
-				res[i]["entity_styles"] = {};				
-			} 
-			if (res[i]["entities"] == undefined) {				
-				res[i]["entities"] = []
-			}
-			res[i]["entity_styles"][el_ent_type] = el_style;
-			res[i].tokens.forEach((tok, tok_i) => {
-					if (count == 0 && res[i]["entities"].length == res[i].tokens.length) {
-						return;
-					}
-					let push_ent_type = "";
-					
-					if (res[i]["entities"][tok_i] == undefined) {
-						res[i]["entities"][tok_i] = "";
-					}
-										
-					if (res[i]["entities"][tok_i] == "") {
-						console.log(tok_i, tok);
-						if(el_toks.includes(tok) && tok_i >= el_tok_index && tok_i <= el_tok_index+12) {
-							console.log("SAME");
-							console.log(el_ent_type);
-							push_ent_type = `${el_ent_type}_${mark_i}`;
-							count --;
-						}				
-						res[i]["entities"][tok_i] = push_ent_type;
-						console.log(res[i]["entities"]);
-					}					
-			});
-	 });
- });
- return res;
-}
-
 
 function toggle_grads() {
 	
@@ -453,13 +360,22 @@ function toggle_plain_sent() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	
-	load_pixel_vis_data("data_copy.csv", "drop_8_data.csv").then(data => {
-		let pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
-		window.pixelVis1 = pixelVis1;
-		pixelVis1.draw();
-		let pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
-		window.pixelVis2 = pixelVis2;
-		pixelVis2.draw();
+	// load_data("data_copy.csv", "drop_8_data.csv").then(data => {
+	load_data("data_copy.csv", false).then(data => {
+		// let pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
+		// window.pixelVis1 = pixelVis1;
+		// pixelVis1.draw();
+		// let pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
+		// window.pixelVis2 = pixelVis2;
+		// pixelVis2.draw();
+		// -------------------------------
+		// scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");
+		// scatter_plot(data.data2, false, DATA_FILE_TWO, "#projection_model_2");	
+		let matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
+		matrix_vis_1.draw();
+		
+		// let matrix_vis_2 = new MatrixVis(data.data2, "#matrix_vis_2", "MatrixVis 2");
+		// matrix_vis_2.draw();
 	})
 	
 	document.getElementById("show-similar").disabled = true;
@@ -470,10 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		delay: 12500
 	});
 		
-	// $('#toast').toast('hide');
-	
-	scatter_plot({}, false, DATA_FILE_ONE, "#projection_model_1");
-	scatter_plot({}, false, DATA_FILE_TWO, "#projection_model_2");	
+	// $('#toast').toast('hide');	
 
 	const test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States."
 	// "taking office at a moment of profound economic, health and political crises with a promise to seek unity after a tumultuous four years that tore at the fabric of American society.";
@@ -503,6 +416,22 @@ document.addEventListener("DOMContentLoaded", () => {
 	const toggle_mean_attention_button = d3.select("#toggle_mean_attention");
 	const similar_sents_display_attention = d3.select("#similar_sents_display_attention");
 	const toggle_gradients_button = d3.select("#toggle_gradients");
+	const cluster_button = d3.select("#cluster_button");
+	const epsilon_input = d3.select("#epsilon_input");
+	
+	const create_one_hot = d3.select("#create_one_hot");
+	const threshold_input = d3.select("#threshold_input");	
+	
+	cluster_button.on("click", () => {
+		let epsilon = Number(epsilon_input.property("value"));
+		let min_samples = 25;
+		let url = `/get_clusters?file=${data_filename_1}&epsilon=${epsilon}&min_samples=${min_samples}`;
+		fetch(url)
+		.then(resp => resp.json())
+		.then(obj => {
+			console.log(obj);
+		})
+	});
 
 
 	test_rule_button.on("click", () => {

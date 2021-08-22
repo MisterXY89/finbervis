@@ -1,38 +1,23 @@
 
 // see https://observablehq.com/@mbostock/the-impact-of-vaccines
 
-function transform_data(data) {
-	data.map(row => {
-		row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens) : [];
-		row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
-		row.embeddings = (row.embeddings != undefined) ? to_array(row.embeddings) : [];
-		row.cls_embs = (row.cls_embs != undefined) ? to_array(row.cls_embs) : [];
-		row.props = (row.props != undefined) ? to_array(row.props) : [];
-		row.x = (row.x != undefined) ? Number(row.x) : 0;
-		row.y = (row.y != undefined) ? Number(row.y) : 0;
-		row.id = (row.id != undefined) ? Number(row.id) : -1;
-	})
-	console.log(data);
-	return data;
-}
-
-async function load_pixel_vis_data(fi1, fi2) {
-	const papa_config = {delimiter: ",", header: true};
-	let data1 = await fetch(`/data/${fi1}`)
-		.then(resp => resp.text())
-		.then(t => Papa.parse(t, papa_config))
-		.then(data1 => {
-			console.log("pre trans ", data1);
-    	return transform_data(data1.data);
-  	});
-  let data2 = await fetch(`/data/${fi2}`)
-  	.then(resp => resp.text())
-  	.then(t => Papa.parse(t, papa_config))
-  	.then(data2 => {
-    	return transform_data(data2.data);
-  	});
-  return { data1, data2 }
-}
+// async function load_pixel_vis_data(fi1, fi2) {
+// 	const papa_config = {delimiter: ",", header: true};
+// 	let data1 = await fetch(`/data/${fi1}`)
+// 		.then(resp => resp.text())
+// 		.then(t => Papa.parse(t, papa_config))
+// 		.then(data1 => {
+// 			console.log("pre trans ", data1);
+//     	return transform_data(data1.data);
+//   	});
+//   let data2 = await fetch(`/data/${fi2}`)
+//   	.then(resp => resp.text())
+//   	.then(t => Papa.parse(t, papa_config))
+//   	.then(data2 => {
+//     	return transform_data(data2.data);
+//   	});
+//   return { data1, data2 }
+// }
 
 function create_sentence_view(data, is_one) {
 	let div_id = "#pixel-sentence-view";
@@ -47,25 +32,34 @@ function create_sentence_view(data, is_one) {
 	}
 	data = [data1, data2];
 	console.log("- data - ", data);
-	let sentence_pixel_vis = new PixelVis(data, div_id, false);
+	let dims = {
+		height: 100,
+		width: 700
+	}
+	let sentence_pixel_vis = new PixelVis(data, div_id, "Sentence View", false, dims);
 	sentence_pixel_vis.draw();
 }
 
 class PixelVis {
 	
-	constructor(data, div_id, name, is_one) {
+	constructor(data, div_id, name, is_one, dims) {
+		console.log(dims);
+		this.sentence_view = (div_id == "#pixel-sentence-view") ? true : false;		
+		this.dims = (dims == undefined) ? {} : dims;
 		this.is_one = (is_one == undefined) ? true : is_one;
 		this.name = name;
 		this.data = data;
 		this.div_id = div_id;
 		this.margin = {
 				top: 20, 
-				right: 40, 
-				bottom: 100, 
-				left: 40
+				right: 20, 
+				bottom: 120, 
+				left: 0
 			};
-		this.width = 800;
-		this.height = 1000;
+		console.log(this.sentence_view);
+		console.log(this.dims);
+		this.width = (this.dims.width == undefined) ? 600 : this.dims.width;
+		this.height = (this.dims.height == undefined) ? 600 : this.dims.height;
 		// this.color_scale = d3.scaleLinear()
 		//   .range(["blue","white", "red"])
 		//   .domain([-1, 0, 1]);
@@ -123,17 +117,49 @@ class PixelVis {
 		console.log(rd);
 		const vis_data = rd.matrix;
 		// Labels of row and columns
-		const x_axis_labels = rd.x_labels;
+		console.log(this.sentence_view);
+		if (this.sentence_view) {
+			console.log("HEHEH");
+			const x_axis_labels = rd.matrix[0].tokens;
+		} else {
+			console.log("UGUGUGUGU");
+			const x_axis_labels = rd.x_labels;			
+		}
+		const x_axis_labels_domain = rd.x_labels;
 		const y_axis_labels = rd.y_labels;
+		
 		
 		// Build X scales and axis:
 		const x = d3.scaleBand()
 		  .range([ 0, this.width ])
-		  .domain(x_axis_labels)
-		  .padding(0.01);
+		  .domain(x_axis_labels_domain)
+		  .padding(0.01)
+			// .tickFormat(function(d) { console.log("dd", d)})
+			
 		container.append("g")
 		  .attr("transform", "translate(0," + this.height + ")")
-		  .call(d3.axisBottom(x))
+			.style("text-anchor", "start")
+			.attr("class", "x-axis")
+		  .call(d3.axisBottom(x)
+							.tickFormat(d => {
+								// console.log(d);
+								if (this.sentence_view) {
+									return x_axis_labels[d];
+								} else {
+									return d;
+								}
+								// transform: translate(-90)
+							})	
+						)
+						
+		if (this.sentence_view) {			
+			container.select(".x-axis")
+			.selectAll("text")
+			// .attr("transform", "")
+			.style("text-anchor", "end")
+			.attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")")
+		}
+			
 
 		// Build X scales and axis:
 		const y = d3.scaleBand()
@@ -178,6 +204,7 @@ class PixelVis {
       .enter()
       .append("rect")
       .attr("x", d =>  x(d.x))
+			// .attr("class", `row_${d.y}`)
       .attr("y", d => y(d.y))
       .attr("width", x.bandwidth())
       .attr("height", y.bandwidth())
@@ -186,6 +213,50 @@ class PixelVis {
 			.on("mousemove", mousemove)
 			.on("mouseleave", mouseleave)
 			.on("mouseover", mouseover)
+			
+		container.append("text")
+			.attr("class", "pixelVisHeader")
+			.attr("x", 0)
+			.attr("y", -65)
+			.attr("text-anchor", "left")
+			.style("font-size", "22px")
+			.text(this.name);
+			
+			
+		// #saliency-filter-value-range
+		
+		if (!$("#saliency-filter-value-range").is(":visible")) {
+			const slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1]
+			const saliencySliderRange = d3
+				.sliderBottom()
+				.min(d3.min(slider_data_vals))
+				.max(d3.max(slider_data_vals))
+				.width(600)
+				.tickFormat(d3.format('.2%'))
+				.ticks(5)
+				.default(0.70)
+				.fill('#2196f3')
+				.on('onchange', val => {
+					console.log(val);
+					d3.select('p#saliency-filter-value-range').text(d3.format('.1%')(val));
+				});
+
+			const saliency_gRange = d3
+				.select('div#saliency-filter-slider-range')
+				.append('svg')
+				.attr('width', 700)
+				.attr('height', 100)
+				.append('g')
+				.attr('transform', 'translate(30,30)');
+
+			saliency_gRange.call(saliencySliderRange);
+			d3.select('p#saliency-filter-value-range').text(
+				d3.format('.1%')(
+				saliencySliderRange
+					.value()
+				)
+			);
+		}	
 	
-	}
+	}	
 }

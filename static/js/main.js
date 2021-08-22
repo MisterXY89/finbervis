@@ -112,16 +112,6 @@ function toggle_ents() {
         });
     }
 }
-function to_array(string) {
-    // console.log(string);
-    if (typeof string == "object") {
-        return string;
-    }
-    if (string == undefined) {
-        return [];
-    }
-    return string.slice(1, -1).split(", ").map(function (el) { return Number(el); });
-}
 function get_segment_html(seg) {
     // type="button" class="btn btn-secondary"
     return "<div class=\"search-seg\" title=\"" + seg + "\">\n  \t" + seg.slice(0, 120) + "...\n\t</div>";
@@ -273,84 +263,6 @@ function search_data(search_q) {
         }
     });
 }
-function extract_ents_json(html, res) {
-    var json = [];
-    var doc = document.createElement('html');
-    doc.innerHTML = html;
-    var ents = Array.from(doc.getElementsByClassName("entities")); //.slice(1);
-    console.log(ents);
-    console.log(ents.length);
-    // html = 
-    ents.forEach(function (ent_sent, i) {
-        console.log("#### SENT ", i);
-        var curr_i = 0;
-        Array.from(ent_sent.getElementsByTagName("mark")).forEach(function (el, mark_i) {
-            console.log("-----");
-            var el_toks = el.textContent;
-            var el_style = el.style;
-            var el_ent_type = el.getElementsByTagName("span")[0].textContent;
-            el_toks = el_toks.replace(el_ent_type, "").replace(/\n/g, "").replace(/\s\s+/g, " ");
-            el_toks = (el_toks[0] == " ") ? el_toks.slice(1) : el_toks;
-            el_toks = (el_toks[el_toks.length - 1][-1] == " ") ? el_toks.slice(-1) : el_toks;
-            el_toks = el_toks.split(" ").filter(function (el) { return el.length > 0; });
-            var el_toks_copy = [];
-            el_toks.forEach(function (et) {
-                if (et.includes(",")) {
-                    var ets = et.split(",");
-                    el_toks_copy.push(ets[0]);
-                    el_toks_copy.push(",");
-                    el_toks_copy.push(ets[1]);
-                }
-                else {
-                    el_toks_copy.push(et);
-                }
-            });
-            el_toks = el_toks_copy;
-            // let el_tok_index = ent_sent.textContent.slice(curr_i, Number(ent_sent.textContent.slice(curr_i).indexOf(el_toks.join(" "))) +el_toks.join(" ").length+curr_i).split(" ").map(el => el.replace(/\n/g, "")).filter(el => el.length > 0).length-el_toks.length-6;
-            var split_index_end = ent_sent.textContent.slice(curr_i).indexOf(el_toks.join(" "));
-            if (split_index_end == -1) {
-                split_index_end = ent_sent.textContent.slice(curr_i).indexOf(el_toks[0]);
-            }
-            split_index_end += el_toks.join(" ").length;
-            var el_tok_index = ent_sent.textContent.slice(0, split_index_end).split(" ").map(function (el) { return el.replace(/\n/g, ""); }).filter(function (el) { return el.length > 0; }).length - 5;
-            curr_i = el_tok_index;
-            console.log(el_toks);
-            console.log(el_tok_index);
-            el_toks = el_toks.map(function (s) { return s.toLowerCase(); });
-            // console.log(el_ent_type);
-            // console.log(el_toks);
-            var count = el_toks.length;
-            if (res[i]["entity_styles"] == undefined) {
-                res[i]["entity_styles"] = {};
-            }
-            if (res[i]["entities"] == undefined) {
-                res[i]["entities"] = [];
-            }
-            res[i]["entity_styles"][el_ent_type] = el_style;
-            res[i].tokens.forEach(function (tok, tok_i) {
-                if (count == 0 && res[i]["entities"].length == res[i].tokens.length) {
-                    return;
-                }
-                var push_ent_type = "";
-                if (res[i]["entities"][tok_i] == undefined) {
-                    res[i]["entities"][tok_i] = "";
-                }
-                if (res[i]["entities"][tok_i] == "") {
-                    console.log(tok_i, tok);
-                    if (el_toks.includes(tok) && tok_i >= el_tok_index && tok_i <= el_tok_index + 12) {
-                        console.log("SAME");
-                        console.log(el_ent_type);
-                        push_ent_type = el_ent_type + "_" + mark_i;
-                        count--;
-                    }
-                    res[i]["entities"][tok_i] = push_ent_type;
-                    console.log(res[i]["entities"]);
-                }
-            });
-        });
-    });
-    return res;
-}
 function toggle_grads() {
     $("#selected-segment").hide();
     $("#selected-segment-ents").hide();
@@ -398,13 +310,21 @@ function toggle_plain_sent() {
     }
 }
 document.addEventListener("DOMContentLoaded", function () {
-    load_pixel_vis_data("data_copy.csv", "drop_8_data.csv").then(function (data) {
-        var pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
-        window.pixelVis1 = pixelVis1;
-        pixelVis1.draw();
-        var pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
-        window.pixelVis2 = pixelVis2;
-        pixelVis2.draw();
+    // load_data("data_copy.csv", "drop_8_data.csv").then(data => {
+    load_data("data_copy.csv", false).then(function (data) {
+        // let pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
+        // window.pixelVis1 = pixelVis1;
+        // pixelVis1.draw();
+        // let pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
+        // window.pixelVis2 = pixelVis2;
+        // pixelVis2.draw();
+        // -------------------------------
+        // scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");
+        // scatter_plot(data.data2, false, DATA_FILE_TWO, "#projection_model_2");	
+        var matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
+        matrix_vis_1.draw();
+        // let matrix_vis_2 = new MatrixVis(data.data2, "#matrix_vis_2", "MatrixVis 2");
+        // matrix_vis_2.draw();
     });
     document.getElementById("show-similar").disabled = true;
     document.getElementById("self-attention-collapse-btn").disabled = true;
@@ -412,9 +332,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $('.toast').toast({
         delay: 12500
     });
-    // $('#toast').toast('hide');
-    scatter_plot({}, false, DATA_FILE_ONE, "#projection_model_1");
-    scatter_plot({}, false, DATA_FILE_TWO, "#projection_model_2");
+    // $('#toast').toast('hide');	
     var test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States.";
     // "taking office at a moment of profound economic, health and political crises with a promise to seek unity after a tumultuous four years that tore at the fabric of American society.";
     console.log(test_sent);
@@ -442,6 +360,20 @@ document.addEventListener("DOMContentLoaded", function () {
     var toggle_mean_attention_button = d3.select("#toggle_mean_attention");
     var similar_sents_display_attention = d3.select("#similar_sents_display_attention");
     var toggle_gradients_button = d3.select("#toggle_gradients");
+    var cluster_button = d3.select("#cluster_button");
+    var epsilon_input = d3.select("#epsilon_input");
+    var create_one_hot = d3.select("#create_one_hot");
+    var threshold_input = d3.select("#threshold_input");
+    cluster_button.on("click", function () {
+        var epsilon = Number(epsilon_input.property("value"));
+        var min_samples = 25;
+        var url = "/get_clusters?file=" + data_filename_1 + "&epsilon=" + epsilon + "&min_samples=" + min_samples;
+        fetch(url)
+            .then(function (resp) { return resp.json(); })
+            .then(function (obj) {
+            console.log(obj);
+        });
+    });
     test_rule_button.on("click", function () {
         attention_interaction_group.style("opacity", 1);
         spinner.style("display", "block");

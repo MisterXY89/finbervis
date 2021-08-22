@@ -1,22 +1,4 @@
 
-// see https://observablehq.com/@mbostock/the-impact-of-vaccines
-
-function transform_data(data) {
-	data.map(row => {
-		row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens) : [];
-		row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
-		row.embeddings = (row.embeddings != undefined) ? to_array(row.embeddings) : [];
-		row.cls_embs = (row.cls_embs != undefined) ? to_array(row.cls_embs) : [];
-		row.props = (row.props != undefined) ? to_array(row.props) : [];
-		row.x = (row.x != undefined) ? Number(row.x) : 0;
-		row.y = (row.y != undefined) ? Number(row.y) : 0;
-		row.id = (row.id != undefined) ? Number(row.id) : -1;
-	})
-	console.log(data);
-	return data;
-}
-
-
 class ScatterPlot {
 	
 	constructor(data, div_id, name, is_one) {

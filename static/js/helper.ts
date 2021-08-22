@@ -10,6 +10,66 @@ function unzoom() {
 	// click_point(window.d);
 }
 
+function to_array(string) {
+	// console.log(string);
+	if (typeof string == "object") {
+		return string;
+	}
+	if (string == undefined) {
+		return [];
+	}
+	let arr = string.slice(1, -1).split(", ");
+	if (Number.isNaN(Number(arr[0]))) {
+		if (arr[0][0] == "''") {
+			return arr.map(el => el.slice(1, -1));
+		}
+		return arr;
+	}
+	return arr.map(Number);
+}
+
+async function load_data(fi1, fi2) {
+	const papa_config = {delimiter: ",", header: true};
+	let data1 = await fetch(`/data/${fi1}`)
+		.then(resp => resp.text())
+		.then(t => Papa.parse(t, papa_config))
+		.then(data1 => {
+			console.log("pre trans ", data1);
+    	return transform_data(data1.data);
+  	});
+	if (!fi2) {
+		return {data1};
+	}
+  let data2 = await fetch(`/data/${fi2}`)
+  	.then(resp => resp.text())
+  	.then(t => Papa.parse(t, papa_config))
+  	.then(data2 => {
+    	return transform_data(data2.data);
+  	});
+  return { data1, data2 }
+}
+
+function transform_data(data) {
+	data.map(row => {
+		row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens, true) : [];
+		row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
+		row.embeddings = (row.embeddings != undefined) ? to_array(row.embeddings) : [];
+		row.cls_embs = (row.cls_embs != undefined) ? to_array(row.cls_embs) : [];
+		row.props = (row.props != undefined) ? to_array(row.props) : [];
+		row.x = (row.x != undefined) ? Number(row.x) : 0;
+		row.y = (row.y != undefined) ? Number(row.y) : 0;
+		row.id = (row.id != undefined) ? Number(row.id) : -1;
+		row.one_hot_cluster = (row.one_hot_cluster != undefined) ? Number(row.one_hot_cluster) : -1;
+		row.one_hot = (row.one_hot != undefined) ? to_array(row.one_hot, false) : [];
+		row.pos_tag_classes = (row.pos_tag_classes != undefined) ? to_array(row.pos_tag_classes, false) : [];
+		row.deRoseAttention = (row.deRoseAttention != undefined) ? to_array(row.deRoseAttention) : [];
+		row.pos_tags = (row.pos_tags != undefined) ? to_array(row.pos_tags) : [];		
+	})
+	console.log("transformed_data:", data);
+	return data;
+}
+
+
 
 function create_heatmap(segment, layer, head, div_id) {
 	load_attention_heatmap_data().then(data => {
@@ -49,7 +109,8 @@ function get_max_value(str_props, pretty) {
 	return max_val;
 }
 
-function tok_to_array(string) {
+function tok_to_array(string, tok) {
+	tok = (tok == undefined) ? true : tok;
 	if (string == undefined) {
 		return [];
 	}
@@ -58,6 +119,9 @@ function tok_to_array(string) {
 			return string.tokens;
 		}
 		return string;
+	}
+	if (!tok) {
+			return string.slice(1,-1).split(",").map(Number);
 	}
 	// return string.replaceAll("', '##", "").slice(2, -1).split(", '").map(el => el.slice(0, -1))	
 	string = string.split("', '");
