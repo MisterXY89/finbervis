@@ -147,3 +147,26 @@ function get_mouse_events(data) {
 		click
 	]
 }
+
+d3.select("#positiveSentimentCheckbox").on("change", () => {
+	update_visible_sentiments("positive");				
+});
+
+d3.select("#neutralSentimentCheckbox").on("change", () => {
+	update_visible_sentiments("neutral");
+}); 
+d3.select("#negativeSentimentCheckbox").on("change", () => {
+	update_visible_sentiments("negative");
+}); 
+
+
+function update_visible_sentiments (sentiment) {
+	let checked = d3.select(`#${sentiment}SentimentCheckbox`).property("checked");
+	let display_style = (checked) ? "block" : "none";
+	// d3.selectAll("circle").style("display", "none");				
+	d3.selectAll("rect")
+		 .transition()
+		 .filter((el) => el.sentiment == sentiment)
+		 .duration(300)
+		 .style("display", display_style);
+}

@@ -132,3 +132,22 @@ function get_mouse_events(data) {
         click
     ];
 }
+d3.select("#positiveSentimentCheckbox").on("change", function () {
+    update_visible_sentiments("positive");
+});
+d3.select("#neutralSentimentCheckbox").on("change", function () {
+    update_visible_sentiments("neutral");
+});
+d3.select("#negativeSentimentCheckbox").on("change", function () {
+    update_visible_sentiments("negative");
+});
+function update_visible_sentiments(sentiment) {
+    var checked = d3.select("#" + sentiment + "SentimentCheckbox").property("checked");
+    var display_style = (checked) ? "block" : "none";
+    // d3.selectAll("circle").style("display", "none");				
+    d3.selectAll("rect")
+        .transition()
+        .filter(function (el) { return el.sentiment == sentiment; })
+        .duration(300)
+        .style("display", display_style);
+}
