@@ -5,7 +5,13 @@ import json
 import numpy as np
 from flask import Flask, render_template, request, redirect, url_for, Response, send_from_directory, jsonify, make_response
 
-from src import interface
+
+from src import (
+	config,
+	interface,
+	cluster_one_hot_vectors,
+	create_one_hot_vector
+)
 
 COLLECTED_LABELD_DATA_FILE = "data/COLLECTED_LABELD_DATA.csv"
 
@@ -250,6 +256,57 @@ def search():
 		"status": status,
 		"result": result_l,
 	})
+	
+
+@app.route("/get_clusters")
+def get_clusters():
+	req_data = request.args
+	status = False
+	result = ""
+	if not "file" in req_data:
+		result = f"Error: 'missing <file> in req_data'\n{req_data=}"
+	if not "epsilon" in req_data:
+		result += f"Error: 'missing <epsilon> in req_data'\n{req_data=}"
+	if not "min_samples" in req_data:		
+		result += f"Error: 'missing <min_samples> in req_data'\n{req_data=}"
+	else:
+		file = req_data["file"]
+		epsilon = float(req_data["epsilon"])
+		min_samples = int(req_data["min_samples"])
+		result_i, df = cluster_one_hot_vectors.cluster_one_hot(config.DATA_DIR + "/" + file, epsilon=epsilon, min_samples=min_samples)
+		result_i = [*map(int, result_i)]
+		result = df.to_dict()
+		print(result)
+		print(type(result))
+		status = True
+		
+	return jsonify({
+		"status": status,
+		"result": result
+	})
+	
+@app.route("/get_one_hot_vectors")
+def get_one_hot_vectors():
+	req_data = request.args
+	status = False
+	result = ""
+	if not "file" in req_data:
+		result = f"Error: 'missing <file> in req_data'\n{req_data=}"
+	if not "threshold" in req_data:
+		result = f"Error: 'missing <threshold> in req_data'\n{req_data=}"
+	else:
+		file = req_data["file"]
+		threshold = float(req_data["threshold"])
+		result_i, df = create_one_hot_vector.make_one_hot(config.DATA_DIR + "/" + file) #, is_df=True)
+		result = df.to_dict()
+		status = True
+		
+	return jsonify({
+		"status": status,
+		"result": result
+	})
+		
+		
 
 if __name__ == '__main__':
 	app.run()
