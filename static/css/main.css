@@ -244,7 +244,10 @@ text.active {
   fill: #2f2f2f;
 }
 
-/* .matrix-column {
-  
-} */
+.tick:nth-child(-n+7) text {
+  font-weight: bold;
+}
 
+.tick:nth-last-child(-n+2) text {
+  font-weight: lighter;
+}
