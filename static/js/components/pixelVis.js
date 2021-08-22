@@ -111,11 +111,9 @@ var PixelVis = /** @class */ (function () {
         // Labels of row and columns
         console.log(this.sentence_view);
         if (this.sentence_view) {
-            console.log("HEHEH");
             var x_axis_labels = rd.matrix[0].tokens;
         }
         else {
-            console.log("UGUGUGUGU");
             var x_axis_labels = rd.x_labels;
         }
         var x_axis_labels_domain = rd.x_labels;
