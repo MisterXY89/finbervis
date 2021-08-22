@@ -360,22 +360,25 @@ function toggle_plain_sent() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	
-	// load_data("data_copy.csv", "drop_8_data.csv").then(data => {
-	load_data("data_copy.csv", false).then(data => {
-		// let pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
-		// window.pixelVis1 = pixelVis1;
-		// pixelVis1.draw();
-		// let pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
-		// window.pixelVis2 = pixelVis2;
-		// pixelVis2.draw();
+	load_data("data_copy.csv", "drop_8_data.csv").then(data => {
+		window.data1 = data.data1;
+		window.data2 = data.data1;
+	// load_data("data_copy.csv", false).then(data => {
+		let pixelVis1 = new PixelVis(data.data1, "#pixelVis1", "Centralized Reports", true);
+		window.pixelVis1 = pixelVis1;
+		pixelVis1.draw();
+		let pixelVis2 = new PixelVis(data.data2, "#pixelVis2", "Remove layer 9", false);
+		window.pixelVis2 = pixelVis2;
+		pixelVis2.draw();
 		// -------------------------------
-		// scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");
-		// scatter_plot(data.data2, false, DATA_FILE_TWO, "#projection_model_2");	
+		scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");
+		scatter_plot(data.data2, false, DATA_FILE_TWO, "#projection_model_2");	
 		let matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
+		window.matrix_vis_1 = matrix_vis_1;
 		matrix_vis_1.draw();
 		
-		// let matrix_vis_2 = new MatrixVis(data.data2, "#matrix_vis_2", "MatrixVis 2");
-		// matrix_vis_2.draw();
+		let matrix_vis_2 = new MatrixVis(data.data2, "#matrix_vis_2", "MatrixVis 2");
+		matrix_vis_2.draw();
 	})
 	
 	document.getElementById("show-similar").disabled = true;
@@ -388,9 +391,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		
 	// $('#toast').toast('hide');	
 
-	const test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States."
-	// "taking office at a moment of profound economic, health and political crises with a promise to seek unity after a tumultuous four years that tore at the fabric of American society.";
-	console.log(test_sent);
+	// const test_sent = "Joseph Robinette Biden Jr. was sworn in as the 46th president of the United States."
+	// // "taking office at a moment of profound economic, health and political crises with a promise to seek unity after a tumultuous four years that tore at the fabric of American society.";
+	// console.log(test_sent);
 
 	const spinner = d3.select("#spinning-overlay");
 	const test_rule_button = d3.select("#test-rule");
@@ -417,19 +420,45 @@ document.addEventListener("DOMContentLoaded", () => {
 	const similar_sents_display_attention = d3.select("#similar_sents_display_attention");
 	const toggle_gradients_button = d3.select("#toggle_gradients");
 	const cluster_button = d3.select("#cluster_button");
-	const epsilon_input = d3.select("#epsilon_input");
+	const epsilon_input = d3.select("#epsilonInput");
 	
 	const create_one_hot = d3.select("#create_one_hot");
-	const threshold_input = d3.select("#threshold_input");	
+	const threshold_input = d3.select("#saliencyThreshold");	
+	
+	const matrix_sort_select = d3.select("#matrixSort");
+	matrix_sort_select.on("change", (evt, d) => {
+		console.log(evt, d)
+	});
 	
 	cluster_button.on("click", () => {
+		// let file = data_filename_1;
 		let epsilon = Number(epsilon_input.property("value"));
-		let min_samples = 25;
-		let url = `/get_clusters?file=${data_filename_1}&epsilon=${epsilon}&min_samples=${min_samples}`;
-		fetch(url)
+		let threshold = Number(threshold_input.property("value"));
+		let min_samples = 3;
+			
+		let url_1 = `/get_clusters?file=${data_filename_1}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
+		fetch(url_1)
 		.then(resp => resp.json())
 		.then(obj => {
-			console.log(obj);
+			// window.stats = obj.result;
+			load_data(data_filename_1, false).then(data => {
+				window.data1 = data.data1;
+				document.getElementById("matrix_vis_1").innerHTML = "";
+				let matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
+				matrix_vis_1.draw();					
+			})
+		})
+		
+		let url_2 = `/get_clusters?file=${data_filename_2}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
+		fetch(url_2)
+		.then(resp => resp.json())
+		.then(obj => {
+			load_data(data_filename_2, false).then(data => {
+				window.data2 = data.data1;
+				document.getElementById("matrix_vis_2").innerHTML = "";
+				let matrix_vis_2 = new MatrixVis(data.data1, "#matrix_vis_2", "MatrixVis 2");
+				matrix_vis_2.draw();					
+			})
 		})
 	});
 
