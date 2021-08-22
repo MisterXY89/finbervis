@@ -216,14 +216,10 @@
   /* background: #2d2d2d; */
 }  
 
-#filters {
-  padding-bottom: 2em !important;
-}
-
 #draggable-cards {
-  position: absolute;
-  top: 4em;
-  right: 2em;
+  position: absolute !important;
+  top: 17.5em;
+  right: 1.5em;
 }
 
 .matrix-background {
@@ -244,10 +240,23 @@ text.active {
   fill: #2f2f2f;
 }
 
-.tick:nth-child(-n+7) text {
+#matrix_vis_1 .tick:nth-child(-n+7) text,
+#matrix_vis_2 .tick:nth-child(-n+7) text {
   font-weight: bold;
 }
 
-.tick:nth-last-child(-n+2) text {
+#matrix_vis_1 .tick:nth-last-child(-n+2) text,
+#matrix_vis_2 .tick:nth-last-child(-n+2) text  
+{
   font-weight: lighter;
+}
+
+.form-group label {
+  padding-right: 1em;
+}
+
+#filters {
+  border: 1px solid #353333;
+  padding: 2em;
+  /* padding-bottom: 2em !important;   */
 }
