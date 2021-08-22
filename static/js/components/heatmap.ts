@@ -57,8 +57,8 @@ class Heatmap {
 		},
 		this.width = 650;
 		this.height = 650;		
-		this.vis_width = this.width - this.margins.left - this.margins.right;
-		this.vis_height = this.height - this.margins.top - this.margins.bottom;
+		this.vis_width = this.width - this.margin.left - this.margin.right;
+		this.vis_height = this.height - this.margin.top - this.margin.bottom;
 	}
 	
 	color_scale(x) {
