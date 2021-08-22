@@ -41,10 +41,14 @@ class MatrixVis {
 				value: d3.max(this.data[i].props)
 			}			
 		});
+		let distr_pred_classes_list = pattern_idx.map(i => this.data[i].sentiment);
+		distr_pred_classes_list.forEach(el => distr_pred_classes[el] ++);
+		let distr_pred_classes = {"positive": 0, "neutral": 0, "negative": 0};
 		let saliency_scores = pattern_idx.map(i => this.data[i].saliency_score);
 		let pattern_amount = Object.keys(this.one_hot_patterns).length -1;
 		
-		let distribution_plot = DistributionPlot(props, `#distribution_plot_${this.div_id.slice(-1)}`, "distribution over predicted sentiments propabilities");
+		console.log(props, `#distribution_plot_${this.div_id.slice(-1)}`);
+		let distribution_plot = new DistributionPlot(props, `#distribution_plot_${this.div_id.slice(-1)}`, "distribution over predicted sentiments propabilities");
 		distribution_plot.draw();
 		// let avg_saliency = 
 		return {
@@ -53,7 +57,8 @@ class MatrixVis {
 			wrongly_classified,
 			pattern_amount,
 			props,
-			saliency_scores
+			saliency_scores,
+			distr_pred_classes
 		}
 	}
 	

@@ -37,9 +37,13 @@ var MatrixVis = /** @class */ (function () {
                 value: d3.max(_this.data[i].props)
             };
         });
+        var distr_pred_classes_list = pattern_idx.map(function (i) { return _this.data[i].sentiment; });
+        distr_pred_classes_list.forEach(function (el) { return distr_pred_classes[el]++; });
+        var distr_pred_classes = { "positive": 0, "neutral": 0, "negative": 0 };
         var saliency_scores = pattern_idx.map(function (i) { return _this.data[i].saliency_score; });
         var pattern_amount = Object.keys(this.one_hot_patterns).length - 1;
-        var distribution_plot = DistributionPlot(props, "#distribution_plot_" + this.div_id.slice(-1), "distribution over predicted sentiments propabilities");
+        console.log(props, "#distribution_plot_" + this.div_id.slice(-1));
+        var distribution_plot = new DistributionPlot(props, "#distribution_plot_" + this.div_id.slice(-1), "distribution over predicted sentiments propabilities");
         distribution_plot.draw();
         // let avg_saliency = 
         return {
@@ -48,7 +52,8 @@ var MatrixVis = /** @class */ (function () {
             wrongly_classified: wrongly_classified,
             pattern_amount: pattern_amount,
             props: props,
-            saliency_scores: saliency_scores
+            saliency_scores: saliency_scores,
+            distr_pred_classes: distr_pred_classes
         };
     };
     MatrixVis.prototype.make_nodes = function () {
