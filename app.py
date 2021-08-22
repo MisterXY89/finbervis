@@ -269,16 +269,34 @@ def get_clusters():
 		result += f"Error: 'missing <epsilon> in req_data'\n{req_data=}"
 	if not "min_samples" in req_data:		
 		result += f"Error: 'missing <min_samples> in req_data'\n{req_data=}"
+	if not "threshold" in req_data:
+		result = f"Error: 'missing <threshold> in req_data'\n{req_data=}"	
 	else:
 		file = req_data["file"]
 		epsilon = float(req_data["epsilon"])
 		min_samples = int(req_data["min_samples"])
-		result_i, df = cluster_one_hot_vectors.cluster_one_hot(config.DATA_DIR + "/" + file, epsilon=epsilon, min_samples=min_samples)
+		file = req_data["file"]		
+		threshold = float(req_data["threshold"])
+		result_one_hot, one_hot_df = create_one_hot_vector.make_one_hot(config.DATA_DIR + "/" + file, threshold=threshold) #, is_df=True)
+		result_i, df = cluster_one_hot_vectors.cluster_one_hot(config.DATA_DIR + "/" + file, epsilon=epsilon, min_samples=min_samples, store=True)
 		result_i = [*map(int, result_i)]
-		result = df.to_dict()
-		print(result)
-		print(type(result))
+		try:
+			del df["cls_embs"]
+		except Exception as e:
+			print(e)
+		try:
+			del df["mean_attention"]
+		except Exception as e:
+			print(e)
+		# result = df.to_dict(orient="records")
+		# result[0]
+		# print(result)
+		# print(type(result))
 		status = True
+		result = []
+		# result = {
+		# 	"wrongly_classified": len(df.query("truth_label != sentiment and one_hot_cluster != -1"))
+		# }
 		
 	return jsonify({
 		"status": status,
@@ -298,7 +316,7 @@ def get_one_hot_vectors():
 		file = req_data["file"]
 		threshold = float(req_data["threshold"])
 		result_i, df = create_one_hot_vector.make_one_hot(config.DATA_DIR + "/" + file) #, is_df=True)
-		result = df.to_dict()
+		result = df.to_dict(orient="records")
 		status = True
 		
 	return jsonify({
