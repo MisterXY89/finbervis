@@ -65,7 +65,10 @@ class DistributionPlot {
 			this.add_bin(b, get_sentiment_color(this.sentiments[i]), i);
 		})
 		
-		document.getElementById(`pred-sent-distr-abs-${this.model_v}`).innerHTML += ` <br>positive: ${sentiment_sents[0]} | neutral: ${sentiment_sents[1]} | negative: ${sentiment_sents[2]}`
+		if (this.model_v > 0) {			
+			document.getElementById(`pred-sent-distr-abs-${this.model_v}`).innerHTML += ` <br>positive: ${sentiment_sents[0]} | neutral: ${sentiment_sents[1]} | negative: ${sentiment_sents[2]}`
+		}
+		
 		
 	  
 	}

@@ -129,29 +129,25 @@ var PixelVis = /** @class */ (function () {
             .domain(x_axis_labels_domain)
             .padding(0.01);
         // .tickFormat(function(d) { console.log("dd", d)})
-        // if (this.sentence_view) {			
-        // 
-        // 	container.append("g")
-        // 	  .attr("transform", "translate(0," + this.height + ")")
-        // 		.style("text-anchor", "start")
-        // 		.attr("class", "x-axis")
-        // 	  .call(d3.axisLeft(x)
-        // 						.tickFormat(d => x_axis_labels[d]))
-        // 
-        // 	// container.select(".x-axis")
-        // 	// 	.selectAll("text")
-        // 	// 	// .attr("transform", "")
-        // 	// 	.style("text-anchor", "end")
-        // 	// 	.attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")")
-        // }
-        // 
+        var info_labels = this.data.map(function (d) { return "[" + d.one_hot_cluster + "]"; });
         // Build X scales and axis:
         var y = d3.scaleBand()
             .range([this.height, 0])
             .domain(y_axis_labels)
             .padding(0.01);
-        // container.append("g")
-        //   .call(d3.axisLeft(y))	
+        if (!this.sentence_view) {
+            container.append("g")
+                .attr("class", "sentiment-color-pixel-vis") // , d => `class-${d.sentiment}`)
+                .call(d3.axisLeft(y)
+                .tickFormat(function (d) { return info_labels[d]; })
+            // .attr("class", d => `class-${d.sentiment}`)
+            );
+        }
+        // d3.selectAll(".sentiment-color-pixel-vis")
+        // 	.style("fill", d => {
+        // 		console.log("dddd", d, this);
+        // 		return "blue";
+        // 	})
         var tooltip = d3.select(this.div_id)
             .append("div")
             .style("opacity", 0)
@@ -199,6 +195,7 @@ var PixelVis = /** @class */ (function () {
                 .attr("width", xs_1.bandwidth())
                 .attr("height", ys_1.bandwidth())
                 .style("fill", function (d) { return _this.color_scale(d.z); })
+                // .style("stroke", d => get_sentiment_color(d.sentiment))
                 .on("click", click)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave)
@@ -215,6 +212,7 @@ var PixelVis = /** @class */ (function () {
                 .attr("width", x.bandwidth())
                 .attr("height", y.bandwidth())
                 .style("fill", function (d) { return _this.color_scale(d.z); })
+                // .style("stroke", d => get_sentiment_color(d.sentiment))
                 .on("click", click)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave)

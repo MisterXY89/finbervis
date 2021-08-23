@@ -82,6 +82,15 @@ function click_point(d, clicked_index) {
     d3.select(current_target)
         .attr("r", select_rad)
         .style("fill", SELECT_COLOR).raise();
+    // let model_v = 1;
+    var model_v = current_target.parentNode.parentNode.parentNode.parentNode.id.slice(-1);
+    var vis_id = "matrix_vis_" + model_v;
+    var matrix_vis = model_v == 1 ? window.matrix_vis_1 : window.matrix_vis_2;
+    var matrix_row_idx = Object.keys(matrix_vis.one_hot_patterns).indexOf(d.one_hot.join(""));
+    var matrix_row = document.getElementById(vis_id).getElementsByClassName("matrix-row")[matrix_row_idx];
+    window.last_matrix_row = matrix_row;
+    matrix_row.style.filter = "sepia(100%)";
+    console.log(matrix_row);
 }
 function get_mouse_events(data) {
     // TOOL-TIP & MOUSE EVENTS

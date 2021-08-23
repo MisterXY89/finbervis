@@ -20,14 +20,14 @@ var MatrixVis = /** @class */ (function () {
             top: 80,
             right: 80,
             bottom: 0,
-            left: 40
+            left: 80
         };
         this.width = 600;
         this.height = this.nodes.length * 15;
         this.y = d3.scaleBand()
             .range([this.height, 0])
             .domain(this.myVars)
-            .padding(0.25);
+            .padding(0.3);
         this.x = d3.scaleBand()
             .range([0, this.width])
             .domain(this.myGroups)
@@ -50,7 +50,7 @@ var MatrixVis = /** @class */ (function () {
         var distr_pred_classes_list = pattern_idx.map(function (i) { return _this.data[i].sentiment; });
         var distr_pred_classes = { "positive": 0, "neutral": 0, "negative": 0 };
         distr_pred_classes_list.forEach(function (el) { return distr_pred_classes[el]++; });
-        var saliency_scores = pattern_idx.map(function (i) { return _this.data[i].saliency_score; });
+        // let saliency_scores = pattern_idx.map(i => this.data[i].saliency_score);
         var pattern_amount = Object.keys(this.one_hot_patterns).length - 1;
         var clusters_found = pattern_idx.map(function (i) { return _this.data[i].one_hot_cluster; }).reduce(function (acc, curr) {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc;
@@ -75,7 +75,7 @@ var MatrixVis = /** @class */ (function () {
             wrongly_classified: wrongly_classified,
             pattern_amount: pattern_amount,
             props: props,
-            saliency_scores: saliency_scores,
+            // saliency_scores,
             distr_pred_classes: distr_pred_classes
         };
     };
@@ -129,6 +129,37 @@ var MatrixVis = /** @class */ (function () {
         });
         return matrix;
     };
+    MatrixVis.prototype.compute_stats_for_pixel_vis = function (data, pattern) {
+        var _this = this;
+        // let no_pattern_count = this.one_hot_patterns["00000000000000000"].elements.length;
+        var pattern_idx = this.one_hot_patterns[pattern].elements;
+        var pattern_found_count = pattern_idx.length;
+        var wrongly_classified = pattern_idx.filter(function (i) { return _this.data[i].truth_label != _this.data[i].sentiment; }).length;
+        var props = pattern_idx.map(function (i) {
+            return {
+                type: _this.data[i].sentiment,
+                value: d3.max(_this.data[i].props)
+            };
+        });
+        var clusters_found = pattern_idx.map(function (i) { return _this.data[i].one_hot_cluster; }).reduce(function (acc, curr) {
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc;
+        }, {});
+        var stats_html = "<td>" + Object.keys(clusters_found).length + "</td>"
+            + ("<td>" + pattern_found_count + "</td>")
+            + "<td>-</td>"
+            + ("<td>" + wrongly_classified + "</td>");
+        if (document.getElementById("stats-table-row-pixel-vis") != undefined) {
+            document.getElementById("stats-table-row-pixel-vis").innerHTML = stats_html;
+        }
+        // distribution_plot_pixel_vis
+        // pred-sent-distr-abs-pixel-vis
+        // stats-table-row-pixel-vis
+        if (document.getElementById("distribution_plot_pixel_vis") != undefined) {
+            document.getElementById("distribution_plot_pixel_vis").innerHTML = "";
+        }
+        var distribution_plot = new DistributionPlot(props, "#distribution_plot_pixel_vis", "distribution over predicted sentiments propabilities", -1);
+        distribution_plot.draw();
+    };
     MatrixVis.prototype.draw = function () {
         // this.container.append("rect")
         //   .attr("class", "matrix-background")
@@ -153,9 +184,11 @@ var MatrixVis = /** @class */ (function () {
             // .attr("transform", "")
             .style("text-anchor", "start")
             .attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")");
+        var x_axis_nums = Object.keys(this.one_hot_patterns).map(function (key) { return _this.one_hot_patterns[key].elements.length; });
+        console.log("x_axis_nums", x_axis_nums);
         // Build X scales and axis:		
-        // this.container.append("g")
-        //   .call(d3.axisLeft(this.y));
+        this.container.append("g")
+            .call(d3.axisLeft(this.y).tickFormat(function (d) { return x_axis_nums[d]; }));
         var color_scale = d3.scaleLinear()
             .range(["white", "#353333"])
             .domain([0, 1]);
@@ -183,6 +216,7 @@ var MatrixVis = /** @class */ (function () {
             document.getElementById("pixelVis1").innerHTML = "";
             document.getElementById("pixelVis2").innerHTML = "";
             document.getElementById("pixel-sentence-view").innerHTML = "";
+            _this.compute_stats_for_pixel_vis(data1, pattern);
             var pixelVis1 = new PixelVis(data1, "#pixelVis1", "Centralized Reports", true);
             window.pixelVis1 = pixelVis1;
             pixelVis1.draw();
@@ -208,16 +242,6 @@ var MatrixVis = /** @class */ (function () {
             //        .style('fill', '#FFF');
             // })       
             .style("fill", function (d) { return color_scale(d.z); });
-        // .style("fill", d => {
-        //  if (d.z == 1) {
-        // 	 if (d.c == -1) {
-        // 		 return "black";
-        // 	 }
-        // 	 return cluster_scale(d.c);
-        //  }
-        //  return color_scale(d.z);
-        // })
-        // .style("stroke", '#555');			 
         // TODO: sort open/closed (alle von open/closed/mixed) + cluster				
         // create vis new everytime
         // this.sort("cluster");

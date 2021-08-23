@@ -435,13 +435,40 @@
   </div>  
 </div>
 
-<div class="container-fluid">
-  <h2>
-    Model Comparison
-    <br />
-    <small class="text-muted">Pixel-based model Comparison via saliency scores</small>    
-  </h2>
-  <h4><small id="sentence-select-info-matrix"></small></h4>
+<div class="container-fluid" id="model-comparison">
+  <div class="row">
+    <div class="col-4">
+      <h2>
+        Model Comparison
+        <br />
+        <small class="text-muted">Pixel-based model Comparison via saliency scores</small>    
+      </h2>
+      <h4><small id="sentence-select-info-matrix"></small></h4>          
+    </div>
+    <div class="col-4">
+      <h3>
+        Statistics 
+        <!-- <br /> -->
+        <!-- <small class="text-muted" style="font-size: 0.56em;">For the all sentences where a pattern could be found</small> -->
+      </h3>
+      <div id="distribution_plot_pixel_vis"></div>
+      <p class="text-muted"><small id="pred-sent-distr-abs-pixel-vis">Distribution of predicted sentiments for all patterns</small></p>      
+    </div>
+    <div class="col-4">
+      <table class="table">
+          <thead>
+              <th> No. of clusters </th>
+              <th> Sentences with patterns </th>
+              <th> Sentences <strong>without</strong> patterns </th>
+              <th> Wrongly predicted </th>
+          </thead>
+          <tbody>
+              <tr id="stats-table-row-pixel-vis">
+              </tr>
+          </tbody>
+      </table>
+    </div>
+  </div>
   <div class="row">  
     <div class="col-4">
       <div id="pixelVis1"></div>

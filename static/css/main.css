@@ -56,14 +56,17 @@
 
 .class-neutral {
   background-color: #64abe5;
+  fill: #64abe5;
 }
 
 .class-negative {
     background-color: #9e64e5;
+    fill: #9e64e5;
 }
 
 .class-positive {
   background-color: #abe564;
+  fill: #abe564;
 }
 
 .badge {
@@ -261,3 +264,11 @@ text.active {
   margin-bottom: 3em;
   /* padding-bottom: 2em !important;   */
 }
+
+#model-comparison {
+  padding-top: 2em;
+}
+
+/* .pixel-vis-axis-info {
+  fill: green;
+} */

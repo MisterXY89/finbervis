@@ -140,31 +140,27 @@ class PixelVis {
 		  .padding(0.01)
 			// .tickFormat(function(d) { console.log("dd", d)})
 					
-						
-		// if (this.sentence_view) {			
-		// 
-		// 	container.append("g")
-		// 	  .attr("transform", "translate(0," + this.height + ")")
-		// 		.style("text-anchor", "start")
-		// 		.attr("class", "x-axis")
-		// 	  .call(d3.axisLeft(x)
-		// 						.tickFormat(d => x_axis_labels[d]))
-		// 
-		// 	// container.select(".x-axis")
-		// 	// 	.selectAll("text")
-		// 	// 	// .attr("transform", "")
-		// 	// 	.style("text-anchor", "end")
-		// 	// 	.attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")")
-		// }
-		// 
-
+		let info_labels = this.data.map(d => `[${d.one_hot_cluster}]`);
 		// Build X scales and axis:
 		const y = d3.scaleBand()
 		  .range([ this.height, 0 ])
 		  .domain(y_axis_labels)
 		  .padding(0.01);
-		// container.append("g")
-		//   .call(d3.axisLeft(y))	
+		
+		if (!this.sentence_view) {
+			container.append("g")
+				.attr("class", "sentiment-color-pixel-vis") // , d => `class-${d.sentiment}`)
+				.call(d3.axisLeft(y)
+				.tickFormat(d => info_labels[d])
+				// .attr("class", d => `class-${d.sentiment}`)
+			)			
+		}
+					
+		// d3.selectAll(".sentiment-color-pixel-vis")
+		// 	.style("fill", d => {
+		// 		console.log("dddd", d, this);
+		// 		return "blue";
+		// 	})
 			
 		let tooltip = d3.select(this.div_id)
 	    .append("div")
@@ -237,7 +233,7 @@ class PixelVis {
 				.padding(0.01);
 				
 			container.append("g")
-			  .call(d3.axisLeft(ys).tickFormat(d => x_axis_labels[d])))				
+			  .call(d3.axisLeft(ys).tickFormat(d => x_axis_labels[d])))
 			
 				
 			container.selectAll()
@@ -249,6 +245,7 @@ class PixelVis {
 	      .attr("width", xs.bandwidth())
 	      .attr("height", ys.bandwidth())
 	      .style("fill", d => this.color_scale(d.z))
+				// .style("stroke", d => get_sentiment_color(d.sentiment))
 				.on("click", click)
 				.on("mousemove", mousemove)
 				.on("mouseleave", mouseleave)
@@ -265,6 +262,7 @@ class PixelVis {
 	      .attr("width", x.bandwidth())
 	      .attr("height", y.bandwidth())
 	      .style("fill", d => this.color_scale(d.z))
+				// .style("stroke", d => get_sentiment_color(d.sentiment))
 				.on("click", click)
 				.on("mousemove", mousemove)
 				.on("mouseleave", mouseleave)
