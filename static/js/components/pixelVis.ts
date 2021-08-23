@@ -20,21 +20,25 @@
 // }
 
 function create_sentence_view(data, is_one) {
+	console.log("create_sentence_view", data);
 	let div_id = "#pixel-sentence-view";
-	if (is_one) {
-		let data1 = data;
-		let data2 = window.pixelVis2.data[data.y];
-		console.log("data2", data2);
-	} else {
-		let data1 = window.pixelVis1.data[data.y];
-		let data2 = data;
-		console.log("data1", data1);
-	}
+	// document.getElementById(div_id.slice(1)).innerHTML = "";
+	// if (is_one) {
+	// 	let data1 = data;
+	// 	let data2 = window.pixelVis2.data[data.y];
+	// 	console.log("data2", data2);
+	// } else {
+	// 	let data1 = window.pixelVis1.data[data.y];
+	// 	let data2 = data;
+	// 	console.log("data1", data1);
+	// }
+	let data1 = window.pixelVis1.data[data.y];
+	let data2 = window.pixelVis2.data[data.y];
 	data = [data1, data2];
 	console.log("- data - ", data);
 	let dims = {
-		height: 100,
-		width: 700
+		height: 600,
+		width: 300
 	}
 	let sentence_pixel_vis = new PixelVis(data, div_id, "Sentence View", false, dims);
 	sentence_pixel_vis.draw();

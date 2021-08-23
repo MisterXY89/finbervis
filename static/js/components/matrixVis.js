@@ -56,21 +56,19 @@ var MatrixVis = /** @class */ (function () {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc;
         }, {});
         console.log("cluster-found:", clusters_found);
-        // <th> No. of clusters </th>
-        // <th> Sentences with patterns </th>
-        // <th> Sentences <strong>without</strong> patterns </th>
-        // <th> Wrongly predicted </th>
         var stats_html = "<td>" + Object.keys(clusters_found).length + "</td>"
             + ("<td>" + pattern_found_count + "</td>")
             + ("<td>" + no_pattern_count + "</td>")
             + ("<td>" + wrongly_classified + "</td>");
-        document.getElementById("stats-table-row").innerHTML = stats_html;
-        if (document.getElementById("distribution_plot_" + this.div_id.slice(-1)) != undefined) {
-            document.getElementById("distribution_plot_" + this.div_id.slice(-1)).innerHTML = "";
+        var model_num = this.div_id.slice(-1);
+        if (document.getElementById("stats-table-row-model-" + model_num) != undefined) {
+            document.getElementById("stats-table-row-model-" + model_num).innerHTML = stats_html;
         }
-        var distribution_plot = new DistributionPlot(props, "#distribution_plot_" + this.div_id.slice(-1), "distribution over predicted sentiments propabilities");
+        if (document.getElementById("distribution_plot_" + model_num) != undefined) {
+            document.getElementById("distribution_plot_" + model_num).innerHTML = "";
+        }
+        var distribution_plot = new DistributionPlot(props, "#distribution_plot_" + this.div_id.slice(-1), "distribution over predicted sentiments propabilities", model_num);
         distribution_plot.draw();
-        // let avg_saliency = 
         return {
             no_pattern_count: no_pattern_count,
             pattern_found_count: pattern_found_count,
