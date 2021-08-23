@@ -258,5 +258,6 @@ text.active {
 #filters {
   border: 1px solid #353333;
   padding: 2em;
+  margin-bottom: 1.5em;
   /* padding-bottom: 2em !important;   */
 }
