@@ -4,6 +4,7 @@ class DistributionPlot {
 	constructor(data, div_id, name) {		
 		
 		this.data = data;
+		console.log("distributionPlot", this.data)
 		this.div_id = div_id;
 
 		this.name = name;
@@ -13,19 +14,19 @@ class DistributionPlot {
 			bottom: 30,
 			left: 60
 		};
-		this.width = 200;
-    this.height = 100;
+		this.width = 180;
+    this.height = 180;
 		
 		this.sentiments = ["positive", "neutral", "negative"];
 		
 		// Add Y axis
 		this.y = d3.scaleLinear()
+			.domain([0, 1])
 			.range([this.height, 0])
-			.domain([0, 1]);
 			 
 		this.x = d3.scaleLinear()
 			// .domain([d3.min(this.data, d => d.prop), d3.max(this.data, d => d.prop)])
-	    .domain([-10, 15])
+	    .domain([0, 1])
 	    .range([ 0, this.width ]);
 	}
 	
@@ -40,14 +41,14 @@ class DistributionPlot {
 		          "translate(" + this.margin.left + "," + this.margin.top + ")");
 										    
     this.container.append("g")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", "translate(0," + this.height + ")")
       .call(d3.axisBottom(this.x));
 
     
     this.container.append("g")
       .call(d3.axisLeft(this.y));
 
-		let kde = this.kernelDensityEstimator(this.kernelEpanechnikov(7), this.x.ticks(60))
+		let kde = this.kernelDensityEstimator(this.kernelEpanechnikov(7), this.x.ticks(50))
 		let densities = [];
 		this.sentiments.forEach(sentiment => {
 			densities.push(
@@ -56,20 +57,22 @@ class DistributionPlot {
 		    	.map(d => d.value))
 				)
 		});
+		console.log(densities);
 		
-		densities.forEach((d, i) => {
-			this.add_density_path(d, get_sentiment_color[this.sentiments[i]])
+		densities.forEach((d, i) => {			
+			this.add_density_path(d, get_sentiment_color(this.sentiments[i]))
 		});
 
 	}
 	
 	add_density_path(density, color) {
+		// console.log(color);
 		this.container.append("path")
 		    .attr("class", "predicted-distribution-path")
 		    .datum(density)
 		    .attr("fill", color)
 		    .attr("opacity", ".6")
-		    .attr("stroke", "#000")
+		    .attr("stroke", color)
 		    .attr("stroke-width", 1)
 		    .attr("stroke-linejoin", "round")
 		    .attr("d",  d3.line()
