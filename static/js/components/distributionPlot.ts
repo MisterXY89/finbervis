@@ -1,8 +1,9 @@
 
 class DistributionPlot {
 	
-	constructor(data, div_id, name) {		
+	constructor(data, div_id, name, model_v) {		
 		
+		this.model_v = model_v;
 		this.data = data;
 		console.log("distributionPlot", this.data)
 		this.div_id = div_id;
@@ -12,18 +13,13 @@ class DistributionPlot {
 			top: 10,
 			right: 30,
 			bottom: 30,
-			left: 60
-		};
-		this.width = 180;
-    this.height = 180;
+			left: 40
+		}; 
+		this.width = 260 - this.margin.left - this.margin.right;
+    this.height = 240 - this.margin.top - this.margin.bottom;
 		
 		this.sentiments = ["positive", "neutral", "negative"];
 		
-		// Add Y axis
-		this.y = d3.scaleLinear()
-			.domain([0, 1])
-			.range([this.height, 0])
-			 
 		this.x = d3.scaleLinear()
 			// .domain([d3.min(this.data, d => d.prop), d3.max(this.data, d => d.prop)])
 	    .domain([0, 1])
@@ -43,62 +39,52 @@ class DistributionPlot {
     this.container.append("g")
       .attr("transform", "translate(0," + this.height + ")")
       .call(d3.axisBottom(this.x));
+			    
+		// set the parameters for the histogram
+	  let histogram = d3.histogram()
+	      .value(d => d.value)   // I need to give the vector of value
+	      .domain(this.x.domain())  // then the domain of the graphic
+	      .thresholds(this.x.ticks(35)); // then the numbers of bins
 
-    
-    this.container.append("g")
-      .call(d3.axisLeft(this.y));
-
-		let kde = this.kernelDensityEstimator(this.kernelEpanechnikov(7), this.x.ticks(50))
-		let densities = [];
-		this.sentiments.forEach(sentiment => {
-			densities.push(
-				kde( this.data
-					.filter(d => d.type === sentiment)
-		    	.map(d => d.value))
-				)
-		});
-		console.log(densities);
+	  // And apply twice this function to data to get the bins.
+		let bins = this.sentiments.map(sentiment => {
+			return histogram(this.data.filter(d => d.type === sentiment));
+		})
+		console.log("BINS", bins)
 		
-		densities.forEach((d, i) => {			
-			this.add_density_path(d, get_sentiment_color(this.sentiments[i]))
-		});
-
-	}
-	
-	add_density_path(density, color) {
-		// console.log(color);
-		this.container.append("path")
-		    .attr("class", "predicted-distribution-path")
-		    .datum(density)
-		    .attr("fill", color)
-		    .attr("opacity", ".6")
-		    .attr("stroke", color)
-		    .attr("stroke-width", 1)
-		    .attr("stroke-linejoin", "round")
-		    .attr("d",  d3.line()
-		      .curve(d3.curveBasis)
-		        .x((d, p) => {
-							console.log(d, p)
-							return this.x(p)
-						})
-		        .y(d => this.y(d[1]))
-		    )
-	}
-	
-	// Function to compute density
-	kernelDensityEstimator(kernel, X) {
-  	return function(V) {
-    	return X.map(function(x) {
-      	return [x, d3.mean(V, function(v) { return kernel(x - v); })];
-    	});
-  	};
-	}
-	
-	kernelEpanechnikov(k) {
-  	return function(v) {
-    	return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
-  	};
-	}
-}
+		// Y axis: scale and draw:
+		let sentiment_sents = bins.map(li => d3.max(li.map(el => el.length)));
+		let y_max = d3.max(sentiment_sents);
+	  this.y = d3.scaleLinear()
+      .range([this.height, 0])
+			.domain([0, y_max]);   // d3.hist has to be called before the Y axis obviously
+	  this.container.append("g")
+	     .call(d3.axisLeft(this.y))
 		
+		bins.forEach((b, i) => {			
+			this.add_bin(b, get_sentiment_color(this.sentiments[i]), i);
+		})
+		
+		document.getElementById(`pred-sent-distr-abs-${this.model_v}`).innerHTML += ` <br>positive: ${sentiment_sents[0]} | neutral: ${sentiment_sents[1]} | negative: ${sentiment_sents[2]}`
+		
+	  
+	}
+
+	
+	add_bin(bin, color, i) {				
+		
+		console.log("adding bin:", bin, "with color:", color)
+		let bin_size = d3.sum(bin.map(el => el.length).flat());
+		this.container.selectAll(`rect_b_${i}`)
+     .data(bin)
+     .enter()
+     .append("rect")
+       .attr("x", 1)
+       .attr("transform", d => "translate(" + this.x(d.x0) + "," + this.y(d.length) + ")")
+       .attr("width", d => this.x(d.x1) - this.x(d.x0) - 1 )
+       .attr("height", d => this.height - this.y(d.length))
+       .style("fill", color)
+       .style("opacity", 0.6)
+		
+	}
 }
