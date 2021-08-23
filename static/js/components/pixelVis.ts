@@ -20,7 +20,7 @@
 // }
 
 function create_sentence_view(data, is_one) {
-	console.log("create_sentence_view", data);
+	console.log("create_sentence_view", data);	
 	let div_id = "#pixel-sentence-view";
 	// document.getElementById(div_id.slice(1)).innerHTML = "";
 	// if (is_one) {
@@ -55,15 +55,17 @@ class PixelVis {
 		this.data = data;
 		this.div_id = div_id;
 		this.margin = {
-				top: 20, 
+				top: 80, 
 				right: 20, 
 				bottom: 120, 
-				left: 0
+				left: 100
 			};
 		console.log(this.sentence_view);
 		console.log(this.dims);
 		this.width = (this.dims.width == undefined) ? 600 : this.dims.width;
-		this.height = (this.dims.height == undefined) ? 600 : this.dims.height;
+		this.width -= this.margin.left - this.margin.right;
+		this.height = (this.dims.height == undefined) ? this.data.length * 20 : this.dims.height;
+		this.height -= this.margin.top - this.margin.bottom;
 		// this.color_scale = d3.scaleLinear()
 		//   .range(["blue","white", "red"])
 		//   .domain([-1, 0, 1]);
@@ -137,39 +139,32 @@ class PixelVis {
 		  .domain(x_axis_labels_domain)
 		  .padding(0.01)
 			// .tickFormat(function(d) { console.log("dd", d)})
-			
-		container.append("g")
-		  .attr("transform", "translate(0," + this.height + ")")
-			.style("text-anchor", "start")
-			.attr("class", "x-axis")
-		  .call(d3.axisBottom(x)
-							.tickFormat(d => {
-								// console.log(d);
-								if (this.sentence_view) {
-									return x_axis_labels[d];
-								} else {
-									return d;
-								}
-								// transform: translate(-90)
-							})	
-						)
+					
 						
-		if (this.sentence_view) {			
-			container.select(".x-axis")
-			.selectAll("text")
-			// .attr("transform", "")
-			.style("text-anchor", "end")
-			.attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")")
-		}
-			
+		// if (this.sentence_view) {			
+		// 
+		// 	container.append("g")
+		// 	  .attr("transform", "translate(0," + this.height + ")")
+		// 		.style("text-anchor", "start")
+		// 		.attr("class", "x-axis")
+		// 	  .call(d3.axisLeft(x)
+		// 						.tickFormat(d => x_axis_labels[d]))
+		// 
+		// 	// container.select(".x-axis")
+		// 	// 	.selectAll("text")
+		// 	// 	// .attr("transform", "")
+		// 	// 	.style("text-anchor", "end")
+		// 	// 	.attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")")
+		// }
+		// 
 
 		// Build X scales and axis:
 		const y = d3.scaleBand()
 		  .range([ this.height, 0 ])
 		  .domain(y_axis_labels)
 		  .padding(0.01);
-		container.append("g")
-		  .call(d3.axisLeft(y))	
+		// container.append("g")
+		//   .call(d3.axisLeft(y))	
 			
 		let tooltip = d3.select(this.div_id)
 	    .append("div")
@@ -178,6 +173,7 @@ class PixelVis {
 	    .style("background-color", "white")
 	    .style("border", "solid")
 	    .style("border-width", "2px")
+			.style("width", "450px")
 	    .style("border-radius", "5px")
 	    .style("padding", "5px")
 			
@@ -186,79 +182,106 @@ class PixelVis {
 	  }
 		
 	  let mousemove = function(d) {
+			console.log(d3.mouse(this))
 	    tooltip
-	      .html(`Tokens: ${d.token} <br> Saliency score: ${d.z} <br> Segment: ${d.segment} <br> truth_label: ${d.truth_label} <br> sentiment: ${d.sentiment}`)
-	      .style("left", (d3.mouse(this)[0]+70) + "px")
-	      .style("top", (d3.mouse(this)[1]) + "px")
+	      .html(`
+					<table>
+						<thead>
+						</thead>
+						<tbody>
+							<tr>
+					      <th scope="row">Tokens</th>
+					      <td>${d.token}</td>
+					    </tr>
+							<tr>
+					      <th scope="row">Saliency score</th>
+					      <td>${d.z}</td>
+					    </tr>
+							<tr>
+					      <th scope="row">Segment</th>
+					      <td>${d.segment}</td>
+					    </tr>							
+							<tr>
+					      <th scope="row">Truth Label</th>
+					      <td>${get_sentiment_html(d.sentiment, d.truth_label, true)}</td>
+					    </tr>
+							<tr>
+					      <th scope="row">Sentiment</th>
+					      <td>${get_sentiment_html(d.sentiment)}</td>
+					    </tr>
+						</tbody>
+					`)
+	      .style("left", (d3.mouse(this)[0]+120) + "px")
+	      .style("top", (d3.mouse(this)[1])+100 + "px")
 	  }
 		
 	  let mouseleave = function(d) {
-	    tooltip.style("opacity", 0)
+	  	tooltip.style("opacity", 0)
 	  }
 		
 		let click = function(d) {
 			console.log(d);
 			create_sentence_view(d, this.is_one);
 		}
+		
+		if (this.sentence_view) {
 			
-		container.selectAll()
-      .data(vis_data, d => d.x+':'+d.y)
-      .enter()
-      .append("rect")
-      .attr("x", d =>  x(d.x))
-			// .attr("class", `row_${d.y}`)
-      .attr("y", d => y(d.y))
-      .attr("width", x.bandwidth())
-      .attr("height", y.bandwidth())
-      .style("fill", d => this.color_scale(d.z))
-			.on("click", click)
-			.on("mousemove", mousemove)
-			.on("mouseleave", mouseleave)
-			.on("mouseover", mouseover)
+			const xs = d3.scaleBand()
+			  .range([ 0, this.width ])
+			  .domain(y_axis_labels)
+			  .padding(0.01)
+			
+			const ys = d3.scaleBand()
+				.range([ 0, this.height ])
+				.domain(x_axis_labels_domain)
+				.padding(0.01);
+				
+			container.append("g")
+			  .call(d3.axisLeft(ys).tickFormat(d => x_axis_labels[d])))				
+			
+				
+			container.selectAll()
+	      .data(vis_data, d => d.x+':'+d.y)
+	      .enter()
+	      .append("rect")
+	      .attr("x", d =>  xs(d.y))
+	      .attr("y", d => ys(d.x))
+	      .attr("width", xs.bandwidth())
+	      .attr("height", ys.bandwidth())
+	      .style("fill", d => this.color_scale(d.z))
+				.on("click", click)
+				.on("mousemove", mousemove)
+				.on("mouseleave", mouseleave)
+				.on("mouseover", mouseover)
+		
+		} else {
+			container.selectAll()
+	      .data(vis_data, d => d.x+':'+d.y)
+	      .enter()
+	      .append("rect")
+	      .attr("x", d =>  x(d.x))
+				// .attr("class", `row_${d.y}`)
+	      .attr("y", d => y(d.y))
+	      .attr("width", x.bandwidth())
+	      .attr("height", y.bandwidth())
+	      .style("fill", d => this.color_scale(d.z))
+				.on("click", click)
+				.on("mousemove", mousemove)
+				.on("mouseleave", mouseleave)
+				.on("mouseover", mouseover)			
+		}
 			
 		container.append("text")
 			.attr("class", "pixelVisHeader")
 			.attr("x", 0)
-			.attr("y", -65)
+			.attr("y", -30)
 			.attr("text-anchor", "left")
 			.style("font-size", "22px")
 			.text(this.name);
-			
-			
-		// #saliency-filter-value-range
-		
-		if (!$("#saliency-filter-value-range").is(":visible")) {
-			const slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1]
-			const saliencySliderRange = d3
-				.sliderBottom()
-				.min(d3.min(slider_data_vals))
-				.max(d3.max(slider_data_vals))
-				.width(600)
-				.tickFormat(d3.format('.2%'))
-				.ticks(5)
-				.default(0.70)
-				.fill('#2196f3')
-				.on('onchange', val => {
-					console.log(val);
-					d3.select('p#saliency-filter-value-range').text(d3.format('.1%')(val));
-				});
-
-			const saliency_gRange = d3
-				.select('div#saliency-filter-slider-range')
-				.append('svg')
-				.attr('width', 700)
-				.attr('height', 100)
-				.append('g')
-				.attr('transform', 'translate(30,30)');
-
-			saliency_gRange.call(saliencySliderRange);
-			d3.select('p#saliency-filter-value-range').text(
-				d3.format('.1%')(
-				saliencySliderRange
-					.value()
-				)
-			);
-		}	
+				
+		// if (this.sentence_view) {
+			// container.attr("transform", "rotate(90)");			
+		// }
 	
 	}	
 }

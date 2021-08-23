@@ -18,22 +18,25 @@
 //   return { data1, data2 }
 // }
 function create_sentence_view(data, is_one) {
+    console.log("create_sentence_view", data);
     var div_id = "#pixel-sentence-view";
-    if (is_one) {
-        var data1 = data;
-        var data2 = window.pixelVis2.data[data.y];
-        console.log("data2", data2);
-    }
-    else {
-        var data1 = window.pixelVis1.data[data.y];
-        var data2 = data;
-        console.log("data1", data1);
-    }
+    // document.getElementById(div_id.slice(1)).innerHTML = "";
+    // if (is_one) {
+    // 	let data1 = data;
+    // 	let data2 = window.pixelVis2.data[data.y];
+    // 	console.log("data2", data2);
+    // } else {
+    // 	let data1 = window.pixelVis1.data[data.y];
+    // 	let data2 = data;
+    // 	console.log("data1", data1);
+    // }
+    var data1 = window.pixelVis1.data[data.y];
+    var data2 = window.pixelVis2.data[data.y];
     data = [data1, data2];
     console.log("- data - ", data);
     var dims = {
-        height: 100,
-        width: 700
+        height: 600,
+        width: 300
     };
     var sentence_pixel_vis = new PixelVis(data, div_id, "Sentence View", false, dims);
     sentence_pixel_vis.draw();
@@ -48,15 +51,17 @@ var PixelVis = /** @class */ (function () {
         this.data = data;
         this.div_id = div_id;
         this.margin = {
-            top: 20,
+            top: 80,
             right: 20,
             bottom: 120,
-            left: 0
+            left: 100
         };
         console.log(this.sentence_view);
         console.log(this.dims);
         this.width = (this.dims.width == undefined) ? 600 : this.dims.width;
-        this.height = (this.dims.height == undefined) ? 600 : this.dims.height;
+        this.width -= this.margin.left - this.margin.right;
+        this.height = (this.dims.height == undefined) ? this.data.length * 20 : this.dims.height;
+        this.height -= this.margin.top - this.margin.bottom;
         // this.color_scale = d3.scaleLinear()
         //   .range(["blue","white", "red"])
         //   .domain([-1, 0, 1]);
@@ -124,35 +129,29 @@ var PixelVis = /** @class */ (function () {
             .domain(x_axis_labels_domain)
             .padding(0.01);
         // .tickFormat(function(d) { console.log("dd", d)})
-        container.append("g")
-            .attr("transform", "translate(0," + this.height + ")")
-            .style("text-anchor", "start")
-            .attr("class", "x-axis")
-            .call(d3.axisBottom(x)
-            .tickFormat(function (d) {
-            // console.log(d);
-            if (_this.sentence_view) {
-                return x_axis_labels[d];
-            }
-            else {
-                return d;
-            }
-            // transform: translate(-90)
-        }));
-        if (this.sentence_view) {
-            container.select(".x-axis")
-                .selectAll("text")
-                // .attr("transform", "")
-                .style("text-anchor", "end")
-                .attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")");
-        }
+        // if (this.sentence_view) {			
+        // 
+        // 	container.append("g")
+        // 	  .attr("transform", "translate(0," + this.height + ")")
+        // 		.style("text-anchor", "start")
+        // 		.attr("class", "x-axis")
+        // 	  .call(d3.axisLeft(x)
+        // 						.tickFormat(d => x_axis_labels[d]))
+        // 
+        // 	// container.select(".x-axis")
+        // 	// 	.selectAll("text")
+        // 	// 	// .attr("transform", "")
+        // 	// 	.style("text-anchor", "end")
+        // 	// 	.attr("transform", "rotate(-70) translate(" + (-10) + "," + (-10) + ")")
+        // }
+        // 
         // Build X scales and axis:
         var y = d3.scaleBand()
             .range([this.height, 0])
             .domain(y_axis_labels)
             .padding(0.01);
-        container.append("g")
-            .call(d3.axisLeft(y));
+        // container.append("g")
+        //   .call(d3.axisLeft(y))	
         var tooltip = d3.select(this.div_id)
             .append("div")
             .style("opacity", 0)
@@ -160,16 +159,18 @@ var PixelVis = /** @class */ (function () {
             .style("background-color", "white")
             .style("border", "solid")
             .style("border-width", "2px")
+            .style("width", "450px")
             .style("border-radius", "5px")
             .style("padding", "5px");
         var mouseover = function (d) {
             tooltip.style("opacity", 1);
         };
         var mousemove = function (d) {
+            console.log(d3.mouse(this));
             tooltip
-                .html("Tokens: " + d.token + " <br> Saliency score: " + d.z + " <br> Segment: " + d.segment + " <br> truth_label: " + d.truth_label + " <br> sentiment: " + d.sentiment)
-                .style("left", (d3.mouse(this)[0] + 70) + "px")
-                .style("top", (d3.mouse(this)[1]) + "px");
+                .html("\n\t\t\t\t\t<table>\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Tokens</th>\n\t\t\t\t\t      <td>" + d.token + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Saliency score</th>\n\t\t\t\t\t      <td>" + d.z + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Segment</th>\n\t\t\t\t\t      <td>" + d.segment + "</td>\n\t\t\t\t\t    </tr>\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Truth Label</th>\n\t\t\t\t\t      <td>" + get_sentiment_html(d.sentiment, d.truth_label, true) + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Sentiment</th>\n\t\t\t\t\t      <td>" + get_sentiment_html(d.sentiment) + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t")
+                .style("left", (d3.mouse(this)[0] + 120) + "px")
+                .style("top", (d3.mouse(this)[1]) + 100 + "px");
         };
         var mouseleave = function (d) {
             tooltip.style("opacity", 0);
@@ -178,54 +179,57 @@ var PixelVis = /** @class */ (function () {
             console.log(d);
             create_sentence_view(d, this.is_one);
         };
-        container.selectAll()
-            .data(vis_data, function (d) { return d.x + ':' + d.y; })
-            .enter()
-            .append("rect")
-            .attr("x", function (d) { return x(d.x); })
-            // .attr("class", `row_${d.y}`)
-            .attr("y", function (d) { return y(d.y); })
-            .attr("width", x.bandwidth())
-            .attr("height", y.bandwidth())
-            .style("fill", function (d) { return _this.color_scale(d.z); })
-            .on("click", click)
-            .on("mousemove", mousemove)
-            .on("mouseleave", mouseleave)
-            .on("mouseover", mouseover);
+        if (this.sentence_view) {
+            var xs_1 = d3.scaleBand()
+                .range([0, this.width])
+                .domain(y_axis_labels)
+                .padding(0.01);
+            var ys_1 = d3.scaleBand()
+                .range([0, this.height])
+                .domain(x_axis_labels_domain)
+                .padding(0.01);
+            container.append("g")
+                .call(d3.axisLeft(ys_1).tickFormat(function (d) { return x_axis_labels[d]; }));
+            container.selectAll()
+                .data(vis_data, function (d) { return d.x + ':' + d.y; })
+                .enter()
+                .append("rect")
+                .attr("x", function (d) { return xs_1(d.y); })
+                .attr("y", function (d) { return ys_1(d.x); })
+                .attr("width", xs_1.bandwidth())
+                .attr("height", ys_1.bandwidth())
+                .style("fill", function (d) { return _this.color_scale(d.z); })
+                .on("click", click)
+                .on("mousemove", mousemove)
+                .on("mouseleave", mouseleave)
+                .on("mouseover", mouseover);
+        }
+        else {
+            container.selectAll()
+                .data(vis_data, function (d) { return d.x + ':' + d.y; })
+                .enter()
+                .append("rect")
+                .attr("x", function (d) { return x(d.x); })
+                // .attr("class", `row_${d.y}`)
+                .attr("y", function (d) { return y(d.y); })
+                .attr("width", x.bandwidth())
+                .attr("height", y.bandwidth())
+                .style("fill", function (d) { return _this.color_scale(d.z); })
+                .on("click", click)
+                .on("mousemove", mousemove)
+                .on("mouseleave", mouseleave)
+                .on("mouseover", mouseover);
+        }
         container.append("text")
             .attr("class", "pixelVisHeader")
             .attr("x", 0)
-            .attr("y", -65)
+            .attr("y", -30)
             .attr("text-anchor", "left")
             .style("font-size", "22px")
             .text(this.name);
-        // #saliency-filter-value-range
-        if (!$("#saliency-filter-value-range").is(":visible")) {
-            var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];
-            var saliencySliderRange = d3
-                .sliderBottom()
-                .min(d3.min(slider_data_vals))
-                .max(d3.max(slider_data_vals))
-                .width(600)
-                .tickFormat(d3.format('.2%'))
-                .ticks(5)
-                .default(0.70)
-                .fill('#2196f3')
-                .on('onchange', function (val) {
-                console.log(val);
-                d3.select('p#saliency-filter-value-range').text(d3.format('.1%')(val));
-            });
-            var saliency_gRange = d3
-                .select('div#saliency-filter-slider-range')
-                .append('svg')
-                .attr('width', 700)
-                .attr('height', 100)
-                .append('g')
-                .attr('transform', 'translate(30,30)');
-            saliency_gRange.call(saliencySliderRange);
-            d3.select('p#saliency-filter-value-range').text(d3.format('.1%')(saliencySliderRange
-                .value()));
-        }
+        // if (this.sentence_view) {
+        // container.attr("transform", "rotate(90)");			
+        // }
     };
     return PixelVis;
 }());
