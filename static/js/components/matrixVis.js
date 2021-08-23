@@ -13,6 +13,8 @@ var MatrixVis = /** @class */ (function () {
         this.matrix = this.prep_data_for_vis();
         this.nodes = this.make_nodes();
         console.log("nodes: ", this.nodes);
+        this.myGroups = this.POS_TAGS; // x
+        this.myVars = Object.keys(this.one_hot_patterns);
         this.name = name;
         this.margin = {
             top: 80,
@@ -22,6 +24,14 @@ var MatrixVis = /** @class */ (function () {
         };
         this.width = 600;
         this.height = this.nodes.length * 15;
+        this.y = d3.scaleBand()
+            .range([this.height, 0])
+            .domain(this.myVars)
+            .padding(0.1);
+        this.x = d3.scaleBand()
+            .range([0, this.width])
+            .domain(this.myGroups)
+            .padding(0.1);
         this.stats = this.compute_stats();
         console.log(this.stats);
     }
@@ -38,11 +48,26 @@ var MatrixVis = /** @class */ (function () {
             };
         });
         var distr_pred_classes_list = pattern_idx.map(function (i) { return _this.data[i].sentiment; });
-        distr_pred_classes_list.forEach(function (el) { return distr_pred_classes[el]++; });
         var distr_pred_classes = { "positive": 0, "neutral": 0, "negative": 0 };
+        distr_pred_classes_list.forEach(function (el) { return distr_pred_classes[el]++; });
         var saliency_scores = pattern_idx.map(function (i) { return _this.data[i].saliency_score; });
         var pattern_amount = Object.keys(this.one_hot_patterns).length - 1;
-        console.log(props, "#distribution_plot_" + this.div_id.slice(-1));
+        var clusters_found = pattern_idx.map(function (i) { return _this.data[i].one_hot_cluster; }).reduce(function (acc, curr) {
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc;
+        }, {});
+        console.log("cluster-found:", clusters_found);
+        // <th> No. of clusters </th>
+        // <th> Sentences with patterns </th>
+        // <th> Sentences <strong>without</strong> patterns </th>
+        // <th> Wrongly predicted </th>
+        var stats_html = "<td>" + Object.keys(clusters_found).length + "</td>"
+            + ("<td>" + pattern_found_count + "</td>")
+            + ("<td>" + no_pattern_count + "</td>")
+            + ("<td>" + wrongly_classified + "</td>");
+        document.getElementById("stats-table-row").innerHTML = stats_html;
+        if (document.getElementById("distribution_plot_" + this.div_id.slice(-1)) != undefined) {
+            document.getElementById("distribution_plot_" + this.div_id.slice(-1)).innerHTML = "";
+        }
         var distribution_plot = new DistributionPlot(props, "#distribution_plot_" + this.div_id.slice(-1), "distribution over predicted sentiments propabilities");
         distribution_plot.draw();
         // let avg_saliency = 
@@ -115,37 +140,28 @@ var MatrixVis = /** @class */ (function () {
         //   .attr("class", "matrix-background")
         //   .attr("width", this.width)
         //   .attr("height", this.height);
+        var _this = this;
         this.container = d3.select(this.div_id)
             .append("svg")
             .attr("width", this.width + this.margin.left + this.margin.right)
             .attr("height", this.height + this.margin.top + this.margin.bottom)
             .append("g")
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-        var myGroups = this.POS_TAGS; // x
-        var myVars = Object.keys(this.one_hot_patterns);
         var cluster_scale = d3.scaleOrdinal(d3.schemeCategory20);
         console.log("matrix", this.matrix);
-        // Build X scales and axis:
-        var x = d3.scaleBand()
-            .range([0, width])
-            .domain(myGroups)
-            .padding(0.1);
+        // Build X scales and axis:		
         this.container.append("g")
             .attr("transform", "translate(0," + 0 + ")")
-            .call(d3.axisTop(x))
+            .call(d3.axisTop(this.x))
             .attr("class", "matrix-x-axis");
         this.container.select(".matrix-x-axis")
             .selectAll("text")
             // .attr("transform", "")
             .style("text-anchor", "start")
             .attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")");
-        // Build X scales and axis:
-        var y = d3.scaleBand()
-            .range([this.height, 0])
-            .domain(myVars)
-            .padding(0.02);
+        // Build X scales and axis:		
         // this.container.append("g")
-        //   .call(d3.axisLeft(y));
+        //   .call(d3.axisLeft(this.y));
         var color_scale = d3.scaleLinear()
             .range(["white", "#50514F"])
             .domain([0, 1]);
@@ -158,10 +174,10 @@ var MatrixVis = /** @class */ (function () {
             .data(function (d) { return d; })
             .enter().append("rect")
             .attr("class", "cell")
-            .attr("x", function (d) { return x(d.x); })
-            .attr("y", function (d) { return y(d.y); })
-            .attr("width", x.bandwidth())
-            .attr("height", y.bandwidth())
+            .attr("x", function (d) { return _this.x(d.x); })
+            .attr("y", function (d) { return _this.y(d.y); })
+            .attr("width", this.x.bandwidth())
+            .attr("height", this.y.bandwidth())
             // .on('mouseover', function() {
             //    d3.select(this)
             //        .style('fill', '#0F0');
@@ -235,6 +251,7 @@ var MatrixVis = /** @class */ (function () {
     };
     MatrixVis.prototype.sort = function (type) {
         // Features of the annotation		
+        var _this = this;
         this.container.selectAll(".matrix-row").sort(function (a, b) {
             console.log("sort!", type);
             if (type == "cluster") {
@@ -243,8 +260,9 @@ var MatrixVis = /** @class */ (function () {
             return d3.ascending(Number(a[0].c), Number(b[0].c));
         })
             .attr("transform", function (d, i) {
-            console.log(y(i));
-            return "translate(0, " + y(i) + ")";
+            console.log(d, i);
+            console.log(_this.y(_this.one_hot_patterns[d[0].y]));
+            return "translate(0, " + (_this.y(_this.one_hot_patterns[d[0].y])) + ")";
         });
     };
     return MatrixVis;

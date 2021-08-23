@@ -17,6 +17,9 @@ class MatrixVis {
 		this.nodes = this.make_nodes();
 		console.log("nodes: ", this.nodes);
 		
+		this.myGroups = this.POS_TAGS; // x
+		this.myVars = Object.keys(this.one_hot_patterns);
+		
 		this.name = name;
 		this.margin = {
 			top: 80,
@@ -26,6 +29,17 @@ class MatrixVis {
 		};
 		this.width = 600;
     this.height = this.nodes.length * 15;
+		
+		this.y = d3.scaleBand()
+		  .range([ this.height, 0 ])
+		  .domain(this.myVars)
+		  .padding(0.1);
+			
+		this.x = d3.scaleBand()
+		  .range([ 0, this.width ])
+		  .domain(this.myGroups)
+		  .padding(0.1);
+					
 		this.stats = this.compute_stats();
 		console.log(this.stats);
 	}
@@ -42,12 +56,30 @@ class MatrixVis {
 			}			
 		});
 		let distr_pred_classes_list = pattern_idx.map(i => this.data[i].sentiment);
-		distr_pred_classes_list.forEach(el => distr_pred_classes[el] ++);
 		let distr_pred_classes = {"positive": 0, "neutral": 0, "negative": 0};
+		distr_pred_classes_list.forEach(el => distr_pred_classes[el] ++);
 		let saliency_scores = pattern_idx.map(i => this.data[i].saliency_score);
-		let pattern_amount = Object.keys(this.one_hot_patterns).length -1;
+		let pattern_amount = Object.keys(this.one_hot_patterns).length -1;		
+		let clusters_found = pattern_idx.map(i => this.data[i].one_hot_cluster).reduce(function (acc, curr) {
+		  return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+		}, {});
+		console.log("cluster-found:", clusters_found)
 		
-		console.log(props, `#distribution_plot_${this.div_id.slice(-1)}`);
+		// <th> No. of clusters </th>
+		// <th> Sentences with patterns </th>
+		// <th> Sentences <strong>without</strong> patterns </th>
+		// <th> Wrongly predicted </th>
+		
+		let stats_html = `<td>${Object.keys(clusters_found).length}</td>`
+					+	`<td>${pattern_found_count}</td>`
+					+ `<td>${no_pattern_count}</td>`
+					+ `<td>${wrongly_classified}</td>`;
+		
+		document.getElementById("stats-table-row").innerHTML = stats_html;			
+		
+		if (document.getElementById(`distribution_plot_${this.div_id.slice(-1)}`) != undefined) {
+			document.getElementById(`distribution_plot_${this.div_id.slice(-1)}`).innerHTML = "";			
+		}
 		let distribution_plot = new DistributionPlot(props, `#distribution_plot_${this.div_id.slice(-1)}`, "distribution over predicted sentiments propabilities");
 		distribution_plot.draw();
 		// let avg_saliency = 
@@ -129,23 +161,16 @@ class MatrixVis {
 			  .attr("height", this.height + this.margin.top + this.margin.bottom)
 			.append("g")
 			  .attr("transform",
-			        "translate(" + this.margin.left + "," + this.margin.top + ")")
-						
-		let myGroups = this.POS_TAGS; // x
-		let myVars = Object.keys(this.one_hot_patterns);
+			        "translate(" + this.margin.left + "," + this.margin.top + ")")								
 		
 		const cluster_scale = d3.scaleOrdinal(d3.schemeCategory20);
 	
 		console.log("matrix", this.matrix);	
 		
-		// Build X scales and axis:
-		let x = d3.scaleBand()
-		  .range([ 0, width ])
-		  .domain(myGroups)
-		  .padding(0.1);
+		// Build X scales and axis:		
 		this.container.append("g")
 			.attr("transform", "translate(0," + 0 + ")")
-		  .call(d3.axisTop(x))		
+		  .call(d3.axisTop(this.x))		
 			.attr("class", "matrix-x-axis")
 			
 		this.container.select(".matrix-x-axis")
@@ -154,13 +179,9 @@ class MatrixVis {
 			.style("text-anchor", "start")
 			.attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")")
 
-		// Build X scales and axis:
-		let y = d3.scaleBand()
-		  .range([ this.height, 0 ])
-		  .domain(myVars)
-		  .padding(0.02);
+		// Build X scales and axis:		
 		// this.container.append("g")
-		//   .call(d3.axisLeft(y));
+		//   .call(d3.axisLeft(this.y));
 			
 		let color_scale = d3.scaleLinear()
 			.range(["white", "#50514F"])
@@ -176,10 +197,10 @@ class MatrixVis {
   		.data(d => d)
       .enter().append("rect")
       .attr("class", "cell")
-			.attr("x", d => x(d.x))
-		  .attr("y", d => y(d.y))
-			.attr("width", x.bandwidth())
-	 	  .attr("height", y.bandwidth())
+			.attr("x", d => this.x(d.x))
+		  .attr("y", d => this.y(d.y))
+			.attr("width",this.x.bandwidth())
+	 	  .attr("height", this.y.bandwidth())
        // .on('mouseover', function() {
        //    d3.select(this)
        //        .style('fill', '#0F0');
@@ -266,8 +287,10 @@ class MatrixVis {
 				return d3.ascending(Number(a[0].c), Number(b[0].c));
 			})
 			.attr("transform", (d, i) => {
-				console.log(y(i));
-				return "translate(0, " + y(i) + ")"; 
+				console.log(d, i);
+				console.log(this.y(this.one_hot_patterns[d[0].y]));
+				
+				return "translate(0, " + (this.y(this.one_hot_patterns[d[0].y])) + ")"; 
 			})
 	}
 }
