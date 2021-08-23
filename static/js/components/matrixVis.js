@@ -27,7 +27,7 @@ var MatrixVis = /** @class */ (function () {
         this.y = d3.scaleBand()
             .range([this.height, 0])
             .domain(this.myVars)
-            .padding(0.1);
+            .padding(0.25);
         this.x = d3.scaleBand()
             .range([0, this.width])
             .domain(this.myGroups)
@@ -97,10 +97,6 @@ var MatrixVis = /** @class */ (function () {
         });
         return nodes;
     };
-    // color_scale(x) {
-    // 	let sc = d3.scaleLinear().domain([-1,1]).range([0,1]);
-    // 	return d3.interpolateBrBG(sc(x));
-    // }
     MatrixVis.prototype.prep_data_for_vis = function (data) {
         var _this = this;
         var matrix = [];
@@ -161,13 +157,39 @@ var MatrixVis = /** @class */ (function () {
         // this.container.append("g")
         //   .call(d3.axisLeft(this.y));
         var color_scale = d3.scaleLinear()
-            .range(["white", "#50514F"])
+            .range(["white", "#353333"])
             .domain([0, 1]);
         var rows = this.container.selectAll(".matrix-row")
             .data(this.matrix)
             .enter().append("g")
             .attr("class", "matrix-row")
-            .attr("cluster", function (d) { return d[0].c; });
+            .attr("cluster", function (d) { return d[0].c; })
+            .on("mouseover", function (d, p) {
+            var el = document.getElementById("" + _this.div_id.slice(1)).getElementsByClassName("matrix-row")[p];
+            el.style.opacity = "0.4";
+        })
+            .on("mouseout", function (d, p) {
+            var el = document.getElementById("" + _this.div_id.slice(1)).getElementsByClassName("matrix-row")[p];
+            el.style.opacity = "1";
+        })
+            .on('click', function (d, p) {
+            var model_num = _this.div_id.slice(-1);
+            var pattern = d[0].y;
+            document.getElementById("sentence-select-info-matrix").innerHTML = "Sentences with pattern: <code>" + pattern + "</code> from <code>model " + model_num + "</code>";
+            var idx = _this.one_hot_patterns[pattern].elements;
+            // console.log("IDX", idx)
+            var data1 = window.data1.filter(function (el, i) { return idx.includes(i); });
+            var data2 = window.data2.filter(function (el, i) { return idx.includes(i); });
+            document.getElementById("pixelVis1").innerHTML = "";
+            document.getElementById("pixelVis2").innerHTML = "";
+            document.getElementById("pixel-sentence-view").innerHTML = "";
+            var pixelVis1 = new PixelVis(data1, "#pixelVis1", "Centralized Reports", true);
+            window.pixelVis1 = pixelVis1;
+            pixelVis1.draw();
+            var pixelVis2 = new PixelVis(data2, "#pixelVis2", "Remove layer 9", false);
+            window.pixelVis2 = pixelVis2;
+            pixelVis2.draw();
+        });
         var cols = rows.selectAll(".cell")
             .data(function (d) { return d; })
             .enter().append("rect")
@@ -176,6 +198,7 @@ var MatrixVis = /** @class */ (function () {
             .attr("y", function (d) { return _this.y(d.y); })
             .attr("width", this.x.bandwidth())
             .attr("height", this.y.bandwidth())
+            .style("stroke", "grey")
             // .on('mouseover', function() {
             //    d3.select(this)
             //        .style('fill', '#0F0');
@@ -184,71 +207,22 @@ var MatrixVis = /** @class */ (function () {
             //    d3.select(this)
             //        .style('fill', '#FFF');
             // })       
-            // .style("fill", d => color_scale(d.z))
-            .style("fill", function (d) {
-            if (d.z == 1) {
-                if (d.c == -1) {
-                    return "black";
-                }
-                return cluster_scale(d.c);
-            }
-            return color_scale(d.z);
-        })
-            // .style("stroke", '#555');
-            .on('click', function (d, p) {
-            console.log(d, p);
-            console.log(d3.select(this));
-        });
-        var annotations = [
-            {
-                note: {
-                    // label: "Here is the annotation label",
-                    label: "",
-                    title: "Closed class",
-                    padding: 10,
-                    wrap: 100
-                },
-                subject: {
-                    width: 245,
-                    height: 50
-                },
-                type: d3.annotationCalloutRect,
-                x: 0,
-                y: -50,
-                dy: 50,
-                dx: -40
-            },
-            {
-                note: {
-                    // label: "based on the universal dependencies .org",
-                    label: "",
-                    title: "Open class",
-                    padding: 10,
-                    wrap: 100
-                },
-                subject: {
-                    width: 360,
-                    height: 50
-                },
-                type: d3.annotationCalloutRect,
-                x: 260,
-                y: -50,
-                dy: 50,
-                dx: 400
-            }
-        ];
-        // // Add annotation to the chart
-        // let makeAnnotations = d3.annotation()
-        //   .annotations(annotations)
-        // this.container
-        //   .append("g")
-        //   .call(makeAnnotations)
+            .style("fill", function (d) { return color_scale(d.z); });
+        // .style("fill", d => {
+        //  if (d.z == 1) {
+        // 	 if (d.c == -1) {
+        // 		 return "black";
+        // 	 }
+        // 	 return cluster_scale(d.c);
+        //  }
+        //  return color_scale(d.z);
+        // })
+        // .style("stroke", '#555');			 
         // TODO: sort open/closed (alle von open/closed/mixed) + cluster				
         // create vis new everytime
         // this.sort("cluster");
     };
     MatrixVis.prototype.sort = function (type) {
-        // Features of the annotation		
         var _this = this;
         this.container.selectAll(".matrix-row").sort(function (a, b) {
             console.log("sort!", type);
@@ -260,7 +234,8 @@ var MatrixVis = /** @class */ (function () {
             .attr("transform", function (d, i) {
             console.log(d, i);
             console.log(_this.y(_this.one_hot_patterns[d[0].y]));
-            return "translate(0, " + (_this.y(_this.one_hot_patterns[d[0].y])) + ")";
+            var key = Object.keys(_this.one_hot_patterns)[i];
+            return "translate(0, " + (_this.y(_this.one_hot_patterns[key])) + ")";
         });
     };
     return MatrixVis;

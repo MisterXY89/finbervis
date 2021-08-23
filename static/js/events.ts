@@ -1,4 +1,4 @@
-function click_point(d: any) {
+function click_point(d: any, clicked_index:any) {
 	
 	$("#self-attention-heatmap svg").remove();
 	document.getElementById("show-similar").disabled = false;
@@ -6,8 +6,11 @@ function click_point(d: any) {
 	$("#similar-sents-display").css("opacity", 0.5);
 	$("#similar-sents-ents-display").css("opacity", 0.5);	
 	$("#select-splits").hide();
+	if (window.last_matrix_row != undefined) {
+		window.last_matrix_row.style.filter = "sepia(0%)";
+	}
 	
-	console.log(d);
+	console.log(d, clicked_index);
 
 	let current_target;
 	if (typeof d == "number" || d3.event == null) {
@@ -87,6 +90,16 @@ function click_point(d: any) {
 	d3.select(current_target)
 		.attr("r", select_rad)
 		.style("fill", SELECT_COLOR).raise();
+		
+	// let model_v = 1;
+	let model_v = current_target.parentNode.parentNode.parentNode.parentNode.id.slice(-1)
+	let vis_id = "matrix_vis_" + model_v;
+	let matrix_vis = model_v == 1 ? window.matrix_vis_1 : window.matrix_vis_2;
+	let matrix_row_idx = Object.keys(matrix_vis.one_hot_patterns).indexOf(d.one_hot.join(""));
+	let matrix_row = document.getElementById(vis_id).getElementsByClassName("matrix-row")[matrix_row_idx];
+	window.last_matrix_row = matrix_row;
+	matrix_row.style.filter = "sepia(100%)";
+	console.log(matrix_row);
 }
 
 function get_mouse_events(data) {
