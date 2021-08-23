@@ -434,7 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		// let file = data_filename_1;
 		let epsilon = Number(epsilon_input.property("value"));
 		let threshold = Number(threshold_input.property("value"));
-		let min_samples = 3;
+		let min_samples = 2;
 			
 		let url_1 = `/get_clusters?file=${data_filename_1}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
 		fetch(url_1)
@@ -609,47 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		$("#similar-sents-display").toggle();
 		$("#similar-sents-ents-display").toggle();
 		
-		// let segment_select_tokens = tok_to_array(window.d.tokens).slice(1, -1);
-		// 
-		// Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
-		// 	let index = 0;
-		// 	let element = window.sim_res[sent_i];
-		// 	let ents = element["entities"];
-		// 	Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
-		// 
-		// 		if (span.backgroundColor != "") {
-		// 			span.style.backgroundColor = "";
-		// 			span.classList.remove("saliency-active");
-		// 		}
-		// 
-		// 		if (span.classList.contains("saliency-active")) {
-		// 			span.style.backgroundColor = "transparent";
-		// 			span.classList.remove("entity");
-		// 			span.classList.remove(`entity entity-${ent_type}`);
-		// 		}
-		// 
-		// 		let el_entity = ents[span_i];
-		// 		if (el_entity != "") {
-		// 				console.log(el_entity);
-		// 				console.log(ents[span_i+1]);
-		// 				// if (span_i +1 >= ents.length) {
-		// 				if (ents[span_i+1] != el_entity) {
-		// 					// let next_el = Array.from(sent.getElementsByTagName("span"))[span_i+1];
-		// 					span.textContent += `(${el_entity})`;
-		// 				}
-		// 
-		// 				if (span.classList.contains("entity")) {
-		// 					span.style.backgroundColor = "transparent";
-		// 					span.classList.remove("entity");
-		// 					span.classList.remove(`entity-${el_entity}`);
-		// 				} else {
-		// 					span.classList.add("entity");
-		// 					span.classList.add(`entity-${el_entity}`);
-		// 				}
-		// 		}
-		// 
-		// 	});
-		// });
+
 	});
 	
 	toggle_mean_attention_button.on("click", () => {
