@@ -25,7 +25,7 @@ class MatrixVis {
 			top: 80,
 			right: 80,
 			bottom: 0,
-			left: 80
+			left: 100
 		};
 		this.width = 600;
     this.height = this.nodes.length * 15;
@@ -196,7 +196,7 @@ class MatrixVis {
 		// Build X scales and axis:		
 		this.container.append("g")
 			.attr("transform", "translate(0," + 0 + ")")
-		  .call(d3.axisTop(this.x))		
+		  .call(d3.axisTop(this.x))
 			.attr("class", "matrix-x-axis")
 			
 		this.container.select(".matrix-x-axis")
@@ -204,12 +204,12 @@ class MatrixVis {
 			// .attr("transform", "")
 			.style("text-anchor", "start")
 			.attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")")
-
-		let x_axis_nums = Object.keys(this.one_hot_patterns).map(key => this.one_hot_patterns[key].elements.length);
-		console.log("x_axis_nums", x_axis_nums);
+		
 		// Build X scales and axis:		
-		this.container.append("g")
-			.call(d3.axisLeft(this.y).tickFormat(d => x_axis_nums[d]))
+		this.container.append("g")			
+			.call(d3.axisLeft(this.y).tickFormat(d => {
+				return this.one_hot_patterns[d].elements.length;
+			}))
 			
 		let color_scale = d3.scaleLinear()
 			.range(["white", "#353333"])

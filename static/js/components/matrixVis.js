@@ -20,7 +20,7 @@ var MatrixVis = /** @class */ (function () {
             top: 80,
             right: 80,
             bottom: 0,
-            left: 80
+            left: 100
         };
         this.width = 600;
         this.height = this.nodes.length * 15;
@@ -184,11 +184,11 @@ var MatrixVis = /** @class */ (function () {
             // .attr("transform", "")
             .style("text-anchor", "start")
             .attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")");
-        var x_axis_nums = Object.keys(this.one_hot_patterns).map(function (key) { return _this.one_hot_patterns[key].elements.length; });
-        console.log("x_axis_nums", x_axis_nums);
         // Build X scales and axis:		
         this.container.append("g")
-            .call(d3.axisLeft(this.y).tickFormat(function (d) { return x_axis_nums[d]; }));
+            .call(d3.axisLeft(this.y).tickFormat(function (d) {
+            return _this.one_hot_patterns[d].elements.length;
+        }));
         var color_scale = d3.scaleLinear()
             .range(["white", "#353333"])
             .domain([0, 1]);
