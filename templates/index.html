@@ -347,14 +347,21 @@
     </div> -->
     <div class="col-12">
       <div class="form-inline">        
-        <div class="col-sm-5">
+        <div class="col-sm-3">
           <div class="form-group">
             <label for="saliencyThreshold">Saliency threshold</label>
             <input type="number" class="form-control" id="saliencyThreshold" max="1" min="-1" aria-describedby="saliencyHelp" step="0.05" value="0.3">
             <small id="saliencyHelp" class="form-text text-muted">A score > 0 indicates indicates importance for the predicted label</small>  
           </div>
         </div>
-        <div class="col-sm-5">
+        <div class="col-sm-3">
+          <div class="form-group">
+            <label for="min_samples_input">Min. amount of elements</label>
+            <input type="number" class="form-control" id="min_samples_input" aria-describedby="min_samples_input_help" min="1" step="1" value="2">
+            <small id="min_samples_input_help" class="form-text text-muted">Current value is <script>document.write(localStorage.getItem("min_samples"))</script></small>  
+          </div>
+        </div>        
+        <div class="col-sm-3">
           <div class="form-group">
             <label for="epsilonInput">Specify Epsilon</label>
             <input type="number" class="form-control" id="epsilonInput" aria-describedby="epsilonHelp" min="0.0001" step="0.05" value="0.9">
@@ -373,8 +380,9 @@
     <div class="col-6 form-group">
     <label for="matrixSort">Sort Matrix by</label>
     <select class="form-control" id="matrixSort">
-      <option value="cluster" selected>Cluster</option>
-      <option value="postag">POS-Tag</option>
+      <option value="none">-</option>
+      <option value="cluster">Cluster</option>
+      <option value="count">Count</option>
       <!-- <option value="cluster">Cluster</option>
       <option value="cluster">Cluster</option>
       <option value="cluster">Cluster</option> -->
@@ -443,6 +451,7 @@
         <br />
         <small class="text-muted">Pixel-based model Comparison via saliency scores</small>    
       </h2>
+      <h4><small>Red colored rows indicate a different truth label.</small></h4>
       <h4><small id="sentence-select-info-matrix"></small></h4>          
     </div>
     <div class="col-4">
