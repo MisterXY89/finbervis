@@ -41,7 +41,8 @@ class MatrixVis {
 		  .padding(0.1);
 					
 		this.stats = this.compute_stats();
-		console.log(this.stats);
+		console.log("stats", this.stats);
+		this.cluster_sort = false;
 	}
 	
 	compute_stats() {
@@ -63,7 +64,7 @@ class MatrixVis {
 		let clusters_found = pattern_idx.map(i => this.data[i].one_hot_cluster).reduce(function (acc, curr) {
 		  return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
 		}, {});
-		console.log("cluster-found:", clusters_found)
+		// console.log("cluster-found:", clusters_found)
 		
 		let stats_html = `<td>${Object.keys(clusters_found).length}</td>`
 					+	`<td>${pattern_found_count}</td>`
@@ -93,7 +94,7 @@ class MatrixVis {
 	
 	make_nodes() {
 		let nodes = [];
-		console.log(this.one_hot_patterns);
+		// console.log(this.one_hot_patterns);
 		Object.keys(this.one_hot_patterns).forEach(key => {
 			if (key.length == 17) {				
 				nodes.push({
@@ -176,10 +177,7 @@ class MatrixVis {
 	}
 	
 	draw() {
-		// this.container.append("rect")
-	  //   .attr("class", "matrix-background")
-	  //   .attr("width", this.width)
-	  //   .attr("height", this.height);
+		document.getElementById(this.div_id.slice(1)).innerHTML = "";
 		
 		this.container = d3.select(this.div_id)
 			.append("svg")
@@ -248,7 +246,8 @@ class MatrixVis {
 					window.pixelVis2 = pixelVis2;
 					pixelVis2.draw();
         })			 	 
-
+		
+		console.log("cluster_sort", this.cluster_sort)
     let cols = rows.selectAll(".cell")
   		.data(d => d)
       .enter().append("rect")
@@ -266,27 +265,52 @@ class MatrixVis {
        //    d3.select(this)
        //        .style('fill', '#FFF');
        // })       
-			 .style("fill", d => color_scale(d.z))
+			 .style("fill", d => {				 
+				 if (this.cluster_sort) {
+					 if (d.z == 1) {
+						 return cluster_scale(d.c);						 
+					 }
+				 }
+				 return color_scale(d.z);			 
+			 })
 			
 		// TODO: sort open/closed (alle von open/closed/mixed) + cluster				
-		// create vis new everytime
-		// this.sort("cluster");
+		// create vis new everytime		
 	}
 	
-	sort(type) {				
+	sort(type) {		
+		this.cluster_sort = false;
+		if (type == "cluster") {
+			this.cluster_sort = true;			
+		}
+		let sorted_rows = [];
+		let sorted_one_hots = {};
 		this.container.selectAll(".matrix-row").sort( 
 			(a, b) => {
-				console.log("sort!", type);
-				if (type == "cluster") {					
-					return d3.ascending(Number(a[0].c), Number(b[0].c));
-				}
-				return d3.ascending(Number(a[0].c), Number(b[0].c));
+				if (type == "cluster") {
+					return d3.descending(Number(a[0].c), Number(b[0].c));					
+				} else { // count == default
+					return d3.descending(this.one_hot_patterns[a[0].y].elements.length, this.one_hot_patterns[b[0].y].elements.length);
+				} 
+				// sorted_rows = d3.ascending(Number(a[0].c), Number(b[0].c));
+			}).attr("transform", d => {
+				sorted_rows.push(d);
+				sorted_one_hots[d[0].y] = this.one_hot_patterns[d[0].y];
+				return "x";
 			})
-			.attr("transform", (d, i) => {
-				console.log(d, i);
-				console.log(this.y(this.one_hot_patterns[d[0].y]));
-				let key = Object.keys(this.one_hot_patterns)[i];
-				return "translate(0, " + (this.y(this.one_hot_patterns[key])) + ")"; 
-			})
+			// .attr("transform", (d, i) => {
+			// 	let key = Object.keys(this.one_hot_patterns)[i];
+			// 	console.log(d[0].y, key, i);
+			// 	return "translate(0, " + (this.y(key)) + ")"; 
+			// })
+		console.log("sorted_rows", sorted_rows);
+		this.matrix = sorted_rows;
+		this.one_hot_patterns = sorted_one_hots;
+		let sorted_vars = Object.keys(this.one_hot_patterns);
+		this.y = d3.scaleBand()
+		  .range([ this.height, 0 ])
+		  .domain(sorted_vars)
+		  .padding(0.3);
+		this.draw();
 	}
 }

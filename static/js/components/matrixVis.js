@@ -33,7 +33,8 @@ var MatrixVis = /** @class */ (function () {
             .domain(this.myGroups)
             .padding(0.1);
         this.stats = this.compute_stats();
-        console.log(this.stats);
+        console.log("stats", this.stats);
+        this.cluster_sort = false;
     }
     MatrixVis.prototype.compute_stats = function () {
         var _this = this;
@@ -55,7 +56,7 @@ var MatrixVis = /** @class */ (function () {
         var clusters_found = pattern_idx.map(function (i) { return _this.data[i].one_hot_cluster; }).reduce(function (acc, curr) {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc;
         }, {});
-        console.log("cluster-found:", clusters_found);
+        // console.log("cluster-found:", clusters_found)
         var stats_html = "<td>" + Object.keys(clusters_found).length + "</td>"
             + ("<td>" + pattern_found_count + "</td>")
             + ("<td>" + no_pattern_count + "</td>")
@@ -82,7 +83,7 @@ var MatrixVis = /** @class */ (function () {
     MatrixVis.prototype.make_nodes = function () {
         var _this = this;
         var nodes = [];
-        console.log(this.one_hot_patterns);
+        // console.log(this.one_hot_patterns);
         Object.keys(this.one_hot_patterns).forEach(function (key) {
             if (key.length == 17) {
                 nodes.push({
@@ -161,11 +162,8 @@ var MatrixVis = /** @class */ (function () {
         distribution_plot.draw();
     };
     MatrixVis.prototype.draw = function () {
-        // this.container.append("rect")
-        //   .attr("class", "matrix-background")
-        //   .attr("width", this.width)
-        //   .attr("height", this.height);
         var _this = this;
+        document.getElementById(this.div_id.slice(1)).innerHTML = "";
         this.container = d3.select(this.div_id)
             .append("svg")
             .attr("width", this.width + this.margin.left + this.margin.right)
@@ -224,6 +222,7 @@ var MatrixVis = /** @class */ (function () {
             window.pixelVis2 = pixelVis2;
             pixelVis2.draw();
         });
+        console.log("cluster_sort", this.cluster_sort);
         var cols = rows.selectAll(".cell")
             .data(function (d) { return d; })
             .enter().append("rect")
@@ -241,26 +240,52 @@ var MatrixVis = /** @class */ (function () {
             //    d3.select(this)
             //        .style('fill', '#FFF');
             // })       
-            .style("fill", function (d) { return color_scale(d.z); });
+            .style("fill", function (d) {
+            if (_this.cluster_sort) {
+                if (d.z == 1) {
+                    return cluster_scale(d.c);
+                }
+            }
+            return color_scale(d.z);
+        });
         // TODO: sort open/closed (alle von open/closed/mixed) + cluster				
-        // create vis new everytime
-        // this.sort("cluster");
+        // create vis new everytime		
     };
     MatrixVis.prototype.sort = function (type) {
         var _this = this;
+        this.cluster_sort = false;
+        if (type == "cluster") {
+            this.cluster_sort = true;
+        }
+        var sorted_rows = [];
+        var sorted_one_hots = {};
         this.container.selectAll(".matrix-row").sort(function (a, b) {
-            console.log("sort!", type);
             if (type == "cluster") {
-                return d3.ascending(Number(a[0].c), Number(b[0].c));
+                return d3.descending(Number(a[0].c), Number(b[0].c));
             }
-            return d3.ascending(Number(a[0].c), Number(b[0].c));
-        })
-            .attr("transform", function (d, i) {
-            console.log(d, i);
-            console.log(_this.y(_this.one_hot_patterns[d[0].y]));
-            var key = Object.keys(_this.one_hot_patterns)[i];
-            return "translate(0, " + (_this.y(_this.one_hot_patterns[key])) + ")";
+            else { // count == default
+                return d3.descending(_this.one_hot_patterns[a[0].y].elements.length, _this.one_hot_patterns[b[0].y].elements.length);
+            }
+            // sorted_rows = d3.ascending(Number(a[0].c), Number(b[0].c));
+        }).attr("transform", function (d) {
+            sorted_rows.push(d);
+            sorted_one_hots[d[0].y] = _this.one_hot_patterns[d[0].y];
+            return "x";
         });
+        // .attr("transform", (d, i) => {
+        // 	let key = Object.keys(this.one_hot_patterns)[i];
+        // 	console.log(d[0].y, key, i);
+        // 	return "translate(0, " + (this.y(key)) + ")"; 
+        // })
+        console.log("sorted_rows", sorted_rows);
+        this.matrix = sorted_rows;
+        this.one_hot_patterns = sorted_one_hots;
+        var sorted_vars = Object.keys(this.one_hot_patterns);
+        this.y = d3.scaleBand()
+            .range([this.height, 0])
+            .domain(sorted_vars)
+            .padding(0.3);
+        this.draw();
     };
     return MatrixVis;
 }());
