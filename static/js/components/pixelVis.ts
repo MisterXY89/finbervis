@@ -47,7 +47,7 @@ function create_sentence_view(data, is_one) {
 class PixelVis {
 	
 	constructor(data, div_id, name, is_one, dims) {
-		console.log(dims);
+		// console.log(dims);
 		this.sentence_view = (div_id == "#pixel-sentence-view") ? true : false;		
 		this.dims = (dims == undefined) ? {} : dims;
 		this.is_one = (is_one == undefined) ? true : is_one;
@@ -61,11 +61,15 @@ class PixelVis {
 				bottom: 120, 
 				left: this.left_margin
 			};
-		console.log(this.sentence_view);
-		console.log(this.dims);
+		// console.log(this.sentence_view);
+		// console.log(this.dims);
 		this.width = (this.dims.width == undefined) ? 600 : this.dims.width;
 		this.width -= this.margin.left - this.margin.right;
-		this.height = (this.dims.height == undefined) ? this.data.length * 20 : this.dims.height;
+		let variable_height = this.data.length * 20;
+		if (variable_height > 900) {
+			variable_height = 900;
+		}
+		this.height = (this.dims.height == undefined) ? variable_height : this.dims.height;
 		this.height -= this.margin.top - this.margin.bottom;
 		// this.color_scale = d3.scaleLinear()
 		//   .range(["blue","white", "red"])
@@ -121,7 +125,7 @@ class PixelVis {
 		        "translate(" + this.margin.left + "," + this.margin.top + ")");
 		
 		let rd = this.prep_data_for_vis();
-		console.log(rd);
+		// console.log(rd);
 		const vis_data = rd.matrix;
 		// Labels of row and columns
 		// console.log(this.sentence_view);
@@ -166,7 +170,7 @@ class PixelVis {
 			})
 			
 		container.selectAll(".row-stats-pixel-vis line")
-			.style("stroke-width", 20)
+			.style("stroke-width", this.height/this.data.length)
 			.style("stroke", d => {
 				let el = this.data[d];
 				return el.sentiment != el.truth_label ? "red" : "white";
@@ -189,7 +193,7 @@ class PixelVis {
 	  }
 		
 	  let mousemove = function(d) {
-			console.log(d3.mouse(this))
+			// console.log(d3.mouse(this))
 	    tooltip
 	      .html(`
 					<table>
