@@ -256,9 +256,6 @@ class PixelVis {
 				 
 			container.selectAll(".pos-token-sentence-view-pixl-vis text")
 				.text(d => this.data[0].pos_tags[d].slice(1,-1))
-			
-							
-			
 				
 			container.selectAll()
 	      .data(vis_data, d => d.x+':'+d.y)
