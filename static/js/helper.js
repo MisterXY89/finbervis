@@ -129,8 +129,6 @@ function get_sentiment_html(sent, truth_label, is_truth_label) {
     is_truth_label = is_truth_label == undefined ? false : is_truth_label;
     var truth_label_sentiment_class = "";
     if (is_truth_label && truth_label != sent) {
-        console.log(truth_label);
-        console.log(sent);
         truth_label_sentiment_class = "truth-label-sentiment";
         sent = truth_label;
     }
@@ -139,12 +137,12 @@ function get_sentiment_html(sent, truth_label, is_truth_label) {
 function get_max_value(str_props, pretty) {
     pretty = pretty == undefined ? false : pretty;
     if (str_props == "NaN" || str_props == "Na" || str_props == undefined) {
-        console.log(str_props);
+        // console.log(str_props);
         return (pretty) ? "-" : 0;
     }
     var max_val;
     if (typeof str_props == "object" && str_props.length == 3) {
-        console.log("str_props", str_props);
+        // console.log("str_props", str_props);
         max_val = d3.max(str_props);
     }
     else {
@@ -198,10 +196,9 @@ function get_radius(new_point) {
     return RADIUS;
 }
 function add_labeled_record(sentiment, segment) {
-    console.log("add_label");
     var data = new FormData();
     var json_string = JSON.stringify({ sentiment: sentiment, segment: segment });
-    console.log(json_string);
+    console.log("add_label", json_string);
     data.append("json", json_string);
     fetch("/add_labeled_record", {
         method: "POST",
