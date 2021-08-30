@@ -50,11 +50,12 @@ var PixelVis = /** @class */ (function () {
         this.name = name;
         this.data = data;
         this.div_id = div_id;
+        this.left_margin = (this.sentence_view) ? 100 : 150;
         this.margin = {
             top: 80,
-            right: 20,
+            right: 100,
             bottom: 120,
-            left: 100
+            left: this.left_margin
         };
         console.log(this.sentence_view);
         console.log(this.dims);
@@ -114,7 +115,7 @@ var PixelVis = /** @class */ (function () {
         console.log(rd);
         var vis_data = rd.matrix;
         // Labels of row and columns
-        console.log(this.sentence_view);
+        // console.log(this.sentence_view);
         if (this.sentence_view) {
             var x_axis_labels = rd.matrix[0].tokens;
         }
@@ -130,6 +131,7 @@ var PixelVis = /** @class */ (function () {
             .padding(0.01);
         // .tickFormat(function(d) { console.log("dd", d)})
         var info_labels = this.data.map(function (d) { return "[" + d.one_hot_cluster + "]"; });
+        var prop_infos = this.data.map(function (d) { return d.sentiment; });
         // Build X scales and axis:
         var y = d3.scaleBand()
             .range([this.height, 0])
@@ -137,17 +139,24 @@ var PixelVis = /** @class */ (function () {
             .padding(0.01);
         if (!this.sentence_view) {
             container.append("g")
-                .attr("class", "sentiment-color-pixel-vis") // , d => `class-${d.sentiment}`)
-                .call(d3.axisLeft(y)
-                .tickFormat(function (d) { return info_labels[d]; })
-            // .attr("class", d => `class-${d.sentiment}`)
-            );
+                .attr("class", "row-stats-pixel-vis") // , d => `class-${d.sentiment}`)
+                .call(d3.axisLeft(y));
         }
-        // d3.selectAll(".sentiment-color-pixel-vis")
-        // 	.style("fill", d => {
-        // 		console.log("dddd", d, this);
-        // 		return "blue";
-        // 	})
+        container.selectAll(".row-stats-pixel-vis text")
+            .style("fill", function (d) {
+            // console.log("dddd", d, this);
+            return get_sentiment_color(_this.data[d].sentiment);
+        })
+            .style("font-size", 11.5)
+            .text(function (d) {
+            return _this.data[d].sentiment + ", " + d3.max(_this.data[d].props).toString().slice(0, 4);
+        });
+        container.selectAll(".row-stats-pixel-vis line")
+            .style("stroke-width", 20)
+            .style("stroke", function (d) {
+            var el = _this.data[d];
+            return el.sentiment != el.truth_label ? "red" : "white";
+        });
         var tooltip = d3.select(this.div_id)
             .append("div")
             .style("opacity", 0)
@@ -186,6 +195,15 @@ var PixelVis = /** @class */ (function () {
                 .padding(0.01);
             container.append("g")
                 .call(d3.axisLeft(ys_1).tickFormat(function (d) { return x_axis_labels[d]; }));
+            // USE AXIS RIGHT FOR POS TAGS?
+            container.append("g")
+                .call(d3.axisRight(ys_1))
+                .attr("class", "pos-token-sentence-view-pixl-vis")
+                .style("transform", "translateX(" + this.width + "px)");
+            // 	"translate(" + this.width + "," + 0 + ")");
+            // .tickFormat(d => x_axis_labels[d]))
+            container.selectAll(".pos-token-sentence-view-pixl-vis text")
+                .text(function (d) { return _this.data[0].pos_tags[d].slice(1, -1); });
             container.selectAll()
                 .data(vis_data, function (d) { return d.x + ':' + d.y; })
                 .enter()
