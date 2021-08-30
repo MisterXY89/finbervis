@@ -178,6 +178,7 @@ function create_scatter_plot(data, div_id) {
         .append("svg")
         .attr("width", width + margins.left + margins.right)
         .attr("height", height + margins.top + margins.bottom)
+        .attr("class", "projection-container")
         .append("g")
         .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
     // // X-AXIS
@@ -289,6 +290,7 @@ function scatter_plot(data, click, data_file, div_id) {
     // }
     // 
     // console.log(data);
+    document.getElementById(div_id.slice(1)).innerHTML = "";
     create_scatter_plot(data, div_id);
     if (!$(".slider").is(":visible")) {
         var slider_data_vals = [0, 0.25, 0.5, 0.75, 0.8, 0.9, 0.95, 1];

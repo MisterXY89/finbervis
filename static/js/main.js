@@ -361,6 +361,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var cluster_button = d3.select("#cluster_button");
     var epsilon_input = d3.select("#epsilonInput");
     var min_samples_input = d3.select("#min_samples_input");
+    var reset_filter_button_projection = d3.select("#resetFilterButtonProjection");
     var create_one_hot = d3.select("#create_one_hot");
     var threshold_input = d3.select("#saliencyThreshold");
     var matrix_sort_select = d3.select("#matrixSort");
@@ -374,6 +375,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         window.matrix_vis_1.sort(selection);
         window.matrix_vis_2.sort(selection);
+    });
+    reset_filter_button_projection.on("click", function (evt) {
+        d3.select("#resetSelectionCol").style("display", "none");
+        scatter_plot(window.data1, false, DATA_FILE_ONE, "#projection_model_1");
+        scatter_plot(window.data2, false, DATA_FILE_TWO, "#projection_model_2");
     });
     cluster_button.on("click", function () {
         // let file = data_filename_1;

@@ -417,6 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const cluster_button = d3.select("#cluster_button");
 	const epsilon_input = d3.select("#epsilonInput");
 	const min_samples_input = d3.select("#min_samples_input");
+	const reset_filter_button_projection = d3.select("#resetFilterButtonProjection");
 	
 	const create_one_hot = d3.select("#create_one_hot");
 	const threshold_input = d3.select("#saliencyThreshold");	
@@ -435,6 +436,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		window.matrix_vis_1.sort(selection);
 		window.matrix_vis_2.sort(selection);
 	});
+	
+	reset_filter_button_projection.on("click", evt => {
+		d3.select("#resetSelectionCol").style("display", "none");
+		scatter_plot(window.data1, false, DATA_FILE_ONE, "#projection_model_1");
+		scatter_plot(window.data2, false, DATA_FILE_TWO, "#projection_model_2");
+	})
 	
 	cluster_button.on("click", () => {
 		// let file = data_filename_1;

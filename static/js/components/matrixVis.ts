@@ -245,6 +245,11 @@ class MatrixVis {
 					let pixelVis2 = new PixelVis(data2, "#pixelVis2", "Remove layer 9", false);
 					window.pixelVis2 = pixelVis2;
 					pixelVis2.draw();
+					
+					scatter_plot(data1, false, DATA_FILE_ONE, "#projection_model_1");
+					scatter_plot(data2, false, DATA_FILE_TWO, "#projection_model_2");	
+					d3.select("#patternProjectionSelection").html(`<code>${pattern}</code>`)
+					d3.select("#resetSelectionCol").style("display", "block");
         })			 	 
 		
 		console.log("cluster_sort", this.cluster_sort)

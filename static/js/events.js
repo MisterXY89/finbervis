@@ -90,6 +90,8 @@ function click_point(d, clicked_index) {
     var matrix_row = document.getElementById(vis_id).getElementsByClassName("matrix-row")[matrix_row_idx];
     window.last_matrix_row = matrix_row;
     matrix_row.style.filter = "sepia(100%)";
+    d.y = d.id;
+    create_sentence_view(d);
     console.log(matrix_row);
 }
 function get_mouse_events(data) {

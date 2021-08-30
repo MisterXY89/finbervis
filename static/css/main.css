@@ -269,6 +269,14 @@ text.active {
   padding-top: 2em;
 }
 
-/* .pixel-vis-axis-info {
-  fill: green;
-} */
+#resetSelectionCol {
+  display: none;
+}
+
+.projection-container {
+  border-bottom: 1px solid #353333;
+  border-right: 1px solid #353333;
+  border-bottom-right-radius: 2px;
+  margin-top: 1em;
+  margin-right: 1em;
+}
