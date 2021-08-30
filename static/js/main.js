@@ -360,17 +360,29 @@ document.addEventListener("DOMContentLoaded", function () {
     var toggle_gradients_button = d3.select("#toggle_gradients");
     var cluster_button = d3.select("#cluster_button");
     var epsilon_input = d3.select("#epsilonInput");
+    var min_samples_input = d3.select("#min_samples_input");
     var create_one_hot = d3.select("#create_one_hot");
     var threshold_input = d3.select("#saliencyThreshold");
     var matrix_sort_select = d3.select("#matrixSort");
-    matrix_sort_select.on("change", function (evt, d) {
-        console.log(evt, d);
+    epsilon_input.attr("value", localStorage.getItem("epsilon"));
+    threshold_input.attr("value", localStorage.getItem("threshold"));
+    min_samples_input.attr("value", localStorage.getItem("min_samples"));
+    matrix_sort_select.on("change", function (evt) {
+        var selection = matrix_sort_select.property("value");
+        if (selection == "none") {
+            selection = "count";
+        }
+        window.matrix_vis_1.sort(selection);
+        window.matrix_vis_2.sort(selection);
     });
     cluster_button.on("click", function () {
         // let file = data_filename_1;
         var epsilon = Number(epsilon_input.property("value"));
         var threshold = Number(threshold_input.property("value"));
-        var min_samples = 2;
+        var min_samples = Number(min_samples_input.property("value"));
+        localStorage.setItem("epsilon", epsilon);
+        localStorage.setItem("threshold", threshold);
+        localStorage.setItem("min_samples", min_samples);
         var url_1 = "/get_clusters?file=" + data_filename_1 + "&epsilon=" + epsilon + "&min_samples=" + min_samples + "&threshold=" + threshold;
         fetch(url_1)
             .then(function (resp) { return resp.json(); })

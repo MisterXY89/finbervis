@@ -416,20 +416,35 @@ document.addEventListener("DOMContentLoaded", () => {
 	const toggle_gradients_button = d3.select("#toggle_gradients");
 	const cluster_button = d3.select("#cluster_button");
 	const epsilon_input = d3.select("#epsilonInput");
+	const min_samples_input = d3.select("#min_samples_input");
 	
 	const create_one_hot = d3.select("#create_one_hot");
 	const threshold_input = d3.select("#saliencyThreshold");	
 	
 	const matrix_sort_select = d3.select("#matrixSort");
-	matrix_sort_select.on("change", (evt, d) => {
-		console.log(evt, d)
+	
+	epsilon_input.attr("value", localStorage.getItem("epsilon"));
+	threshold_input.attr("value", localStorage.getItem("threshold"));
+	min_samples_input.attr("value", localStorage.getItem("min_samples"));
+	
+	matrix_sort_select.on("change", (evt) => {
+		let selection = matrix_sort_select.property("value");		
+		if (selection == "none") {
+			selection = "count";
+		}
+		window.matrix_vis_1.sort(selection);
+		window.matrix_vis_2.sort(selection);
 	});
 	
 	cluster_button.on("click", () => {
 		// let file = data_filename_1;
 		let epsilon = Number(epsilon_input.property("value"));
 		let threshold = Number(threshold_input.property("value"));
-		let min_samples = 2;
+		let min_samples = Number(min_samples_input.property("value"));
+		
+		localStorage.setItem("epsilon", epsilon);
+		localStorage.setItem("threshold", threshold);
+		localStorage.setItem("min_samples", min_samples);
 			
 		let url_1 = `/get_clusters?file=${data_filename_1}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
 		fetch(url_1)
