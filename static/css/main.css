@@ -243,8 +243,8 @@ text.active {
   fill: #2f2f2f;
 }
 
-#matrix_vis_1 .tick:nth-child(-n+7) text,
-#matrix_vis_2 .tick:nth-child(-n+7) text {
+#matrix_vis_1 .matrix-x-axis .tick:nth-child(-n+7) text,
+#matrix_vis_2 .matrix-x-axis .tick:nth-child(-n+7) text {
   font-weight: bold;
 }
 
