@@ -20,7 +20,7 @@
 function create_sentence_view(data, is_one) {
     console.log("create_sentence_view", data);
     var div_id = "#pixel-sentence-view";
-    // document.getElementById(div_id.slice(1)).innerHTML = "";
+    document.getElementById(div_id.slice(1)).innerHTML = "";
     // if (is_one) {
     // 	let data1 = data;
     // 	let data2 = window.pixelVis2.data[data.y];
