@@ -121,8 +121,8 @@ function toggle_ents() {
 		$("#selected-segment-tokens").show();
 		
 	} else {
-		let seq_id = d3.select("#point_id").text();
-		let url: string = `/get_entities?seq_id=${seq_id}`;
+		let seq_id = d3.select("#point_id").text();		
+		let url: string = `/get_entities?seq_id=${seq_id}&model=${window.model_num}`;
 		fetch(url)
 		.then(resp => resp.json())
 		.then(json => {
@@ -145,7 +145,7 @@ function toggle_ents() {
 function get_segment_html(seg) {
 	// type="button" class="btn btn-secondary"
 	return `<div class="search-seg" title="${seg}">
-  	${seg.slice(0,120)}...
+		${seg.slice(0,120)}...
 	</div>`;
 }
 
@@ -156,7 +156,7 @@ function prep_search_vis(res) {
 	res.forEach((element, i) => {
 		window.search_result_data.push(element);
 		html += '<div class="card" style="width: 100%;">'
-	  	+ '<div class="card-body">'
+			+ '<div class="card-body">'
 				+ `<div class="card-title row">`
 					+ `<div class="col-8">`				
 						// + `<h5>Result #${i+1}</h5>`
@@ -166,7 +166,7 @@ function prep_search_vis(res) {
 						+ `<a href="#" class="btn btn-primary" onclick='click_point(${i});'>Select</a>`
 					+ `</div>`
 				+ `</div>`
-	    	+ `<p class="card-text">`
+				+ `<p class="card-text">`
 					// + `<strong>ID</strong> ${element.id}<hr>`
 					+ `${get_segment_html(element.segment)}<br>`
 					+ `<div class="row">`
@@ -178,7 +178,7 @@ function prep_search_vis(res) {
 						+ `</div>`
 					+ `</div>`
 				+ '</p>'
-	  	+ '</div>'
+			+ '</div>'
 		+ '</div><br>';
 	});
 	return html;
@@ -258,8 +258,8 @@ function get_mean_attention_html(tokens, attention, sent) {
 		// let color_val = attention[i];
 		// border-top: 3px and map value to color
 		var color = d3.scaleLinear()
-      .domain([0, 0.9])
-      .range(["#ddd", "#540012"]);   // output for opacity between .3 and 1 %
+			.domain([0, 0.9])
+			.range(["#ddd", "#540012"]);   // output for opacity between .3 and 1 %
 			// white edf6f9
 			// ffb600 - warm yellow
 			// ff4800 - warm orange
@@ -274,35 +274,49 @@ function get_mean_attention_html(tokens, attention, sent) {
 function search_data(search_q) {
 	let params = "";	
 	if (search_q[0] == "#") {
-		params = `?seg_id=${search_q.slice(1)}` : "";
+		let sq = search_q.slice(1);
+		if (sq.includes("#")) {
+			let model_num = sq.split("#")[1];
+		}
+		sq = sq[0];
+		params = `?seg_id=${sq}&model=${model_num}` : "";
 	} else {
 		params = `?q=${search_q}`;
 	}
 	let url = `/search${params}`;
 	
-	
-	fetch(url)
-	.then(resp => {
-		if (search_q == ")()UJIH=all") {
-			return resp.text();
-		} 
-		return resp.json();
-	})
-	.then(json => {
-		console.log(json);
-		$("#search_results-wrapper").show();
-		if (search_q == "OJOJOJOO =all") {
-			alert("=all");
-			$("#search-header").html("All Segments");
-			$("#search-results").html(json);
-			$("#search-results").show();
-		} else {
-			let res = json.result;
-			// console.log(res);
-			d3.select("#search-results").html(prep_search_vis(res));
-			d3.select("#total-results").text(res.length);
-		}			
-	});
+	if (search_q == "=all") {
+		alert("Please specify the model like this: =all#1, =all#2")
+	} else {
+		if (search_q.includes("=all")) {
+			let model_num = window.selected_models_nums[Number(search_q.split("#")[1]) -1]
+			url += `&model=${model_num}`;
+		}
+		fetch(url)
+		.then(resp => {
+			// if (search_q == ")()UJIH=all") {
+			if (search_q == "=all") {
+				return resp.text();
+			} 
+			return resp.json();
+		})
+		.then(json => {
+			console.log(json);
+			$("#search_results-wrapper").show();
+			if (search_q == "all") {
+				alert("=all");
+				$("#search-header").html("All Segments");
+				$("#search-results").html(json);
+				$("#search-results").show();
+			} else {
+				let res = json.result;
+				// console.log(res);
+				d3.select("#search-results").html(prep_search_vis(res));
+				d3.select("#total-results").text(res.length);
+			}			
+		});
+	}
+		
 }
 
 
@@ -320,7 +334,9 @@ function toggle_grads() {
 		if (sal_scores[span_i] > 0) {			
 			token_grad_color = "221,89,100";
 		}
-		let color = `rgba(${token_grad_color}, ${opacity})`;
+		let sc = d3.scaleLinear().domain([-1,1]).range([0,1]);
+		let color = d3.interpolateBrBG(sc(sal_scores[span_i]));
+		// let color = `rgba(${token_grad_color}, ${opacity})`;
 		
 		// if (span.classList.contains("identical-token")) {
 		// 	span.classList.remove("identical-token");
@@ -360,13 +376,19 @@ function toggle_plain_sent() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	
-	load_data("data_copy.csv", "drop_8_data.csv").then(data => {
+	let choosen_models = [0,1];
+	let selected_models = choosen_models.map(i => MODEL_NAMES[i]);
+	console.log(selected_models)
+	window.selected_models = selected_models;
+	window.selected_models_nums = choosen_models;
+	
+	load_data(selected_models).then(data => {
 		window.data1 = data.data1;
 		window.data2 = data.data2;
 		// load_data("data_copy.csv", false).then(data => {		
-		// -------------------------------
-		scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");
-		scatter_plot(data.data2, false, DATA_FILE_TWO, "#projection_model_2");	
+		// -------------------------------				
+		scatter_plot(data.data1, false, DATA_FILES[choosen_models[0]], "#projection_model_1");		
+		scatter_plot(data.data2, false,  DATA_FILES[choosen_models[1]], "#projection_model_2");	
 		let matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
 		window.matrix_vis_1 = matrix_vis_1;
 		matrix_vis_1.draw();
@@ -492,7 +514,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		.then(json => {	
 			console.log(json);
 			// add_datapoint(json);
-			spinner.style("display", "none");	
+			spinner.style("display", "none");		
+			
+			// scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");			
 			scatter_plot(json, true);
 			// click_point(json);
 			// user_classification_select.style("display", "block");
@@ -545,7 +569,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		$("#show-simmilar").show();
 		
 		let id = d3.select("#point_id").text();
-		let url: string = `/get_similar_segments?seg_id=${id}&return_sents=True`;
+		let url: string = `/get_similar_segments?seg_id=${id}&return_sents=True`;		
+		let model_num = window.selected_models_nums[window.model_num];
+		// let model_num = window.selected_models_nums[Number(search_q.split("#")[1]) -1]
+		url += `&model=${model_num}`;
 		console.log(url);
 		// TODO: disable button & add loading cirlcle next to it
 		$("#sim-sent-spinner").toggle();

@@ -28,25 +28,27 @@ function to_array(string) {
 	return arr.map(Number);
 }
 
-async function load_data(fi1, fi2) {
+async function load_data(files) {
+	let fi1 = files[0];
 	const papa_config = {delimiter: ",", header: true};
 	let data1 = await fetch(`/data/${fi1}`)
 		.then(resp => resp.text())
 		.then(t => Papa.parse(t, papa_config))
 		.then(data1 => {
 			console.log("pre trans ", data1);
-    	return transform_data(data1.data);
-  	});
-	if (!fi2) {
+			return transform_data(data1.data);
+		});
+	let fi2 = files[1];
+	if (!fi2 || fi2 == undefined) {
 		return {data1};
 	}
-  let data2 = await fetch(`/data/${fi2}`)
-  	.then(resp => resp.text())
-  	.then(t => Papa.parse(t, papa_config))
-  	.then(data2 => {
-    	return transform_data(data2.data);
-  	});
-  return { data1, data2 }
+	let data2 = await fetch(`/data/${fi2}`)
+		.then(resp => resp.text())
+		.then(t => Papa.parse(t, papa_config))
+		.then(data2 => {
+			return transform_data(data2.data);
+		});
+	return { data1, data2 }
 }
 
 function transform_data(data) {

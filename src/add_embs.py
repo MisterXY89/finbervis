@@ -5,7 +5,7 @@ import pandas as pd
 from config import DATA_DIR
 from interface import Interface
 
-FILENAME = "drop_8_data.csv"
+FILENAME = "drop_from_3_data.csv"
 FILE = f"{DATA_DIR}/{FILENAME}"
 
 interface = Interface()
@@ -30,7 +30,8 @@ for index, row in df.iterrows():
         cls_embs_list.append(None)
         print(40*"-")
         # row["cls_embs"] = None
-        continue
+        raise e
+        # continue
 
     print(list(cls_embs))
     cls_embs_list.append(list(cls_embs))

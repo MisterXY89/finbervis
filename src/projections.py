@@ -18,7 +18,7 @@ BASE_DIR = WORKING_DIR
 if "src" in WORKING_DIR:
     BASE_DIR = WORKING_DIR.split("/src")[0]
 DATA_DIR = BASE_DIR + "/data"
-NEW_EMBS_FILENAME = "drop_8_data.csv"
+NEW_EMBS_FILENAME = "drop_from_3_data.csv"
 NEW_EMBS_FILE = f"{DATA_DIR}/{NEW_EMBS_FILENAME}"
 
 data = pd.read_csv(NEW_EMBS_FILE)
@@ -26,6 +26,9 @@ data = pd.read_csv(NEW_EMBS_FILE)
 
 def get_segment_vectors(df, f=0, t=50):
     cls_embeddings = df.cls_embs
+    print(cls_embeddings)
+    print(cls_embeddings[1])
+    # list(cls_embeddings.apply(lambda r: list(filter(lambda x: len(x) > 1, r[:-1][1:].split(","))))) 
     cls_values = list(cls_embeddings.apply(lambda r: list(filter(lambda x: len(x) > 1, r[:-1][1:].split(",")))))
     segment_vectors = np.array(list(map(lambda e: np.array(list(map(float, e))), cls_values)))
     return segment_vectors
@@ -84,10 +87,10 @@ reducer.embeddings_ = []
 reducer_embs_list = [list(rel) for rel in list(reducer_embs)]
 
 
-with open(f"{DATA_DIR}/reducer_drop_8.pk", "wb") as file:
+with open(f"{DATA_DIR}/drop_from_3.pk", "wb") as file:
     pickle.dump(reducer, file) # protocol=pickle.HIGHEST_PROTOCOL
 
-with open(f"{DATA_DIR}/reducer_drop_8_embs.pk", "wb") as file:
+with open(f"{DATA_DIR}/drop_from_3_embs.pk", "wb") as file:
     pickle.dump(reducer_embs_list, file)
     
     

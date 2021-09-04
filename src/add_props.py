@@ -5,7 +5,7 @@ import pandas as pd
 from config import MODEL_DIR, DATA_DIR
 from predict import SentimentPredictor
 
-FILENAME = "drop_8_data.csv"
+FILENAME = "drop_from_3_data.csv"
 FILE = f"{DATA_DIR}/{FILENAME}"
 
 sent_pred = SentimentPredictor()

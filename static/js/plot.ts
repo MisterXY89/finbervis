@@ -23,14 +23,6 @@ const visHeight:number = height - margins.top - margins.bottom;
 // console.log(`> Loading file: ${DATA_FILE}`);
 
 
-const x = d3.scaleLinear()
-	.domain([-10, 20])
-	.range([0, width]);
-
-const y = d3.scaleLinear()
-	.domain([-15, 20])
-	.range([height, 0]);
-
 function _create_heatmap_(segment: string, layer: number, head: number) {
 
 	let csv_url = `/get-attention?layer=${layer}&head=${head}&segment=${segment}`;
@@ -211,6 +203,22 @@ function hide_heatmap(hm_id) {
 function create_scatter_plot(data: Iterable<unknown>, div_id) {
 	// d3.select(PLOT_ID).select("svg").remove();
 	// d3.select("svg").remove();
+  
+  let x_vals = data.map(el => el.x);
+  let y_vals = data.map(el => el.y);
+  
+  let min_x = d3.min(x_vals);
+  let max_x = d3.max(x_vals);
+  let min_y = d3.min(y_vals);
+  let max_y = d3.max(y_vals);
+  
+  const x = d3.scaleLinear()
+  	.domain([min_x, max_x])
+  	.range([0, width]);
+
+  const y = d3.scaleLinear()
+  	.domain([min_y, max_y])
+  	.range([height, 0]);
 
 	const container: SVGSelect = d3.select(div_id)
 	  .append("svg")
@@ -246,9 +254,9 @@ function create_scatter_plot(data: Iterable<unknown>, div_id) {
 			.call(brush);
 
 	function restore() {
-		x.domain([-10, 20]);
-		y.domain([-15, 20]);
-		let t = container.transition().duration(700);
+	  x.domain([min_x, max_x]);
+		y.domain([min_y, max_y]);
+		let t = container.transition().duration(600);
 		container.selectAll("circle").transition(t).attr("r", 3);
 		unzoom();
 		// click_point(window.d);

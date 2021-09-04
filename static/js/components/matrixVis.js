@@ -20,7 +20,7 @@ var MatrixVis = /** @class */ (function () {
             top: 80,
             right: 80,
             bottom: 0,
-            left: 100
+            left: 160
         };
         this.width = 600;
         this.height = this.nodes.length * 15;
@@ -128,7 +128,21 @@ var MatrixVis = /** @class */ (function () {
                 _this.one_hot_patterns[str_one_hot_pattern].elements.push(row_i);
             }
         });
+        this.set_one_hot_patterns_max();
         return matrix;
+    };
+    MatrixVis.prototype.set_one_hot_patterns_max = function () {
+        var _this = this;
+        var max_l = -1;
+        console.log(this.one_hot_patterns);
+        console.log(Object.keys(this.one_hot_patterns).filter(function (p) { return p.includes("1"); }).indexOf("0000000000000000"));
+        Object.keys(this.one_hot_patterns).filter(function (p) { return p.includes("1"); }).forEach(function (key) {
+            var p = _this.one_hot_patterns[key];
+            if (p.elements.length > max_l) {
+                max_l = p.elements.length;
+            }
+        });
+        this.one_hot_patterns_max = max_l;
     };
     MatrixVis.prototype.compute_stats_for_pixel_vis = function (data, pattern) {
         var _this = this;
@@ -161,6 +175,12 @@ var MatrixVis = /** @class */ (function () {
         var distribution_plot = new DistributionPlot(props, "#distribution_plot_pixel_vis", "distribution over predicted sentiments propabilities", -1);
         distribution_plot.draw();
     };
+    MatrixVis.prototype.norm_length = function (len) {
+        var scale = d3.scaleLinear()
+            .domain([0, this.one_hot_patterns_max])
+            .range([0, 150]);
+        return scale(len);
+    };
     MatrixVis.prototype.draw = function () {
         var _this = this;
         document.getElementById(this.div_id.slice(1)).innerHTML = "";
@@ -184,9 +204,27 @@ var MatrixVis = /** @class */ (function () {
             .attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")");
         // Build X scales and axis:		
         this.container.append("g")
+            .attr("class", "x-axis-length")
             .call(d3.axisLeft(this.y).tickFormat(function (d) {
             return _this.one_hot_patterns[d].elements.length;
         }));
+        this.container.selectAll(".x-axis-length text")
+            .style("fill", function (d) { return "black"; })
+            .style("font-size", 11.5);
+        this.container.selectAll(".x-axis-length line")
+            .style("stroke-width", "15px")
+            .attr("x2", function (el_pattern, index) {
+            // console.log(d,p)
+            // let el_pattern = this.data[d].one_hot.join("");
+            var len = _this.one_hot_patterns[el_pattern].elements.length;
+            console.log("X2: ", _this.norm_length(len), "len: ", len);
+            return -_this.norm_length(len);
+        })
+            .style("stroke", function (d) { return "gray"; });
+        // {
+        // 	let el = this.data[d];
+        // 	return el.sentiment != el.truth_label ? "red" : "white";
+        // })
         var color_scale = d3.scaleLinear()
             .range(["white", "#353333"])
             .domain([0, 1]);
@@ -197,16 +235,36 @@ var MatrixVis = /** @class */ (function () {
             .attr("cluster", function (d) { return d[0].c; })
             .on("mouseover", function (d, p) {
             var el = document.getElementById("" + _this.div_id.slice(1)).getElementsByClassName("matrix-row")[p];
-            el.style.opacity = "0.4";
+            el.style.filter = "sepia(100)";
+            var pattern = Object.keys(_this.one_hot_patterns)[p];
+            var other_matrix_vis = _this.div_id.includes("1") ? window.matrix_vis_2 : window.matrix_vis_1;
+            var matching_pattern_row = Object.keys(other_matrix_vis.one_hot_patterns).indexOf(pattern);
+            var el2 = document.getElementById("" + other_matrix_vis.div_id.slice(1)).getElementsByClassName("matrix-row");
+            if (el2[matching_pattern_row] != undefined) {
+                el2 = el2[matching_pattern_row];
+                el2.style.filter = "sepia(100)";
+            }
         })
             .on("mouseout", function (d, p) {
             var el = document.getElementById("" + _this.div_id.slice(1)).getElementsByClassName("matrix-row")[p];
-            el.style.opacity = "1";
+            el.style.filter = "none";
+            var pattern = Object.keys(_this.one_hot_patterns)[p];
+            var other_matrix_vis = _this.div_id.includes("1") ? window.matrix_vis_2 : window.matrix_vis_1;
+            var matching_pattern_row = Object.keys(other_matrix_vis.one_hot_patterns).indexOf(pattern);
+            // console.log("OTHER MATRIX_VIS ROW", matching_pattern_row)
+            var el2 = document.getElementById("" + other_matrix_vis.div_id.slice(1)).getElementsByClassName("matrix-row");
+            if (el2[matching_pattern_row] != undefined) {
+                el2 = el2[matching_pattern_row];
+                el2.style.filter = "none";
+            }
         })
             .on('click', function (d, p) {
             var model_num = _this.div_id.slice(-1);
             var pattern = d[0].y;
-            document.getElementById("sentence-select-info-matrix").innerHTML = "Sentences with pattern: <code>" + pattern + "</code> from <code>model " + model_num + "</code>";
+            console.log(pattern, _this.POS_TAGS);
+            var relevant_pos_tags = pattern.split("").map(function (el, i) { return el == 1 ? _this.POS_TAGS[i] : 0; }).filter(function (el) { return el != 0; });
+            console.log("## relevant_pos_tags ##", relevant_pos_tags);
+            document.getElementById("sentence-select-info-matrix").innerHTML = "Sentences with pattern: <code>" + pattern + "</code> from <code>model " + model_num + "</code> <br>POS-Tags: <code>" + relevant_pos_tags.join(",") + "</code>";
             var idx = _this.one_hot_patterns[pattern].elements;
             // console.log("IDX", idx)
             var data1 = window.data1.filter(function (el, i) { return idx.includes(i); });

@@ -1,35 +1,8 @@
 "use strict";
-// see https://observablehq.com/@mbostock/the-impact-of-vaccines
-// async function load_pixel_vis_data(fi1, fi2) {
-// 	const papa_config = {delimiter: ",", header: true};
-// 	let data1 = await fetch(`/data/${fi1}`)
-// 		.then(resp => resp.text())
-// 		.then(t => Papa.parse(t, papa_config))
-// 		.then(data1 => {
-// 			console.log("pre trans ", data1);
-//     	return transform_data(data1.data);
-//   	});
-//   let data2 = await fetch(`/data/${fi2}`)
-//   	.then(resp => resp.text())
-//   	.then(t => Papa.parse(t, papa_config))
-//   	.then(data2 => {
-//     	return transform_data(data2.data);
-//   	});
-//   return { data1, data2 }
-// }
 function create_sentence_view(data, is_one) {
     console.log("create_sentence_view", data);
     var div_id = "#pixel-sentence-view";
     document.getElementById(div_id.slice(1)).innerHTML = "";
-    // if (is_one) {
-    // 	let data1 = data;
-    // 	let data2 = window.pixelVis2.data[data.y];
-    // 	console.log("data2", data2);
-    // } else {
-    // 	let data1 = window.pixelVis1.data[data.y];
-    // 	let data2 = data;
-    // 	console.log("data1", data1);
-    // }
     var data1 = window.pixelVis1.data[data.y];
     var data2 = window.pixelVis2.data[data.y];
     data = [data1, data2];
@@ -153,10 +126,10 @@ var PixelVis = /** @class */ (function () {
         })
             .style("font-size", 11.5)
             .text(function (d) {
-            return _this.data[d].sentiment + ", " + d3.max(_this.data[d].props).toString().slice(0, 4);
+            return _this.data[d].sentiment + ", " + ((d3.max(_this.data[d].props) * 100).toString().slice(0, 4) + "%");
         });
         container.selectAll(".row-stats-pixel-vis line")
-            .style("stroke-width", this.height / this.data.length)
+            .style("stroke-width", this.height / this.data.length - 1)
             .style("stroke", function (d) {
             var el = _this.data[d];
             return el.sentiment != el.truth_label ? "red" : "white";
@@ -177,7 +150,7 @@ var PixelVis = /** @class */ (function () {
         var mousemove = function (d) {
             // console.log(d3.mouse(this))
             tooltip
-                .html("\n\t\t\t\t\t<table>\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Tokens</th>\n\t\t\t\t\t      <td>" + d.token + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Saliency score</th>\n\t\t\t\t\t      <td>" + d.z + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Segment</th>\n\t\t\t\t\t      <td>" + d.segment + "</td>\n\t\t\t\t\t    </tr>\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Truth Label</th>\n\t\t\t\t\t      <td>" + get_sentiment_html(d.sentiment, d.truth_label, true) + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t      <th scope=\"row\">Sentiment</th>\n\t\t\t\t\t      <td>" + get_sentiment_html(d.sentiment) + "</td>\n\t\t\t\t\t    </tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t")
+                .html("\n\t\t\t\t\t<table>\n\t\t\t\t\t\t<thead>\n\t\t\t\t\t\t</thead>\n\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th scope=\"row\">Tokens</th>\n\t\t\t\t\t\t\t\t<td>" + d.token + "</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th scope=\"row\">Saliency score</th>\n\t\t\t\t\t\t\t\t<td>" + d.z + "</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th scope=\"row\">Segment</th>\n\t\t\t\t\t\t\t\t<td>" + d.segment + "</td>\n\t\t\t\t\t\t\t</tr>\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th scope=\"row\">Truth Label</th>\n\t\t\t\t\t\t\t\t<td>" + get_sentiment_html(d.sentiment, d.truth_label, true) + "</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t<th scope=\"row\">Sentiment</th>\n\t\t\t\t\t\t\t\t<td>" + get_sentiment_html(d.sentiment) + "</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</tbody>\n\t\t\t\t\t")
                 .style("left", (d3.mouse(this)[0] + 120) + "px")
                 .style("top", (d3.mouse(this)[1]) + 100 + "px");
         };
@@ -243,10 +216,28 @@ var PixelVis = /** @class */ (function () {
         container.append("text")
             .attr("class", "pixelVisHeader")
             .attr("x", 0)
-            .attr("y", -30)
+            .attr("y", function () {
+            return _this.sentence_view ? -40 : -30;
+        })
             .attr("text-anchor", "left")
             .style("font-size", "22px")
             .text(this.name);
+        if (this.sentence_view) {
+            container.append("text")
+                .attr("class", "pixelVisInfo")
+                .attr("x", 0)
+                .attr("y", -10)
+                .attr("text-anchor", "left")
+                .style("font-size", "15px")
+                .text((d3.max(this.data[0].props) * 100).toString().slice(0, 4) + "%");
+            container.append("text")
+                .attr("class", "pixelVisInfo")
+                .attr("x", this.width / 2)
+                .attr("y", -10)
+                .attr("text-anchor", "left")
+                .style("font-size", "15px")
+                .text((d3.max(this.data[1].props) * 100).toString().slice(0, 4) + "%");
+        }
         // if (this.sentence_view) {
         // container.attr("transform", "rotate(90)");			
         // }

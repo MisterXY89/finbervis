@@ -33,12 +33,12 @@ def index():
 
 @app.route('/data/<path:path>')
 def send_data(path):
-    """
-    enable reading from data folder
-    """
-    response = send_from_directory('data', path)
-    # response.cache_control.max_age = 120
-    return response
+	"""
+	enable reading from data folder
+	"""
+	response = send_from_directory('data', path)
+	# response.cache_control.max_age = 120
+	return response
 
 @app.route("/split_rule")
 def split_rule():
@@ -84,32 +84,33 @@ def test():
 
 @app.route("/test_user_data")
 def test_user_data():
-    req_data = request.args
-    segment = req_data["segment"]
-    props = interface.sent_pred.predict([segment], pretty=False)
-    prediction_label = interface.sent_pred._prettify_probabilities(props, shorten=False)[0]
-    embs_solo = np.array(interface.get_embeddings(segment))
-    embs = np.array([embs_solo, embs_solo, embs_solo, embs_solo])
-    trans_embs = interface.update_UMAP(embs)
-    x = float(trans_embs[0][0])
-    y = float(trans_embs[0][1])
-    new_tokens= interface.get_tokens(segment)
-    embs_solo = list(map(float, list(embs_solo)))
-    props = list(map(float, list(props)))
-    deRoseAttention = list(interface.get_deRose_attention(segment))
-    dict = {
-        "embeddings": embs_solo,
-        "x": x,
-        "y": y,
+	req_data = request.args
+	segment = req_data["segment"]
+	model = int(req_data["model"])
+	props = interface.sent_pred.predict([segment], pretty=False)
+	prediction_label = interface.sent_pred._prettify_probabilities(props, shorten=False)[0]
+	embs_solo = np.array(interface.get_embeddings(segment))
+	embs = np.array([embs_solo, embs_solo, embs_solo, embs_solo])
+	trans_embs = interface.update_UMAP(embs)
+	x = float(trans_embs[0][0])
+	y = float(trans_embs[0][1])
+	new_tokens= interface.get_tokens(segment)
+	embs_solo = list(map(float, list(embs_solo)))
+	props = list(map(float, list(props)))
+	deRoseAttention = list(interface.get_deRose_attention(segment))
+	dict = {
+		"embeddings": embs_solo,
+		"x": x,
+		"y": y,
 		"tokens": new_tokens,
-        "sentiment": prediction_label,
+		"sentiment": prediction_label,
 		"segment": segment,
 		"new": True,
-		"id": len(interface.dist.df),
+		"id": len(interface.get_df_len(model)),
 		"props": props,
 		"deRoseAttention": deRoseAttention,
 	}
-    interface.dist.update_df({
+	interface.dist.update_df({
 		"segment": segment,
 		"sentiment": prediction_label,
 		"embeddings": embs,
@@ -119,9 +120,9 @@ def test_user_data():
 		"props": props,
 		"tokens": new_tokens,
 		"deRoseAttention": deRoseAttention,
-    })
-    # print(dict)
-    return jsonify(dict)
+	})
+	# print(dict)
+	return jsonify(dict)
 
 
 @app.route("/add_labeled_record", methods=["POST"])
@@ -159,11 +160,12 @@ def get_similar_segments():
 		seq_id = req_data["seg_id"]
 		n = int(req_data["n"]) if "n" in req_data else 5
 		return_sents = req_data["return_sents"] if "return_sents" in req_data else False
+		model = int(req_data["model"]) if "model" in req_data else -1
 		if return_sents and return_sents == "True":
 			return_sents = True
 		else:
 			return_sents = False
-		result = interface.get_similar_sents(id=seq_id,n=n,return_sents=return_sents)
+		result = interface.get_similar_sents(model, id=seq_id,n=n,return_sents=return_sents)
 		result = interface.get_entities_for_tokens(result)
 		ent_html = interface.get_ents_vis(result)
 		
@@ -173,7 +175,7 @@ def get_similar_segments():
 		"status": status,
 		"result": result,
 		"ent_html": ent_html,
-		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")], dict=False)
+		"origin_sent_ent_html": interface.get_ents_vis([interface.get_text_by_id(seq_id, model=model).replace("<hr>","")], dict=False)
 	})
 	
 	
@@ -186,8 +188,9 @@ def get_scores():
 		result = "Error: 'seq_id' not in req_data."
 	else:
 		seg_id = req_data["seg_id"]
+		model = int(req_data["model"])
 		
-		segment = list(interface.search(seg_id=seg_id)["segment"])[0]
+		segment = list(interface.search(seg_id=seg_id, model=model)["segment"])[0]
 		print(segment)
 		output = interface.get_gradient_scores([segment])[0]
 		print(output)
@@ -213,7 +216,8 @@ def get_entities():
 		result = f"Error: 'seq_id' not in \n{req_data=}"
 	else:
 		seq_id = req_data["seq_id"]
-		result = interface.get_ents_vis([interface.get_text_by_id(seq_id).replace("<hr>","")], dict=False)
+		model = int(req_data["model"])
+		result = interface.get_ents_vis([interface.get_text_by_id(seq_id, model=model).replace("<hr>","")], dict=False)
 		status = True
  
 	return jsonify({
@@ -230,10 +234,11 @@ def search():
 		result = f"Error: 'not <seg_id> or <q> in req_data'\n{req_data=}"
 	else:		
 		seg_id = int(req_data["seg_id"]) if ("seg_id" in req_data) else None
+		model = int(req_data["model"]) if "model" in req_data else -1
 		q = req_data["q"] if ("q" in req_data) else None
 		# if q == "=all":
 		# 	return render_template("includes/all_search.html")
-		result = interface.search(seg_id=seg_id, q=q)
+		result = interface.search(seg_id=seg_id, q=q, model=model)
 		status = True
 
 	result_l = []
@@ -250,6 +255,9 @@ def search():
 			"saliency_score": row.saliency_score,
 			"mean_attention": row.mean_attention,
 			"deRoseAttention": row.deRoseAttention,
+			"one_hot": row.one_hot,
+			"one_hot_cluster": row.one_hot_cluster,
+			"pos_tags": row.pos_tags,
 			# "embeddings": row.embeddings,,
 		})
 	return jsonify({

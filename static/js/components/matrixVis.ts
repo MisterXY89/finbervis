@@ -25,7 +25,7 @@ class MatrixVis {
 			top: 80,
 			right: 80,
 			bottom: 0,
-			left: 100
+			left: 160
 		};
 		this.width = 600;
     this.height = this.nodes.length * 15;
@@ -139,8 +139,22 @@ class MatrixVis {
 				this.one_hot_patterns[str_one_hot_pattern].elements.push(row_i);			
 			}			
 		});
+		this.set_one_hot_patterns_max()
 		return matrix;		
 	}  
+	
+	set_one_hot_patterns_max() {
+		let max_l = -1;
+		console.log(this.one_hot_patterns)
+		console.log(Object.keys(this.one_hot_patterns).filter(p => p.includes("1")).indexOf("0000000000000000"));
+		Object.keys(this.one_hot_patterns).filter(p => p.includes("1")).forEach(key => {
+			let p = this.one_hot_patterns[key];
+			if (p.elements.length > max_l) {
+				max_l = p.elements.length;
+			}
+		})
+		this.one_hot_patterns_max = max_l;
+	}
 	
 	compute_stats_for_pixel_vis(data, pattern) {
 		// let no_pattern_count = this.one_hot_patterns["00000000000000000"].elements.length;
@@ -176,6 +190,13 @@ class MatrixVis {
 		distribution_plot.draw();
 	}
 	
+	norm_length(len) {
+		let scale = d3.scaleLinear()
+									.domain([0,this.one_hot_patterns_max])
+									.range([0,150])
+		return scale(len);
+	}
+	
 	draw() {
 		document.getElementById(this.div_id.slice(1)).innerHTML = "";
 		
@@ -204,10 +225,30 @@ class MatrixVis {
 			.attr("transform", "rotate(-70) translate(" + (10) + "," + (10) + ")")
 		
 		// Build X scales and axis:		
-		this.container.append("g")			
+		this.container.append("g")
+			.attr("class", "x-axis-length")
 			.call(d3.axisLeft(this.y).tickFormat(d => {
 				return this.one_hot_patterns[d].elements.length;
 			}))
+			
+		this.container.selectAll(".x-axis-length text")
+			.style("fill", d => "black")
+			.style("font-size", 11.5)			
+			
+		this.container.selectAll(".x-axis-length line")
+			.style("stroke-width", "15px")
+			.attr("x2", (el_pattern, index) => {
+				// console.log(d,p)
+				// let el_pattern = this.data[d].one_hot.join("");
+				let len = this.one_hot_patterns[el_pattern].elements.length;
+				console.log("X2: ", this.norm_length(len), "len: ", len);
+				return -this.norm_length(len);
+			})
+			.style("stroke", d => "gray");
+			// {
+			// 	let el = this.data[d];
+			// 	return el.sentiment != el.truth_label ? "red" : "white";
+			// })
 			
 		let color_scale = d3.scaleLinear()
 			.range(["white", "#353333"])
@@ -220,16 +261,41 @@ class MatrixVis {
 				.attr("cluster", d => d[0].c)
 				.on("mouseover", (d, p) => {
 					let el = document.getElementById(`${this.div_id.slice(1)}`).getElementsByClassName("matrix-row")[p];
-					el.style.opacity = "0.4";
+					el.style.filter = "sepia(100)";
+					
+					let pattern = Object.keys(this.one_hot_patterns)[p];
+					let other_matrix_vis = this.div_id.includes("1") ? window.matrix_vis_2 : window.matrix_vis_1;										
+					let matching_pattern_row = Object.keys(other_matrix_vis.one_hot_patterns).indexOf(pattern);
+					
+					let el2 = document.getElementById(`${other_matrix_vis.div_id.slice(1)}`).getElementsByClassName("matrix-row");
+					if (el2[matching_pattern_row] != undefined) {
+						el2 = el2[matching_pattern_row];
+						el2.style.filter = "sepia(100)";
+					}
 				})
 				.on("mouseout", (d, p) => {
 					let el = document.getElementById(`${this.div_id.slice(1)}`).getElementsByClassName("matrix-row")[p];
-					el.style.opacity = "1";
+					el.style.filter = "none";
+					
+					let pattern = Object.keys(this.one_hot_patterns)[p];
+					let other_matrix_vis = this.div_id.includes("1") ? window.matrix_vis_2 : window.matrix_vis_1;										
+					let matching_pattern_row = Object.keys(other_matrix_vis.one_hot_patterns).indexOf(pattern);
+					// console.log("OTHER MATRIX_VIS ROW", matching_pattern_row)
+					
+					let el2 = document.getElementById(`${other_matrix_vis.div_id.slice(1)}`).getElementsByClassName("matrix-row");
+					if (el2[matching_pattern_row] != undefined) {
+						el2 = el2[matching_pattern_row];
+						el2.style.filter = "none";
+					}
 				})
 				.on('click', (d, p) => {
 					let model_num = this.div_id.slice(-1);
 					let pattern = d[0].y;
-					document.getElementById("sentence-select-info-matrix").innerHTML = `Sentences with pattern: <code>${pattern}</code> from <code>model ${model_num}</code>`;
+					console.log(pattern, this.POS_TAGS);
+					let relevant_pos_tags = pattern.split("").map((el,i) => el == 1 ? this.POS_TAGS[i]: 0).filter(el => el != 0);
+					console.log("## relevant_pos_tags ##", relevant_pos_tags);
+					
+					document.getElementById("sentence-select-info-matrix").innerHTML = `Sentences with pattern: <code>${pattern}</code> from <code>model ${model_num}</code> <br>POS-Tags: <code>${relevant_pos_tags.join(",")}</code>`;
 						 
 					let idx = this.one_hot_patterns[pattern].elements;
 					// console.log("IDX", idx)
@@ -310,7 +376,7 @@ class MatrixVis {
 			// })
 		console.log("sorted_rows", sorted_rows);
 		this.matrix = sorted_rows;
-		this.one_hot_patterns = sorted_one_hots;
+		this.one_hot_patterns = sorted_one_hots;		
 		let sorted_vars = Object.keys(this.one_hot_patterns);
 		this.y = d3.scaleBand()
 		  .range([ this.height, 0 ])

@@ -12,12 +12,6 @@ var visWidth = width - margins.left - margins.right;
 var visHeight = height - margins.top - margins.bottom;
 // append the svg object to the body of the page
 // console.log(`> Loading file: ${DATA_FILE}`);
-var x = d3.scaleLinear()
-    .domain([-10, 20])
-    .range([0, width]);
-var y = d3.scaleLinear()
-    .domain([-15, 20])
-    .range([height, 0]);
 function _create_heatmap_(segment, layer, head) {
     var csv_url = "/get-attention?layer=" + layer + "&head=" + head + "&segment=" + segment;
     // set the dimensions and margins of the graph
@@ -174,6 +168,18 @@ function hide_heatmap(hm_id) {
 function create_scatter_plot(data, div_id) {
     // d3.select(PLOT_ID).select("svg").remove();
     // d3.select("svg").remove();
+    var x_vals = data.map(function (el) { return el.x; });
+    var y_vals = data.map(function (el) { return el.y; });
+    var min_x = d3.min(x_vals);
+    var max_x = d3.max(x_vals);
+    var min_y = d3.min(y_vals);
+    var max_y = d3.max(y_vals);
+    var x = d3.scaleLinear()
+        .domain([min_x, max_x])
+        .range([0, width]);
+    var y = d3.scaleLinear()
+        .domain([min_y, max_y])
+        .range([height, 0]);
     var container = d3.select(div_id)
         .append("svg")
         .attr("width", width + margins.left + margins.right)
@@ -202,9 +208,9 @@ function create_scatter_plot(data, div_id) {
         .attr("class", "brush")
         .call(brush);
     function restore() {
-        x.domain([-10, 20]);
-        y.domain([-15, 20]);
-        var t = container.transition().duration(700);
+        x.domain([min_x, max_x]);
+        y.domain([min_y, max_y]);
+        var t = container.transition().duration(600);
         container.selectAll("circle").transition(t).attr("r", 3);
         unzoom();
         // click_point(window.d);

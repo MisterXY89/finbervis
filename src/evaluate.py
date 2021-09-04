@@ -1,25 +1,54 @@
 """
 @author: Tilman Kerl
-@version: 2020.11.25
+@version: 2021.09.04
 ---
-Evaluate the fine-tuned model with new evaluation data
+Evaluate patterns
 """
 
-import torch
+import json
+import numpy as np
 import pandas as pd
 
-from config import EVALUATE_DATASET_FILE
-from predict import SentimentPredictor
-from bert_preprocess import get_tokenizer
+from cluster_one_hot_vectors import cluster_one_hot
+from create_one_hot_vector import make_one_hot
 
-# test_segments = pd.read_csv(EVALUATE_DATASET_FILE)
 
-sent_pred = SentimentPredictor()
-sent_pred.load_model()
+files = ["../data/drop_from_3_data.csv", 
+		"../data/drop_8_data.csv", 
+		"../data/data_copy.csv"
+  ]
 
-tokenizer = get_tokenizer()
-input_ids = torch.tensor(tokenizer.encode("Hello, your dog is cute")).unsqueeze(0)  # Batch size 1
-outputs = sent_pred.model(input_ids)
-print(outputs)
-hs = outputs[0]  #
-print(hs)
+dfs = [pd.read_csv(file) for file in files]
+
+def eval():
+	all_results = []
+	for df in dfs:        
+		results = {
+			"accuracy": len(df.query("sentiment == truth_label"))/len(df)
+		}
+		for t in np.arange(0.3, 1, 0.05):
+			vecs, oh_df = make_one_hot(df, is_df = True, threshold=t)
+			num_with_one = len([v for v in vecs if v.count("1") == 1])			
+			# for sample_size in range(10, 200, 10):
+			cluster_dict = {}
+			for epsilon in np.arange(0.05, 2.5, 0.05):				
+				cluster_list, df, no_clusters, no_noise, clusters = cluster_one_hot(df, epsilon = epsilon, min_samples = 3, is_df = True)
+				cluster_dict[str(epsilon)] = {
+					"no_clusters": float(no_clusters),
+					"no_noise": float(no_noise)
+				}
+				
+			results[str(t)] = {
+				"vecs": vecs,
+				"with_one": num_with_one,
+				"cluster": cluster_dict
+			}
+			
+		all_results.append(results)
+	
+	return all_results
+			
+			
+res = eval()
+with open("evaluate_result.json", "w") as file:
+	json.dump(res, file)

@@ -86,6 +86,8 @@ function click_point(d: any, clicked_index:any) {
 				.style("fill", window.last_color);
 	}
 	window.last_target = current_target
+	window.selected_model = window.last_target.parentElement.parentElement.parentElement.parentElement.id;	
+	window.model_num = window.selected_model.includes("1") ? 0 : 1;
 	window.last_color = get_color(d.sentiment)
 	d3.select(current_target)
 		.attr("r", select_rad)

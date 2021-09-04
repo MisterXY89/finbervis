@@ -94,7 +94,7 @@ function toggle_ents() {
     }
     else {
         var seq_id = d3.select("#point_id").text();
-        var url = "/get_entities?seq_id=" + seq_id;
+        var url = "/get_entities?seq_id=" + seq_id + "&model=" + window.model_num;
         fetch(url)
             .then(function (resp) { return resp.json(); })
             .then(function (json) {
@@ -114,7 +114,7 @@ function toggle_ents() {
 }
 function get_segment_html(seg) {
     // type="button" class="btn btn-secondary"
-    return "<div class=\"search-seg\" title=\"" + seg + "\">\n  \t" + seg.slice(0, 120) + "...\n\t</div>";
+    return "<div class=\"search-seg\" title=\"" + seg + "\">\n\t\t" + seg.slice(0, 120) + "...\n\t</div>";
 }
 function prep_search_vis(res) {
     var html = "";
@@ -232,36 +232,51 @@ function get_mean_attention_html(tokens, attention, sent) {
 function search_data(search_q) {
     var params = "";
     if (search_q[0] == "#") {
-        params = "?seg_id=" + search_q.slice(1);
+        var sq = search_q.slice(1);
+        if (sq.includes("#")) {
+            var model_num = sq.split("#")[1];
+        }
+        sq = sq[0];
+        params = "?seg_id=" + sq + "&model=" + model_num;
         "";
     }
     else {
         params = "?q=" + search_q;
     }
     var url = "/search" + params;
-    fetch(url)
-        .then(function (resp) {
-        if (search_q == ")()UJIH=all") {
-            return resp.text();
+    if (search_q == "=all") {
+        alert("Please specify the model like this: =all#1, =all#2");
+    }
+    else {
+        if (search_q.includes("=all")) {
+            var model_num = window.selected_models_nums[Number(search_q.split("#")[1]) - 1];
+            url += "&model=" + model_num;
         }
-        return resp.json();
-    })
-        .then(function (json) {
-        console.log(json);
-        $("#search_results-wrapper").show();
-        if (search_q == "OJOJOJOO =all") {
-            alert("=all");
-            $("#search-header").html("All Segments");
-            $("#search-results").html(json);
-            $("#search-results").show();
-        }
-        else {
-            var res = json.result;
-            // console.log(res);
-            d3.select("#search-results").html(prep_search_vis(res));
-            d3.select("#total-results").text(res.length);
-        }
-    });
+        fetch(url)
+            .then(function (resp) {
+            // if (search_q == ")()UJIH=all") {
+            if (search_q == "=all") {
+                return resp.text();
+            }
+            return resp.json();
+        })
+            .then(function (json) {
+            console.log(json);
+            $("#search_results-wrapper").show();
+            if (search_q == "all") {
+                alert("=all");
+                $("#search-header").html("All Segments");
+                $("#search-results").html(json);
+                $("#search-results").show();
+            }
+            else {
+                var res = json.result;
+                // console.log(res);
+                d3.select("#search-results").html(prep_search_vis(res));
+                d3.select("#total-results").text(res.length);
+            }
+        });
+    }
 }
 function toggle_grads() {
     $("#selected-segment").hide();
@@ -275,7 +290,9 @@ function toggle_grads() {
         if (sal_scores[span_i] > 0) {
             token_grad_color = "221,89,100";
         }
-        var color = "rgba(" + token_grad_color + ", " + opacity + ")";
+        var sc = d3.scaleLinear().domain([-1, 1]).range([0, 1]);
+        var color = d3.interpolateBrBG(sc(sal_scores[span_i]));
+        // let color = `rgba(${token_grad_color}, ${opacity})`;
         // if (span.classList.contains("identical-token")) {
         // 	span.classList.remove("identical-token");
         // }
@@ -310,13 +327,18 @@ function toggle_plain_sent() {
     }
 }
 document.addEventListener("DOMContentLoaded", function () {
-    load_data("data_copy.csv", "drop_8_data.csv").then(function (data) {
+    var choosen_models = [0, 1];
+    var selected_models = choosen_models.map(function (i) { return MODEL_NAMES[i]; });
+    console.log(selected_models);
+    window.selected_models = selected_models;
+    window.selected_models_nums = choosen_models;
+    load_data(selected_models).then(function (data) {
         window.data1 = data.data1;
         window.data2 = data.data2;
         // load_data("data_copy.csv", false).then(data => {		
-        // -------------------------------
-        scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");
-        scatter_plot(data.data2, false, DATA_FILE_TWO, "#projection_model_2");
+        // -------------------------------				
+        scatter_plot(data.data1, false, DATA_FILES[choosen_models[0]], "#projection_model_1");
+        scatter_plot(data.data2, false, DATA_FILES[choosen_models[1]], "#projection_model_2");
         var matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
         window.matrix_vis_1 = matrix_vis_1;
         matrix_vis_1.draw();
@@ -426,6 +448,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(json);
             // add_datapoint(json);
             spinner.style("display", "none");
+            // scatter_plot(data.data1, false, DATA_FILE_ONE, "#projection_model_1");			
             scatter_plot(json, true);
             // click_point(json);
             // user_classification_select.style("display", "block");
@@ -468,6 +491,9 @@ document.addEventListener("DOMContentLoaded", function () {
         $("#show-simmilar").show();
         var id = d3.select("#point_id").text();
         var url = "/get_similar_segments?seg_id=" + id + "&return_sents=True";
+        var model_num = window.selected_models_nums[window.model_num];
+        // let model_num = window.selected_models_nums[Number(search_q.split("#")[1]) -1]
+        url += "&model=" + model_num;
         console.log(url);
         // TODO: disable button & add loading cirlcle next to it
         $("#sim-sent-spinner").toggle();

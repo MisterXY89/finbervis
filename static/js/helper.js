@@ -60,12 +60,13 @@ function to_array(string) {
     }
     return arr.map(Number);
 }
-function load_data(fi1, fi2) {
+function load_data(files) {
     return __awaiter(this, void 0, void 0, function () {
-        var papa_config, data1, data2;
+        var fi1, papa_config, data1, fi2, data2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    fi1 = files[0];
                     papa_config = { delimiter: ",", header: true };
                     return [4 /*yield*/, fetch("/data/" + fi1)
                             .then(function (resp) { return resp.text(); })
@@ -76,7 +77,8 @@ function load_data(fi1, fi2) {
                         })];
                 case 1:
                     data1 = _a.sent();
-                    if (!fi2) {
+                    fi2 = files[1];
+                    if (!fi2 || fi2 == undefined) {
                         return [2 /*return*/, { data1: data1 }];
                     }
                     return [4 /*yield*/, fetch("/data/" + fi2)

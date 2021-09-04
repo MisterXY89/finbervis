@@ -2,11 +2,15 @@
 var DATA_DIR = "./data";
 var data_filename_1 = "data_copy.csv";
 var data_filename_2 = "drop_8_data.csv";
+var data_filename_3 = "drop_from_3_data.csv";
 var DATA_FILE_ONE = DATA_DIR + "/" + data_filename_1;
 var DATA_FILE_TWO = DATA_DIR + "/" + data_filename_2;
+var DATA_FILE_THREE = DATA_DIR + "/" + data_filename_3;
 // const COLORS = ["#440154", "#3CBB75", "#DCE319"];
 var COLORS = ['#abe564', '#64abe5', '#9e64e5'];
 var SENTIMENT_CLASSES = ["positive", "neutral", "negative"];
+var MODEL_NAMES = [data_filename_1, data_filename_2, data_filename_3];
+var DATA_FILES = [DATA_FILE_ONE, DATA_FILE_TWO, DATA_FILE_THREE];
 var RADIUS = 2;
 var ZOOM_RADIUS = 5;
 var PLOT_ID = "#projection_model_1";
