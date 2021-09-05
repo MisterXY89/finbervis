@@ -29,13 +29,14 @@ POS_TAGS = pos_classes["open"] + pos_classes["closed"] + pos_classes["other"]
 
 dfs = [pd.read_csv(file) for file in files]
 
-def eval():
+def evaluate():
 	all_results = []
 	for df in dfs:
 		# exclude with more than one 1
 		# count num of function words + content words
 		results = {
-			"accuracy": len(df.query("sentiment == truth_label"))/len(df)
+			"accuracy": len(df.query("sentiment == truth_label"))/len(df),
+			"results": []
 		}
 		for t in np.arange(0.2, 1, 0.05):
 			open_class = 0
@@ -87,8 +88,9 @@ def eval():
 			# 		"no_clusters": float(no_clusters),
 			# 		"no_noise": float(no_noise)
 			# 	}
-			results[str(t)] = {
+			results["results"].append({
 				# "vecs": vecs,
+				"threshold": round(t, 2),
 				"with_one": num_with_one,
 				"anti_num": anti_num, 
 				"closed_class": closed_class,
@@ -97,13 +99,21 @@ def eval():
 				"accuracy": accuracy,				
 				# "cluster": cluster_dict,
 				"relevant_pos_tags": Counter(relevant_pos_tags)
-			}
+			})
 			
 		all_results.append(results)
 	
 	return all_results
 			
 			
-res = eval()
-with open("evaluate_2_result.json", "w") as file:
+res = evaluate()
+with open("evaluate_3_result.json", "w") as file:
 	json.dump(res, file)
+	
+res = evaluate()
+with open("evaluate_3_result.json", "r") as file:
+	res = json.load(file)
+	
+print(res[0])
+
+# for res 
