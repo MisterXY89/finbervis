@@ -106,14 +106,24 @@ def evaluate():
 	return all_results
 			
 			
-res = evaluate()
-with open("evaluate_3_result.json", "w") as file:
-	json.dump(res, file)
+# res = evaluate()
+# with open("evaluate_3_result.json", "w") as file:
+# 	json.dump(res, file)
 	
-res = evaluate()
 with open("evaluate_3_result.json", "r") as file:
 	res = json.load(file)
 	
-print(res[0])
+# print(res[0])
 
-# for res 
+latex_rows = ""
+for row, i in enumerate(res[0]["results"]):
+	latex_rows += f"{row['threshold']} & " 
+	latex_rows += f"{row['with_one']} & {row['closed_class']} & {row['open_class']} & {row['ratio']} & {row['accuracy'].split('%')[0]}\%" 
+	latex_rows += f"{res[1]['results']['with_one']} & {res[1]['results']['closed_class']} & {res[1]['results']['open_class']} & {res[1]['results']['ratio']} & {res[1]['results']['accuracy'].split('%')[0]}\%" 
+	latex_rows += f"{res[2]['results']['with_one']} & {res[2]['results']['closed_class']} & {res[2]['results']['open_class']} & {res[2]['results']['ratio']} & {res[2]['results']['accuracy'].split('%')[0]}\%" 
+	latex_rows += "\\\\ \n"
+	
+with open("latex_rows.tex", "w") as file:
+	file.write(latex_rows)
+	
+	
