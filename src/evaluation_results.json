@@ -1,0 +1,993 @@
+[
+  {
+    "accuracy": 0.6005839864761027,
+    "results": [
+      {
+        "threshold": 0.2,
+        "with_one": 2316,
+        "anti_num": 4191,
+        "closed_class": 187,
+        "open_class": 2073,
+        "ratio": 0.0902,
+        "accuracy": "58.59%",
+        "relevant_pos_tags": {
+          "NUM": 155,
+          "NOUN": 1570,
+          "PROPN": 227,
+          "VERB": 67,
+          "ADJ": 190,
+          "PUNCT": 52,
+          "AUX": 2,
+          "ADV": 17,
+          "X": 2,
+          "SYM": 2,
+          "PRON": 7,
+          "ADP": 11,
+          "SCONJ": 6,
+          "DET": 6,
+          "INTJ": 2
+        }
+      },
+      {
+        "threshold": 0.25,
+        "with_one": 2358,
+        "anti_num": 4149,
+        "closed_class": 263,
+        "open_class": 2034,
+        "ratio": 0.1293,
+        "accuracy": "54.54%",
+        "relevant_pos_tags": {
+          "NUM": 235,
+          "ADJ": 155,
+          "NOUN": 1555,
+          "PROPN": 257,
+          "VERB": 59,
+          "PUNCT": 61,
+          "ADP": 14,
+          "ADV": 8,
+          "PRON": 8,
+          "DET": 4,
+          "SCONJ": 1,
+          "CONJ": 1
+        }
+      },
+      {
+        "threshold": 0.3,
+        "with_one": 2307,
+        "anti_num": 4200,
+        "closed_class": 295,
+        "open_class": 1958,
+        "ratio": 0.1507,
+        "accuracy": "53.14%",
+        "relevant_pos_tags": {
+          "NOUN": 1470,
+          "VERB": 71,
+          "PROPN": 258,
+          "ADJ": 151,
+          "NUM": 270,
+          "ADV": 8,
+          "PUNCT": 53,
+          "ADP": 12,
+          "SYM": 1,
+          "DET": 5,
+          "PRON": 6,
+          "CONJ": 2
+        }
+      },
+      {
+        "threshold": 0.35,
+        "with_one": 2035,
+        "anti_num": 4472,
+        "closed_class": 320,
+        "open_class": 1676,
+        "ratio": 0.1909,
+        "accuracy": "53.22%",
+        "relevant_pos_tags": {
+          "NOUN": 1301,
+          "VERB": 65,
+          "PROPN": 193,
+          "ADJ": 109,
+          "NUM": 297,
+          "ADP": 11,
+          "PUNCT": 39,
+          "SCONJ": 1,
+          "ADV": 8,
+          "DET": 7,
+          "PRON": 4
+        }
+      },
+      {
+        "threshold": 0.4,
+        "with_one": 1655,
+        "anti_num": 4852,
+        "closed_class": 350,
+        "open_class": 1279,
+        "ratio": 0.2737,
+        "accuracy": "53.72%",
+        "relevant_pos_tags": {
+          "NOUN": 1002,
+          "VERB": 51,
+          "ADJ": 77,
+          "PROPN": 148,
+          "NUM": 327,
+          "ADP": 9,
+          "SCONJ": 3,
+          "PUNCT": 26,
+          "ADV": 1,
+          "DET": 7,
+          "CONJ": 1,
+          "PRON": 3
+        }
+      },
+      {
+        "threshold": 0.45,
+        "with_one": 1294,
+        "anti_num": 5213,
+        "closed_class": 358,
+        "open_class": 915,
+        "ratio": 0.3913,
+        "accuracy": "56.88%",
+        "relevant_pos_tags": {
+          "NOUN": 720,
+          "VERB": 39,
+          "NUM": 339,
+          "PROPN": 105,
+          "ADJ": 50,
+          "PUNCT": 21,
+          "SCONJ": 3,
+          "ADP": 6,
+          "ADV": 1,
+          "DET": 7,
+          "PRON": 3
+        }
+      },
+      {
+        "threshold": 0.5,
+        "with_one": 1007,
+        "anti_num": 5500,
+        "closed_class": 330,
+        "open_class": 663,
+        "ratio": 0.4977,
+        "accuracy": "59.19%",
+        "relevant_pos_tags": {
+          "NOUN": 533,
+          "VERB": 24,
+          "NUM": 316,
+          "ADJ": 27,
+          "PROPN": 78,
+          "SCONJ": 3,
+          "ADV": 1,
+          "DET": 5,
+          "PUNCT": 14,
+          "PRON": 3,
+          "ADP": 3
+        }
+      },
+      {
+        "threshold": 0.55,
+        "with_one": 770,
+        "anti_num": 5737,
+        "closed_class": 281,
+        "open_class": 479,
+        "ratio": 0.5866,
+        "accuracy": "60.78%",
+        "relevant_pos_tags": {
+          "NOUN": 389,
+          "NUM": 271,
+          "VERB": 15,
+          "SCONJ": 3,
+          "ADV": 1,
+          "PROPN": 58,
+          "ADJ": 16,
+          "PUNCT": 10,
+          "DET": 4,
+          "ADP": 2,
+          "PRON": 1
+        }
+      },
+      {
+        "threshold": 0.6,
+        "with_one": 540,
+        "anti_num": 5967,
+        "closed_class": 222,
+        "open_class": 311,
+        "ratio": 0.7138,
+        "accuracy": "62.22%",
+        "relevant_pos_tags": {
+          "NOUN": 269,
+          "NUM": 214,
+          "SCONJ": 3,
+          "PROPN": 36,
+          "ADJ": 5,
+          "PUNCT": 7,
+          "DET": 4,
+          "VERB": 1,
+          "PRON": 1
+        }
+      },
+      {
+        "threshold": 0.65,
+        "with_one": 401,
+        "anti_num": 6106,
+        "closed_class": 177,
+        "open_class": 221,
+        "ratio": 0.8009,
+        "accuracy": "63.84%",
+        "relevant_pos_tags": {
+          "NOUN": 195,
+          "NUM": 173,
+          "SCONJ": 3,
+          "PROPN": 22,
+          "ADJ": 3,
+          "VERB": 1,
+          "PUNCT": 3,
+          "PRON": 1
+        }
+      },
+      {
+        "threshold": 0.7,
+        "with_one": 296,
+        "anti_num": 6211,
+        "closed_class": 143,
+        "open_class": 151,
+        "ratio": 0.947,
+        "accuracy": "64.53%",
+        "relevant_pos_tags": {
+          "NOUN": 136,
+          "NUM": 141,
+          "SCONJ": 1,
+          "PROPN": 12,
+          "ADJ": 3,
+          "PUNCT": 2,
+          "PRON": 1
+        }
+      },
+      {
+        "threshold": 0.75,
+        "with_one": 227,
+        "anti_num": 6280,
+        "closed_class": 132,
+        "open_class": 93,
+        "ratio": 1.4194,
+        "accuracy": "68.72%",
+        "relevant_pos_tags": {
+          "NOUN": 84,
+          "NUM": 132,
+          "ADJ": 2,
+          "PROPN": 7,
+          "PUNCT": 2
+        }
+      },
+      {
+        "threshold": 0.8,
+        "with_one": 91,
+        "anti_num": 6416,
+        "closed_class": 47,
+        "open_class": 42,
+        "ratio": 1.119,
+        "accuracy": "63.74%",
+        "relevant_pos_tags": {
+          "NOUN": 34,
+          "NUM": 47,
+          "ADJ": 1,
+          "PROPN": 7,
+          "PUNCT": 2
+        }
+      },
+      {
+        "threshold": 0.85,
+        "with_one": 45,
+        "anti_num": 6462,
+        "closed_class": 34,
+        "open_class": 11,
+        "ratio": 3.0909,
+        "accuracy": "66.67%",
+        "relevant_pos_tags": {
+          "NOUN": 11,
+          "NUM": 34
+        }
+      },
+      {
+        "threshold": 0.9,
+        "with_one": 3,
+        "anti_num": 6504,
+        "closed_class": 3,
+        "open_class": 0,
+        "ratio": 3,
+        "accuracy": "66.67%",
+        "relevant_pos_tags": {
+          "NUM": 3
+        }
+      },
+      {
+        "threshold": 0.95,
+        "with_one": 0,
+        "anti_num": 6507,
+        "closed_class": 0,
+        "open_class": 0,
+        "ratio": -1,
+        "accuracy": -1,
+        "relevant_pos_tags": {}
+      }
+    ]
+  },
+  {
+    "accuracy": 0.7300150829562594,
+    "results": [
+      {
+        "threshold": 0.2,
+        "with_one": 2159,
+        "anti_num": 4471,
+        "closed_class": 102,
+        "open_class": 1986,
+        "ratio": 0.0514,
+        "accuracy": "72.16%",
+        "relevant_pos_tags": {
+          "NOUN": 1331,
+          "AUX": 26,
+          "PROPN": 217,
+          "VERB": 204,
+          "ADV": 48,
+          "PUNCT": 70,
+          "ADJ": 186,
+          "DET": 21,
+          "NUM": 41,
+          "ADP": 6,
+          "SCONJ": 5,
+          "PRON": 3,
+          "X": 1
+        }
+      },
+      {
+        "threshold": 0.25,
+        "with_one": 2147,
+        "anti_num": 4483,
+        "closed_class": 111,
+        "open_class": 1963,
+        "ratio": 0.0565,
+        "accuracy": "68.65%",
+        "relevant_pos_tags": {
+          "NOUN": 1259,
+          "AUX": 36,
+          "PROPN": 242,
+          "VERB": 232,
+          "ADJ": 184,
+          "ADV": 46,
+          "PUNCT": 73,
+          "DET": 23,
+          "NUM": 36,
+          "SCONJ": 4,
+          "ADP": 5,
+          "PRON": 3,
+          "CONJ": 2,
+          "PART": 2
+        }
+      },
+      {
+        "threshold": 0.3,
+        "with_one": 2018,
+        "anti_num": 4612,
+        "closed_class": 95,
+        "open_class": 1860,
+        "ratio": 0.0511,
+        "accuracy": "66.9%",
+        "relevant_pos_tags": {
+          "PROPN": 222,
+          "NOUN": 1163,
+          "VERB": 245,
+          "NUM": 30,
+          "ADJ": 174,
+          "ADV": 56,
+          "PUNCT": 63,
+          "AUX": 30,
+          "DET": 19,
+          "PRON": 6,
+          "SCONJ": 4,
+          "ADP": 2,
+          "CONJ": 2,
+          "PART": 2
+        }
+      },
+      {
+        "threshold": 0.35,
+        "with_one": 1874,
+        "anti_num": 4756,
+        "closed_class": 100,
+        "open_class": 1716,
+        "ratio": 0.0583,
+        "accuracy": "66.54%",
+        "relevant_pos_tags": {
+          "NOUN": 1080,
+          "ADJ": 156,
+          "PUNCT": 58,
+          "VERB": 243,
+          "NUM": 24,
+          "ADV": 49,
+          "PROPN": 188,
+          "ADP": 6,
+          "DET": 18,
+          "PRON": 10,
+          "AUX": 34,
+          "CONJ": 3,
+          "PART": 2,
+          "SCONJ": 3
+        }
+      },
+      {
+        "threshold": 0.4,
+        "with_one": 1612,
+        "anti_num": 5018,
+        "closed_class": 77,
+        "open_class": 1479,
+        "ratio": 0.0521,
+        "accuracy": "67.74%",
+        "relevant_pos_tags": {
+          "ADJ": 134,
+          "PUNCT": 56,
+          "VERB": 209,
+          "NUM": 25,
+          "NOUN": 925,
+          "ADV": 41,
+          "PROPN": 170,
+          "ADP": 3,
+          "DET": 13,
+          "PRON": 6,
+          "AUX": 24,
+          "CONJ": 3,
+          "PART": 1,
+          "SCONJ": 2
+        }
+      },
+      {
+        "threshold": 0.45,
+        "with_one": 1330,
+        "anti_num": 5300,
+        "closed_class": 54,
+        "open_class": 1227,
+        "ratio": 0.044,
+        "accuracy": "66.09%",
+        "relevant_pos_tags": {
+          "ADJ": 102,
+          "PUNCT": 49,
+          "NUM": 18,
+          "NOUN": 772,
+          "VERB": 181,
+          "ADV": 33,
+          "PROPN": 139,
+          "DET": 8,
+          "PRON": 4,
+          "AUX": 16,
+          "ADP": 2,
+          "CONJ": 4,
+          "PART": 1,
+          "SCONJ": 1
+        }
+      },
+      {
+        "threshold": 0.5,
+        "with_one": 1069,
+        "anti_num": 5561,
+        "closed_class": 39,
+        "open_class": 987,
+        "ratio": 0.0395,
+        "accuracy": "67.63%",
+        "relevant_pos_tags": {
+          "PUNCT": 43,
+          "NOUN": 596,
+          "VERB": 155,
+          "ADJ": 91,
+          "PROPN": 117,
+          "DET": 6,
+          "ADV": 28,
+          "PRON": 3,
+          "ADP": 4,
+          "AUX": 12,
+          "NUM": 12,
+          "CONJ": 2
+        }
+      },
+      {
+        "threshold": 0.55,
+        "with_one": 807,
+        "anti_num": 5823,
+        "closed_class": 29,
+        "open_class": 744,
+        "ratio": 0.039,
+        "accuracy": "68.9%",
+        "relevant_pos_tags": {
+          "PUNCT": 34,
+          "NOUN": 470,
+          "ADJ": 57,
+          "VERB": 118,
+          "PROPN": 83,
+          "ADV": 16,
+          "AUX": 11,
+          "NUM": 8,
+          "CONJ": 1,
+          "ADP": 2,
+          "PRON": 2,
+          "DET": 5
+        }
+      },
+      {
+        "threshold": 0.6,
+        "with_one": 593,
+        "anti_num": 6037,
+        "closed_class": 16,
+        "open_class": 552,
+        "ratio": 0.029,
+        "accuracy": "67.96%",
+        "relevant_pos_tags": {
+          "NOUN": 352,
+          "ADJ": 40,
+          "VERB": 98,
+          "PROPN": 50,
+          "PUNCT": 25,
+          "NUM": 3,
+          "ADV": 12,
+          "CONJ": 1,
+          "AUX": 7,
+          "DET": 5
+        }
+      },
+      {
+        "threshold": 0.65,
+        "with_one": 442,
+        "anti_num": 6188,
+        "closed_class": 12,
+        "open_class": 410,
+        "ratio": 0.0293,
+        "accuracy": "70.14%",
+        "relevant_pos_tags": {
+          "VERB": 83,
+          "NOUN": 264,
+          "ADJ": 27,
+          "PUNCT": 20,
+          "PROPN": 30,
+          "NUM": 5,
+          "ADV": 6,
+          "AUX": 3,
+          "DET": 4
+        }
+      },
+      {
+        "threshold": 0.7,
+        "with_one": 317,
+        "anti_num": 6313,
+        "closed_class": 6,
+        "open_class": 295,
+        "ratio": 0.0203,
+        "accuracy": "71.92%",
+        "relevant_pos_tags": {
+          "VERB": 56,
+          "NOUN": 196,
+          "PUNCT": 16,
+          "ADJ": 19,
+          "PROPN": 21,
+          "NUM": 3,
+          "DET": 3,
+          "ADV": 3
+        }
+      },
+      {
+        "threshold": 0.75,
+        "with_one": 228,
+        "anti_num": 6402,
+        "closed_class": 3,
+        "open_class": 212,
+        "ratio": 0.0142,
+        "accuracy": "75.0%",
+        "relevant_pos_tags": {
+          "VERB": 35,
+          "NOUN": 147,
+          "PUNCT": 13,
+          "PROPN": 17,
+          "ADJ": 12,
+          "DET": 2,
+          "NUM": 1,
+          "ADV": 1
+        }
+      },
+      {
+        "threshold": 0.8,
+        "with_one": 134,
+        "anti_num": 6496,
+        "closed_class": 0,
+        "open_class": 124,
+        "ratio": 0,
+        "accuracy": "73.13%",
+        "relevant_pos_tags": {
+          "NOUN": 93,
+          "PUNCT": 10,
+          "VERB": 18,
+          "PROPN": 9,
+          "ADJ": 4
+        }
+      },
+      {
+        "threshold": 0.85,
+        "with_one": 46,
+        "anti_num": 6584,
+        "closed_class": 0,
+        "open_class": 39,
+        "ratio": 0,
+        "accuracy": "60.87%",
+        "relevant_pos_tags": {
+          "PUNCT": 7,
+          "NOUN": 25,
+          "VERB": 10,
+          "PROPN": 3,
+          "ADJ": 1
+        }
+      },
+      {
+        "threshold": 0.9,
+        "with_one": 10,
+        "anti_num": 6620,
+        "closed_class": 0,
+        "open_class": 8,
+        "ratio": 0,
+        "accuracy": "50.0%",
+        "relevant_pos_tags": {
+          "NOUN": 5,
+          "PUNCT": 2,
+          "PROPN": 1,
+          "VERB": 2
+        }
+      },
+      {
+        "threshold": 0.95,
+        "with_one": 1,
+        "anti_num": 6629,
+        "closed_class": 0,
+        "open_class": 1,
+        "ratio": 0,
+        "accuracy": "100.0%",
+        "relevant_pos_tags": {
+          "NOUN": 1
+        }
+      }
+    ]
+  },
+  {
+    "accuracy": 0.7363896848137536,
+    "results": [
+      {
+        "threshold": 0.2,
+        "with_one": 1965,
+        "anti_num": 4666,
+        "closed_class": 624,
+        "open_class": 1236,
+        "ratio": 0.5049,
+        "accuracy": "72.26%",
+        "relevant_pos_tags": {
+          "AUX": 310,
+          "VERB": 404,
+          "DET": 200,
+          "NOUN": 542,
+          "PUNCT": 105,
+          "SCONJ": 14,
+          "ADJ": 97,
+          "ADP": 67,
+          "PART": 2,
+          "PROPN": 96,
+          "ADV": 97,
+          "NUM": 20,
+          "CONJ": 4,
+          "PRON": 7
+        }
+      },
+      {
+        "threshold": 0.25,
+        "with_one": 1772,
+        "anti_num": 4859,
+        "closed_class": 490,
+        "open_class": 1211,
+        "ratio": 0.4046,
+        "accuracy": "69.02%",
+        "relevant_pos_tags": {
+          "AUX": 226,
+          "VERB": 374,
+          "NOUN": 558,
+          "DET": 163,
+          "SCONJ": 18,
+          "PUNCT": 71,
+          "ADJ": 99,
+          "ADP": 59,
+          "ADV": 84,
+          "PROPN": 96,
+          "NUM": 17,
+          "CONJ": 3,
+          "PRON": 3,
+          "PART": 1
+        }
+      },
+      {
+        "threshold": 0.3,
+        "with_one": 1502,
+        "anti_num": 5129,
+        "closed_class": 358,
+        "open_class": 1083,
+        "ratio": 0.3306,
+        "accuracy": "65.91%",
+        "relevant_pos_tags": {
+          "ADP": 42,
+          "NOUN": 526,
+          "AUX": 176,
+          "DET": 107,
+          "PROPN": 85,
+          "ADJ": 85,
+          "VERB": 307,
+          "ADV": 80,
+          "CONJ": 3,
+          "PUNCT": 61,
+          "NUM": 16,
+          "SCONJ": 12,
+          "PRON": 2
+        }
+      },
+      {
+        "threshold": 0.35,
+        "with_one": 1216,
+        "anti_num": 5415,
+        "closed_class": 261,
+        "open_class": 915,
+        "ratio": 0.2852,
+        "accuracy": "65.79%",
+        "relevant_pos_tags": {
+          "ADP": 30,
+          "AUX": 135,
+          "PROPN": 76,
+          "ADJ": 62,
+          "VERB": 258,
+          "NOUN": 441,
+          "ADV": 78,
+          "DET": 74,
+          "PUNCT": 40,
+          "PART": 2,
+          "NUM": 8,
+          "SCONJ": 9,
+          "CONJ": 1,
+          "PRON": 2
+        }
+      },
+      {
+        "threshold": 0.4,
+        "with_one": 968,
+        "anti_num": 5663,
+        "closed_class": 181,
+        "open_class": 756,
+        "ratio": 0.2394,
+        "accuracy": "65.91%",
+        "relevant_pos_tags": {
+          "ADP": 19,
+          "AUX": 91,
+          "PROPN": 67,
+          "VERB": 228,
+          "ADJ": 52,
+          "NOUN": 353,
+          "ADV": 56,
+          "DET": 53,
+          "PUNCT": 31,
+          "PART": 2,
+          "NUM": 8,
+          "SCONJ": 6,
+          "PRON": 2
+        }
+      },
+      {
+        "threshold": 0.45,
+        "with_one": 741,
+        "anti_num": 5890,
+        "closed_class": 107,
+        "open_class": 608,
+        "ratio": 0.176,
+        "accuracy": "65.45%",
+        "relevant_pos_tags": {
+          "AUX": 51,
+          "PROPN": 55,
+          "VERB": 194,
+          "ADJ": 38,
+          "ADP": 12,
+          "NOUN": 276,
+          "ADV": 45,
+          "DET": 31,
+          "PUNCT": 26,
+          "NUM": 6,
+          "SCONJ": 6,
+          "PRON": 1
+        }
+      },
+      {
+        "threshold": 0.5,
+        "with_one": 560,
+        "anti_num": 6071,
+        "closed_class": 62,
+        "open_class": 475,
+        "ratio": 0.1305,
+        "accuracy": "67.14%",
+        "relevant_pos_tags": {
+          "PROPN": 38,
+          "VERB": 155,
+          "ADP": 6,
+          "NOUN": 220,
+          "ADJ": 29,
+          "ADV": 33,
+          "AUX": 31,
+          "PUNCT": 23,
+          "DET": 18,
+          "NUM": 3,
+          "SCONJ": 4
+        }
+      },
+      {
+        "threshold": 0.55,
+        "with_one": 420,
+        "anti_num": 6211,
+        "closed_class": 45,
+        "open_class": 357,
+        "ratio": 0.1261,
+        "accuracy": "69.76%",
+        "relevant_pos_tags": {
+          "VERB": 110,
+          "NOUN": 176,
+          "ADJ": 21,
+          "ADV": 22,
+          "PROPN": 28,
+          "AUX": 20,
+          "PUNCT": 18,
+          "DET": 12,
+          "NUM": 5,
+          "ADP": 4,
+          "SCONJ": 4
+        }
+      },
+      {
+        "threshold": 0.6,
+        "with_one": 325,
+        "anti_num": 6306,
+        "closed_class": 21,
+        "open_class": 291,
+        "ratio": 0.0722,
+        "accuracy": "72.62%",
+        "relevant_pos_tags": {
+          "NOUN": 148,
+          "VERB": 90,
+          "ADJ": 16,
+          "ADV": 18,
+          "PROPN": 19,
+          "PUNCT": 13,
+          "AUX": 7,
+          "NUM": 5,
+          "DET": 6,
+          "ADP": 1,
+          "SCONJ": 2
+        }
+      },
+      {
+        "threshold": 0.65,
+        "with_one": 250,
+        "anti_num": 6381,
+        "closed_class": 14,
+        "open_class": 224,
+        "ratio": 0.0625,
+        "accuracy": "75.6%",
+        "relevant_pos_tags": {
+          "NOUN": 122,
+          "VERB": 72,
+          "ADJ": 8,
+          "PUNCT": 12,
+          "ADV": 11,
+          "PROPN": 11,
+          "NUM": 5,
+          "DET": 5,
+          "ADP": 1,
+          "SCONJ": 2,
+          "AUX": 1
+        }
+      },
+      {
+        "threshold": 0.7,
+        "with_one": 195,
+        "anti_num": 6436,
+        "closed_class": 7,
+        "open_class": 178,
+        "ratio": 0.0393,
+        "accuracy": "76.92%",
+        "relevant_pos_tags": {
+          "NOUN": 101,
+          "VERB": 61,
+          "ADJ": 6,
+          "PUNCT": 10,
+          "PROPN": 6,
+          "NUM": 1,
+          "DET": 4,
+          "SCONJ": 2,
+          "ADV": 4
+        }
+      },
+      {
+        "threshold": 0.75,
+        "with_one": 161,
+        "anti_num": 6470,
+        "closed_class": 5,
+        "open_class": 147,
+        "ratio": 0.034,
+        "accuracy": "81.37%",
+        "relevant_pos_tags": {
+          "NOUN": 91,
+          "VERB": 46,
+          "ADJ": 4,
+          "PUNCT": 9,
+          "PROPN": 3,
+          "NUM": 1,
+          "SCONJ": 2,
+          "DET": 2,
+          "ADV": 3
+        }
+      },
+      {
+        "threshold": 0.8,
+        "with_one": 83,
+        "anti_num": 6548,
+        "closed_class": 2,
+        "open_class": 75,
+        "ratio": 0.0267,
+        "accuracy": "78.31%",
+        "relevant_pos_tags": {
+          "VERB": 35,
+          "ADJ": 4,
+          "PUNCT": 6,
+          "NOUN": 33,
+          "SCONJ": 2,
+          "ADV": 2,
+          "PROPN": 1
+        }
+      },
+      {
+        "threshold": 0.85,
+        "with_one": 50,
+        "anti_num": 6581,
+        "closed_class": 0,
+        "open_class": 44,
+        "ratio": 0,
+        "accuracy": "80.0%",
+        "relevant_pos_tags": {
+          "ADJ": 1,
+          "PUNCT": 6,
+          "VERB": 28,
+          "NOUN": 14,
+          "PROPN": 1
+        }
+      },
+      {
+        "threshold": 0.9,
+        "with_one": 25,
+        "anti_num": 6606,
+        "closed_class": 0,
+        "open_class": 22,
+        "ratio": 0,
+        "accuracy": "96.0%",
+        "relevant_pos_tags": {
+          "PUNCT": 3,
+          "NOUN": 1,
+          "VERB": 20,
+          "PROPN": 1
+        }
+      },
+      {
+        "threshold": 0.95,
+        "with_one": 7,
+        "anti_num": 6624,
+        "closed_class": 0,
+        "open_class": 4,
+        "ratio": 0,
+        "accuracy": "85.71%",
+        "relevant_pos_tags": {
+          "PUNCT": 3,
+          "VERB": 4
+        }
+      }
+    ]
+  }
+]
