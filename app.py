@@ -283,10 +283,10 @@ def get_clusters():
 		file = req_data["file"]
 		epsilon = float(req_data["epsilon"])
 		min_samples = int(req_data["min_samples"])
-		file = req_data["file"]		
+		file = req_data["file"]
 		threshold = float(req_data["threshold"])
-		result_one_hot, one_hot_df = create_one_hot_vector.make_one_hot(config.DATA_DIR + "/" + file, threshold=threshold) #, is_df=True)
-		result_i, df = cluster_one_hot_vectors.cluster_one_hot(config.DATA_DIR + "/" + file, epsilon=epsilon, min_samples=min_samples, store=True)
+		result_one_hot, one_hot_df = create_one_hot_vector.make_one_hot(config.DATA_DIR + "/" + file, threshold=threshold) #, is_df=True)		
+		result_i, df, _, _, _ = cluster_one_hot_vectors.cluster_one_hot(config.DATA_DIR + "/" + file, epsilon=epsilon, min_samples=min_samples, store=True)
 		result_i = [*map(int, result_i)]
 		try:
 			del df["cls_embs"]
