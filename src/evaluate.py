@@ -109,21 +109,39 @@ def evaluate():
 # res = evaluate()
 # with open("evaluate_3_result.json", "w") as file:
 # 	json.dump(res, file)
-	
-with open("evaluate_3_result.json", "r") as file:
-	res = json.load(file)
-	
-# print(res[0])
 
-latex_rows = ""
-for row, i in enumerate(res[0]["results"]):
-	latex_rows += f"{row['threshold']} & " 
-	latex_rows += f"{row['with_one']} & {row['closed_class']} & {row['open_class']} & {row['ratio']} & {row['accuracy'].split('%')[0]}\%" 
-	latex_rows += f"{res[1]['results']['with_one']} & {res[1]['results']['closed_class']} & {res[1]['results']['open_class']} & {res[1]['results']['ratio']} & {res[1]['results']['accuracy'].split('%')[0]}\%" 
-	latex_rows += f"{res[2]['results']['with_one']} & {res[2]['results']['closed_class']} & {res[2]['results']['open_class']} & {res[2]['results']['ratio']} & {res[2]['results']['accuracy'].split('%')[0]}\%" 
-	latex_rows += "\\\\ \n"
+def get_accuracy(acc, x):
+	if isinstance(acc, int):
+		val = str(acc)
+	else:
+		val = f"{acc.split('%')[0]}\%"
 	
-with open("latex_rows.tex", "w") as file:
-	file.write(latex_rows)
+	if x < 2:
+		return "\\multicolumn{1}{l|}{" + val + "}&"
+	return val
+		
+		
+def get_long_data(res, short, x, i):
+	if short:
+		return " "	
+	return f"{res[x]['results'][i]['with_one']} &"
 	
+
+def gen_latex(short=True):
+	
+	with open("evaluate_3_result.json", "r") as file:
+		res = json.load(file)			
+	
+	latex_rows = ""
+	for i, row in enumerate(res[0]["results"]):
+		latex_rows += "\\multicolumn{1}{l|}{" + str(row['threshold']) +  "}& " 
+		for x in range(0, 3):
+			latex_rows += get_long_data(res, short, 0, i) + f"{res[x]['results'][i]['closed_class']} & {res[x]['results'][i]['open_class']} & {res[x]['results'][i]['ratio']} & " + get_accuracy(res[x]['results'][i]['accuracy'], x)
+		latex_rows += "\\\\ \n"
+		
+		with open("latex_rows.tex", "w") as file:
+			file.write(latex_rows)
+	
+
+gen_latex(short=True)	
 	
