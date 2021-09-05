@@ -76,8 +76,8 @@ def make_one_hot(file, is_df=False, threshold=0.4):
 				one_hot[pos_index] = 1
 		one_hot_vectors.append(one_hot)
 	print(tt)
-	if not is_df:
-		df["one_hot"] = one_hot_vectors
+	df["one_hot"] = one_hot_vectors
+	if not is_df:	
 		print(diff)
 		df.to_csv(file, index=False)
 	return one_hot_vectors, df    
