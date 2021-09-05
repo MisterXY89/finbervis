@@ -229,14 +229,22 @@ var PixelVis = /** @class */ (function () {
                 .attr("y", -10)
                 .attr("text-anchor", "left")
                 .style("font-size", "15px")
-                .text((d3.max(this.data[0].props) * 100).toString().slice(0, 4) + "%");
+                .style("fill", function () {
+                return _this.data[0].truth_label != _this.data[0].sentiment ? "red" : get_sentiment_color(_this.data[0].sentiment);
+            })
+                .text((d3.max(this.data[0].props) * 100).toString().slice(0, 4) + "%"
+                + " - " + this.data[0].sentiment);
             container.append("text")
                 .attr("class", "pixelVisInfo")
                 .attr("x", this.width / 2)
                 .attr("y", -10)
                 .attr("text-anchor", "left")
                 .style("font-size", "15px")
-                .text((d3.max(this.data[1].props) * 100).toString().slice(0, 4) + "%");
+                .style("fill", function () {
+                return _this.data[1].truth_label != _this.data[1].sentiment ? "red" : get_sentiment_color(_this.data[1].sentiment);
+            })
+                .text((d3.max(this.data[1].props) * 100).toString().slice(0, 4) + "%"
+                + " - " + this.data[1].sentiment);
         }
         // if (this.sentence_view) {
         // container.attr("transform", "rotate(90)");			

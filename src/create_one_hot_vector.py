@@ -50,17 +50,17 @@ def make_one_hot(file, is_df=False, threshold=0.4):
 			one_hot_vectors.append([-1 for x in range(len(POS_TAGS))])
 			continue
 		toks = mk_list(row.tokens, tok=True)
-		row.tokens = toks
+		# row.tokens = toks
 		# print(toks, len(toks))
 		sal = mk_list(row.saliency_score)
-		row.saliency_score = sal
+		# row.saliency_score = sal
 		if len(toks) != len(sal):
 			one_hot_vectors.append([-1 for x in range(len(POS_TAGS))])
 			diff += 1
 			continue
 		# print(sal, len(sal))
 		pos = mk_list(row.pos_tags, tok=True)
-		row.pos_tags = pos
+		# row.pos_tags = pos
 		# pos = pos[1:-1]
 		one_hot = [0 for x in range(len(POS_TAGS))]
 		for i in range(1, len(sal)):

@@ -376,7 +376,8 @@ function toggle_plain_sent() {
 
 document.addEventListener("DOMContentLoaded", () => {
 	
-	let choosen_models = [0,1];
+	let choosen_models = [0,2];
+	window.choosen_models = choosen_models;
 	let selected_models = choosen_models.map(i => MODEL_NAMES[i]);
 	console.log(selected_models)
 	window.selected_models = selected_models;
@@ -474,28 +475,32 @@ document.addEventListener("DOMContentLoaded", () => {
 		localStorage.setItem("epsilon", epsilon);
 		localStorage.setItem("threshold", threshold);
 		localStorage.setItem("min_samples", min_samples);
-			
-		let url_1 = `/get_clusters?file=${data_filename_1}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
+		
+		let fi1 = MODEL_NAMES[window.choosen_models[0]];
+		let url_1 = `/get_clusters?file=${fi1}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
 		fetch(url_1)
 		.then(resp => resp.json())
 		.then(obj => {
 			// window.stats = obj.result;
-			load_data(data_filename_1, false).then(data => {
+			load_data([fi1, false]).then(data => {
 				window.data1 = data.data1;
 				document.getElementById("matrix_vis_1").innerHTML = "";
 				let matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
+				window.matrix_vis_1 = matrix_vis_1;
 				matrix_vis_1.draw();					
 			})
 		})
 		
-		let url_2 = `/get_clusters?file=${data_filename_2}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
+		let fi2 = MODEL_NAMES[window.choosen_models[1]];
+		let url_2 = `/get_clusters?file=${fi2}&epsilon=${epsilon}&min_samples=${min_samples}&threshold=${threshold}`;
 		fetch(url_2)
 		.then(resp => resp.json())
 		.then(obj => {
-			load_data(data_filename_2, false).then(data => {
+			load_data([fi2, false]).then(data => {
 				window.data2 = data.data1;
 				document.getElementById("matrix_vis_2").innerHTML = "";
 				let matrix_vis_2 = new MatrixVis(data.data1, "#matrix_vis_2", "MatrixVis 2");
+				window.matrix_vis_2 = matrix_vis_2;
 				matrix_vis_2.draw();					
 			})
 		})
@@ -533,13 +538,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		Array.from(document.getElementsByClassName("sim-sentence")).forEach((sent, sent_i) => {
 			Array.from(sent.getElementsByTagName("span")).forEach((span, span_i) => {
 				let sal_scores = window.sim_res[sent_i]["saliency_score"];
-				sal_scores = to_array(sal_scores);
-				let opacity = Math.abs(sal_scores[span_i]);
-				let token_grad_color = "252,186,3"; // negative values
-				if (sal_scores[span_i] > 0) {			
-					token_grad_color = "221,89,100";
-				}
-				let color = `rgba(${token_grad_color}, ${opacity})`;
+				sal_scores = to_array(sal_scores);				
+				let sc = d3.scaleLinear().domain([-1,1]).range([0,1]);
+				let color = d3.interpolateBrBG(sc(sal_scores[span_i]));
 				
 				if (span.classList.contains("identical-token")) {
 					span.classList.remove("identical-token");

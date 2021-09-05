@@ -206,7 +206,7 @@ class PixelVis {
 			create_sentence_view(d, this.is_one);
 		}
 		
-		if (this.sentence_view) {					
+		if (this.sentence_view) {
 			
 			const xs = d3.scaleBand()
 				.range([ 0, this.width ])
@@ -282,7 +282,13 @@ class PixelVis {
 				.attr("y", -10)
 				.attr("text-anchor", "left")
 				.style("font-size", "15px")
-				.text((d3.max(this.data[0].props) * 100).toString().slice(0,4) + "%");
+				.style("fill", () => {
+					return this.data[0].truth_label != this.data[0].sentiment ? "red" : get_sentiment_color(this.data[0].sentiment)
+				})
+				.text(
+					(d3.max(this.data[0].props) * 100).toString().slice(0,4) + "%"
+					+ " - " + this.data[0].sentiment
+				);
 				
 			container.append("text")
 				.attr("class", "pixelVisInfo")
@@ -290,7 +296,14 @@ class PixelVis {
 				.attr("y", -10)
 				.attr("text-anchor", "left")
 				.style("font-size", "15px")
-				.text((d3.max(this.data[1].props) * 100).toString().slice(0,4) + "%");
+				.style("fill", () => {
+					return this.data[1].truth_label != this.data[1].sentiment ? "red" : get_sentiment_color(this.data[1].sentiment)
+				})
+				.text(
+					(d3.max(this.data[1].props) * 100).toString().slice(0,4) + "%"
+					+ " - " + this.data[1].sentiment
+				);
+			
 		}
 				
 		// if (this.sentence_view) {

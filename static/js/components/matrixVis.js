@@ -217,7 +217,7 @@ var MatrixVis = /** @class */ (function () {
             // console.log(d,p)
             // let el_pattern = this.data[d].one_hot.join("");
             var len = _this.one_hot_patterns[el_pattern].elements.length;
-            console.log("X2: ", _this.norm_length(len), "len: ", len);
+            // console.log("X2: ", this.norm_length(len), "len: ", len);
             return -_this.norm_length(len);
         })
             .style("stroke", function (d) { return "gray"; });

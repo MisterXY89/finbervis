@@ -214,14 +214,15 @@
 }
 
 .draggable {
-	width: 500px;
+	z-index: 999;
+	width: 650px;
 	min-height: 50px;
 	/* background: #2d2d2d; */
 }  
 
 #draggable-cards {
 	position: absolute !important;
-	top: 17.5em;
+	top: 18.5em;
 	right: 1.5em;
 }
 
@@ -276,6 +277,7 @@ text.active {
 .projection-container {
 	margin-top: 1em;
 	margin-right: 1em;
+	/* border-bottom: 1px solid #353333; */
 }
 
 .projection-container:first-child {

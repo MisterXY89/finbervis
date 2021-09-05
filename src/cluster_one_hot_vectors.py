@@ -30,6 +30,7 @@ def mk_list(s_arr, tok=False, spacy=False):
 def cluster_one_hot(file, epsilon = 1.0, min_samples = 13, store = False, is_df=False):
 	
 	if not is_df:
+		print(file)
 		df = pd.read_csv(file)
 	else:
 		df = file

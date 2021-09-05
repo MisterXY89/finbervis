@@ -327,7 +327,8 @@ function toggle_plain_sent() {
     }
 }
 document.addEventListener("DOMContentLoaded", function () {
-    var choosen_models = [0, 1];
+    var choosen_models = [0, 2];
+    window.choosen_models = choosen_models;
     var selected_models = choosen_models.map(function (i) { return MODEL_NAMES[i]; });
     console.log(selected_models);
     window.selected_models = selected_models;
@@ -411,26 +412,30 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("epsilon", epsilon);
         localStorage.setItem("threshold", threshold);
         localStorage.setItem("min_samples", min_samples);
-        var url_1 = "/get_clusters?file=" + data_filename_1 + "&epsilon=" + epsilon + "&min_samples=" + min_samples + "&threshold=" + threshold;
+        var fi1 = MODEL_NAMES[window.choosen_models[0]];
+        var url_1 = "/get_clusters?file=" + fi1 + "&epsilon=" + epsilon + "&min_samples=" + min_samples + "&threshold=" + threshold;
         fetch(url_1)
             .then(function (resp) { return resp.json(); })
             .then(function (obj) {
             // window.stats = obj.result;
-            load_data(data_filename_1, false).then(function (data) {
+            load_data([fi1, false]).then(function (data) {
                 window.data1 = data.data1;
                 document.getElementById("matrix_vis_1").innerHTML = "";
                 var matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
+                window.matrix_vis_1 = matrix_vis_1;
                 matrix_vis_1.draw();
             });
         });
-        var url_2 = "/get_clusters?file=" + data_filename_2 + "&epsilon=" + epsilon + "&min_samples=" + min_samples + "&threshold=" + threshold;
+        var fi2 = MODEL_NAMES[window.choosen_models[1]];
+        var url_2 = "/get_clusters?file=" + fi2 + "&epsilon=" + epsilon + "&min_samples=" + min_samples + "&threshold=" + threshold;
         fetch(url_2)
             .then(function (resp) { return resp.json(); })
             .then(function (obj) {
-            load_data(data_filename_2, false).then(function (data) {
+            load_data([fi2, false]).then(function (data) {
                 window.data2 = data.data1;
                 document.getElementById("matrix_vis_2").innerHTML = "";
                 var matrix_vis_2 = new MatrixVis(data.data1, "#matrix_vis_2", "MatrixVis 2");
+                window.matrix_vis_2 = matrix_vis_2;
                 matrix_vis_2.draw();
             });
         });
@@ -461,12 +466,8 @@ document.addEventListener("DOMContentLoaded", function () {
             Array.from(sent.getElementsByTagName("span")).forEach(function (span, span_i) {
                 var sal_scores = window.sim_res[sent_i]["saliency_score"];
                 sal_scores = to_array(sal_scores);
-                var opacity = Math.abs(sal_scores[span_i]);
-                var token_grad_color = "252,186,3"; // negative values
-                if (sal_scores[span_i] > 0) {
-                    token_grad_color = "221,89,100";
-                }
-                var color = "rgba(" + token_grad_color + ", " + opacity + ")";
+                var sc = d3.scaleLinear().domain([-1, 1]).range([0, 1]);
+                var color = d3.interpolateBrBG(sc(sal_scores[span_i]));
                 if (span.classList.contains("identical-token")) {
                     span.classList.remove("identical-token");
                 }

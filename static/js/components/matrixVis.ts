@@ -4,9 +4,9 @@ class MatrixVis {
 	constructor(data, div_id, name) {
 		this.POS_TAGS = ['ADJ', 'ADV', 'INTJ', 'NOUN', 'PROPN', 'VERB', 'ADP', 'AUX', 'CONJ', 'DET', 'NUM', 'PART', 'PRON', 'SCONJ', 'PUNCT', 'SYM', 'X'];
 		this.pos_classes_dict = {
-		    "open": ["ADJ", "ADV", "INTJ", "NOUN", "PROPN", "VERB"],
-		    "closed": ["ADP", "AUX","CONJ","DET","NUM","PART","PRON","SCONJ"],
-		    "other": ["PUNCT", "SYM", "X"]
+				"open": ["ADJ", "ADV", "INTJ", "NOUN", "PROPN", "VERB"],
+				"closed": ["ADP", "AUX","CONJ","DET","NUM","PART","PRON","SCONJ"],
+				"other": ["PUNCT", "SYM", "X"]
 		};
 		
 		this.data = data;
@@ -28,17 +28,17 @@ class MatrixVis {
 			left: 160
 		};
 		this.width = 600;
-    this.height = this.nodes.length * 15;
+		this.height = this.nodes.length * 15;
 		
 		this.y = d3.scaleBand()
-		  .range([ this.height, 0 ])
-		  .domain(this.myVars)
-		  .padding(0.3);
+			.range([ this.height, 0 ])
+			.domain(this.myVars)
+			.padding(0.3);
 			
 		this.x = d3.scaleBand()
-		  .range([ 0, this.width ])
-		  .domain(this.myGroups)
-		  .padding(0.1);
+			.range([ 0, this.width ])
+			.domain(this.myGroups)
+			.padding(0.1);
 					
 		this.stats = this.compute_stats();
 		console.log("stats", this.stats);
@@ -62,7 +62,7 @@ class MatrixVis {
 		// let saliency_scores = pattern_idx.map(i => this.data[i].saliency_score);
 		let pattern_amount = Object.keys(this.one_hot_patterns).length -1;		
 		let clusters_found = pattern_idx.map(i => this.data[i].one_hot_cluster).reduce(function (acc, curr) {
-		  return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+			return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
 		}, {});
 		// console.log("cluster-found:", clusters_found)
 		
@@ -168,7 +168,7 @@ class MatrixVis {
 			}			
 		});
 		let clusters_found = pattern_idx.map(i => this.data[i].one_hot_cluster).reduce(function (acc, curr) {
-		  return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+			return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
 		}, {});
 		
 		let stats_html = `<td>${Object.keys(clusters_found).length}</td>`
@@ -202,11 +202,11 @@ class MatrixVis {
 		
 		this.container = d3.select(this.div_id)
 			.append("svg")
-			  .attr("width", this.width + this.margin.left + this.margin.right)
-			  .attr("height", this.height + this.margin.top + this.margin.bottom)
+				.attr("width", this.width + this.margin.left + this.margin.right)
+				.attr("height", this.height + this.margin.top + this.margin.bottom)
 			.append("g")
-			  .attr("transform",
-			        "translate(" + this.margin.left + "," + this.margin.top + ")")								
+				.attr("transform",
+							"translate(" + this.margin.left + "," + this.margin.top + ")")								
 		
 		const cluster_scale = d3.scaleOrdinal(d3.schemeCategory20);
 	
@@ -215,7 +215,7 @@ class MatrixVis {
 		// Build X scales and axis:		
 		this.container.append("g")
 			.attr("transform", "translate(0," + 0 + ")")
-		  .call(d3.axisTop(this.x))
+			.call(d3.axisTop(this.x))
 			.attr("class", "matrix-x-axis")
 			
 		this.container.select(".matrix-x-axis")
@@ -241,7 +241,7 @@ class MatrixVis {
 				// console.log(d,p)
 				// let el_pattern = this.data[d].one_hot.join("");
 				let len = this.one_hot_patterns[el_pattern].elements.length;
-				console.log("X2: ", this.norm_length(len), "len: ", len);
+				// console.log("X2: ", this.norm_length(len), "len: ", len);
 				return -this.norm_length(len);
 			})
 			.style("stroke", d => "gray");
@@ -252,12 +252,12 @@ class MatrixVis {
 			
 		let color_scale = d3.scaleLinear()
 			.range(["white", "#353333"])
-	  	.domain([0,1]);		
+			.domain([0,1]);		
 
-    let rows = this.container.selectAll(".matrix-row")
-        .data(this.matrix)
-      	.enter().append("g")
-        .attr("class", "matrix-row")
+		let rows = this.container.selectAll(".matrix-row")
+				.data(this.matrix)
+				.enter().append("g")
+				.attr("class", "matrix-row")
 				.attr("cluster", d => d[0].c)
 				.on("mouseover", (d, p) => {
 					let el = document.getElementById(`${this.div_id.slice(1)}`).getElementsByClassName("matrix-row")[p];
@@ -316,26 +316,26 @@ class MatrixVis {
 					scatter_plot(data2, false, DATA_FILE_TWO, "#projection_model_2");	
 					d3.select("#patternProjectionSelection").html(`<code>${pattern}</code>`)
 					d3.select("#resetSelectionCol").style("display", "block");
-        })			 	 
+				})			 	 
 		
 		console.log("cluster_sort", this.cluster_sort)
-    let cols = rows.selectAll(".cell")
-  		.data(d => d)
-      .enter().append("rect")
-      .attr("class", "cell")
+		let cols = rows.selectAll(".cell")
+			.data(d => d)
+			.enter().append("rect")
+			.attr("class", "cell")
 			.attr("x", d => this.x(d.x))
-		  .attr("y", d => this.y(d.y))
+			.attr("y", d => this.y(d.y))
 			.attr("width",this.x.bandwidth())
-	 	  .attr("height", this.y.bandwidth())
+			 .attr("height", this.y.bandwidth())
 			.style("stroke", "grey")
-       // .on('mouseover', function() {
-       //    d3.select(this)
-       //        .style('fill', '#0F0');
-       // })
-       // .on('mouseout', function() {
-       //    d3.select(this)
-       //        .style('fill', '#FFF');
-       // })       
+			 // .on('mouseover', function() {
+			 //    d3.select(this)
+			 //        .style('fill', '#0F0');
+			 // })
+			 // .on('mouseout', function() {
+			 //    d3.select(this)
+			 //        .style('fill', '#FFF');
+			 // })       
 			 .style("fill", d => {				 
 				 if (this.cluster_sort) {
 					 if (d.z == 1) {
@@ -379,9 +379,9 @@ class MatrixVis {
 		this.one_hot_patterns = sorted_one_hots;		
 		let sorted_vars = Object.keys(this.one_hot_patterns);
 		this.y = d3.scaleBand()
-		  .range([ this.height, 0 ])
-		  .domain(sorted_vars)
-		  .padding(0.3);
+			.range([ this.height, 0 ])
+			.domain(sorted_vars)
+			.padding(0.3);
 		this.draw();
 	}
 }
