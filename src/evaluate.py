@@ -10,6 +10,9 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 from cluster_one_hot_vectors import cluster_one_hot
 from create_one_hot_vector import make_one_hot
 
@@ -107,7 +110,7 @@ def evaluate():
 			
 			
 # res = evaluate()
-# with open("evaluate_3_result.json", "w") as file:
+# with open("evaluation_results.json", "w") as file:
 # 	json.dump(res, file)
 
 def get_accuracy(acc, x):
@@ -129,7 +132,7 @@ def get_long_data(res, short, x, i):
 
 def gen_latex(short=True):
 	
-	with open("evaluate_3_result.json", "r") as file:
+	with open("evaluation_results.json", "r") as file:
 		res = json.load(file)			
 	
 	latex_rows = ""
@@ -143,5 +146,28 @@ def gen_latex(short=True):
 			file.write(latex_rows)
 	
 
-gen_latex(short=True)	
+# gen_latex(short=True)
+
+def make_plt_df(res):
+	df = pd.DataFrame(res[0]["results"])
+	df["model"] = [0 for i in range(len(df))]	
+	for x in range(1,3):
+		tmp_df = pd.DataFrame(res[x]["results"])
+		tmp_df["model"] = [x for i in range(len(tmp_df))]
+		df = df.merge(tmp_df, on="threshold", how="inner")
+	return df
+
+def plot_distr():
+	with open("evaluation_results.json", "r") as file:
+		res = json.load(file)	
 	
+	df = make_plt_df(res)
+	print(df)
+	print(df.keys())
+	# fig, ax = sns.plt.subplots(1, 1, figsize=(7,5))
+	# sns.factorplot(x="items", y="clicks", hue="exp_name", col="status", data=df, kind="bar")
+	# plt.show()
+	df.plot.bar(x="threshold", y=["ratio", "ratio_x", "ratio_y"])
+
+plot_distr()
+plt.show()
