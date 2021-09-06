@@ -278,8 +278,10 @@ function search_data(search_q) {
 		let sq = search_q.slice(1);
 		if (sq.includes("#")) {
 			let model_num = sq.split("#")[1];
-		}
-		sq = sq[0];
+			sq = sq[0];
+		} else {
+			let model_num = -1
+		}		
 		params = `?seg_id=${sq}&model=${model_num}` : "";
 	} else {
 		params = `?q=${search_q}`;
@@ -291,7 +293,7 @@ function search_data(search_q) {
 	} else {
 		if (search_q.includes("=all")) {
 			let model_num = window.selected_models_nums[Number(search_q.split("#")[1]) -1]
-			url += `&model=${model_num}`;
+			url = "/nirvana"
 		}
 		fetch(url)
 		.then(resp => {
@@ -306,12 +308,14 @@ function search_data(search_q) {
 			$("#search_results-wrapper").show();
 			if (search_q == "all") {
 				alert("=all");
+				let data = (model_num == 0) ? window.data1 : window.data2;
 				$("#search-header").html("All Segments");
-				$("#search-results").html(json);
+				$("#search-results").html(data);
 				$("#search-results").show();
 			} else {
 				let res = json.result;
 				// console.log(res);
+				$("#search-header").html("Search Results");
 				d3.select("#search-results").html(prep_search_vis(res));
 				d3.select("#total-results").text(res.length);
 			}			

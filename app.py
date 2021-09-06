@@ -224,6 +224,14 @@ def get_entities():
 		"status": status,
 		"result": result,
 	})
+	
+	
+@app.route("/nirvana")
+def nirvana():
+	return jsonify({
+		"success": True,
+		"result": "nevermind"
+	})
 
 
 @app.route("/search")
@@ -245,25 +253,26 @@ def search():
 	result_l = []
 	for index, row in result.iterrows():
 		# print(row)
+		_id = str(row.id)		
 		result_l.append({
-			"id": int(row.id),
+			"id": _id,
 			"segment": str(row.segment),
 			"sentiment": str(row.sentiment),
 			"truth_label": str(row.truth_label),
-			"x": float(row.x),
-			"y": float(row.y),
+			"x": str(row.x),
+			"y": str(row.y),
 			"props": str(row.props),
-			"tokens": row.tokens,
-			"saliency_score": row.saliency_score,
+			"tokens": str(row.tokens),
+			"saliency_score": str(row.saliency_score),
 			# "mean_attention": row.mean_attention,
 			# "deRoseAttention": row.deRoseAttention,
-			"one_hot": row.one_hot,
-			"one_hot_cluster": row.one_hot_cluster,
-			"pos_tags": row.pos_tags,
-			"model_num": row.model_num
+			"one_hot": str(row.one_hot),
+			"one_hot_cluster": str(row.one_hot_cluster),
+			"pos_tags": str(row.pos_tags),
+			"model_num": str(row.model_num)
 			# "embeddings": row.embeddings,,
 		})
-	print(result_l)
+	# print(result_l)
 	return jsonify({
 		"status": status,
 		"result": result_l,
