@@ -32,7 +32,7 @@ POS_TAGS = pos_classes["open"] + pos_classes["closed"] + pos_classes["other"]
 
 dfs = [pd.read_csv(file) for file in files]
 
-def evaluate():
+def evaluate(exclude_tag = False):
 	all_results = []
 	for df in dfs:
 		# exclude with more than one 1
@@ -50,6 +50,8 @@ def evaluate():
 			num_with_one = len([v for v in vecs if v.count(1) == 1])
 			anti_num = len(vecs) - num_with_one			
 			vecs = [*filter(lambda x: x.count(1) == 1, vecs)]
+			if exclude_tag:
+				vevs = [*filter(lambda x: x[POS_TAGS.index(exclude_tag)] != 1, vecs)]
 			for v in vecs:
 				pos_tag = POS_TAGS[v.index(1)]
 				relevant_pos_tags.append(pos_tag)
@@ -167,7 +169,9 @@ def plot_distr():
 	# fig, ax = sns.plt.subplots(1, 1, figsize=(7,5))
 	# sns.factorplot(x="items", y="clicks", hue="exp_name", col="status", data=df, kind="bar")
 	# plt.show()
-	df.plot.bar(x="threshold", y=["ratio", "ratio_x", "ratio_y"])
+	df.rename(columns={"ratio": "decentralized-full", "ratio_x": "decentralized-first-3", "ratio_y": "decentralized-drop-8"}, inplace=True)
+	ax = df.plot.bar(x="threshold", y=["decentralized-full", "decentralized-drop-8", "decentralized-first-3"])
+	ax.set_ylabel("ratio")
 
 plot_distr()
 plt.show()
