@@ -28,7 +28,7 @@ function to_array(string) {
 	return arr.map(Number);
 }
 
-async function load_data(files) {
+async function load_data(files, mns) {
 	let fi1 = files[0];
 	const papa_config = {delimiter: ",", header: true};
 	let data1 = await fetch(`/data/${fi1}`)
@@ -36,7 +36,7 @@ async function load_data(files) {
 		.then(t => Papa.parse(t, papa_config))
 		.then(data1 => {
 			console.log("pre trans ", data1);
-			return transform_data(data1.data);
+			return transform_data(data1.data, mns[0]);
 		});
 	let fi2 = files[1];
 	if (!fi2 || fi2 == undefined) {
@@ -46,12 +46,12 @@ async function load_data(files) {
 		.then(resp => resp.text())
 		.then(t => Papa.parse(t, papa_config))
 		.then(data2 => {
-			return transform_data(data2.data);
+			return transform_data(data2.data, mns[1]);
 		});
 	return { data1, data2 }
 }
 
-function transform_data(data) {
+function transform_data(data, mn) {
 	data.map(row => {
 		row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens, true) : [];
 		row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
@@ -66,6 +66,7 @@ function transform_data(data) {
 		row.pos_tag_classes = (row.pos_tag_classes != undefined) ? to_array(row.pos_tag_classes, false) : [];
 		row.deRoseAttention = (row.deRoseAttention != undefined) ? to_array(row.deRoseAttention) : [];
 		row.pos_tags = (row.pos_tags != undefined) ? to_array(row.pos_tags) : [];		
+		row.model_num = mn;
 	})
 	console.log("transformed_data:", data);
 	return data;

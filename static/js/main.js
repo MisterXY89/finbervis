@@ -259,19 +259,19 @@ function search_data(search_q) {
         fetch(url)
             .then(function (resp) {
             // if (search_q == ")()UJIH=all") {
-            if (search_q == "=all") {
-                return resp.text();
-            }
+            // if (search_q == "=all") {
+            // 	return resp.text();
+            // } 
             return resp.json();
         })
             .then(function (json) {
             console.log(json);
             $("#search_results-wrapper").show();
-            if (search_q == "all") {
+            if (search_q.includes("all")) {
                 alert("=all");
-                var data = (model_num == 0) ? window.data1 : window.data2;
+                var data = (model_num == 0 || (model_num == 1 && window.choosen_models[0] == 1)) ? window.data1 : window.data2;
                 $("#search-header").html("All Segments");
-                $("#search-results").html(data);
+                $("#search-results").html(prep_search_vis(data));
                 $("#search-results").show();
             }
             else {
@@ -339,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(selected_models);
     window.selected_models = selected_models;
     window.selected_models_nums = choosen_models;
-    load_data(selected_models).then(function (data) {
+    load_data(selected_models, choosen_models).then(function (data) {
         window.data1 = data.data1;
         window.data2 = data.data2;
         // load_data("data_copy.csv", false).then(data => {		
@@ -424,7 +424,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(function (resp) { return resp.json(); })
             .then(function (obj) {
             // window.stats = obj.result;
-            load_data([fi1, false]).then(function (data) {
+            load_data([fi1, false], window.choosen_models[0]).then(function (data) {
                 window.data1 = data.data1;
                 document.getElementById("matrix_vis_1").innerHTML = "";
                 var matrix_vis_1 = new MatrixVis(data.data1, "#matrix_vis_1", "MatrixVis 1");
@@ -437,7 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(url_2)
             .then(function (resp) { return resp.json(); })
             .then(function (obj) {
-            load_data([fi2, false]).then(function (data) {
+            load_data([fi2, false], window.choosen_models[1]).then(function (data) {
                 window.data2 = data.data1;
                 document.getElementById("matrix_vis_2").innerHTML = "";
                 var matrix_vis_2 = new MatrixVis(data.data1, "#matrix_vis_2", "MatrixVis 2");

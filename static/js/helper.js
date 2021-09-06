@@ -60,7 +60,7 @@ function to_array(string) {
     }
     return arr.map(Number);
 }
-function load_data(files) {
+function load_data(files, mns) {
     return __awaiter(this, void 0, void 0, function () {
         var fi1, papa_config, data1, fi2, data2;
         return __generator(this, function (_a) {
@@ -73,7 +73,7 @@ function load_data(files) {
                             .then(function (t) { return Papa.parse(t, papa_config); })
                             .then(function (data1) {
                             console.log("pre trans ", data1);
-                            return transform_data(data1.data);
+                            return transform_data(data1.data, mns[0]);
                         })];
                 case 1:
                     data1 = _a.sent();
@@ -85,7 +85,7 @@ function load_data(files) {
                             .then(function (resp) { return resp.text(); })
                             .then(function (t) { return Papa.parse(t, papa_config); })
                             .then(function (data2) {
-                            return transform_data(data2.data);
+                            return transform_data(data2.data, mns[1]);
                         })];
                 case 2:
                     data2 = _a.sent();
@@ -94,7 +94,7 @@ function load_data(files) {
         });
     });
 }
-function transform_data(data) {
+function transform_data(data, mn) {
     data.map(function (row) {
         row.tokens = (row.tokens != undefined) ? tok_to_array(row.tokens, true) : [];
         row.saliency_score = (row.saliency_score != undefined) ? to_array(row.saliency_score) : [];
@@ -109,6 +109,7 @@ function transform_data(data) {
         row.pos_tag_classes = (row.pos_tag_classes != undefined) ? to_array(row.pos_tag_classes, false) : [];
         row.deRoseAttention = (row.deRoseAttention != undefined) ? to_array(row.deRoseAttention) : [];
         row.pos_tags = (row.pos_tags != undefined) ? to_array(row.pos_tags) : [];
+        row.model_num = mn;
     });
     console.log("transformed_data:", data);
     return data;
