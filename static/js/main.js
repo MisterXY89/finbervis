@@ -117,6 +117,7 @@ function get_segment_html(seg) {
     return "<div class=\"search-seg\" title=\"" + seg + "\">\n\t\t" + seg.slice(0, 120) + "...\n\t</div>";
 }
 function prep_search_vis(res) {
+    console.log(res);
     var html = "";
     // .slice(0,10)
     window.search_result_data = [];
@@ -127,10 +128,10 @@ function prep_search_vis(res) {
             + "<div class=\"card-title row\">"
             + "<div class=\"col-8\">"
             // + `<h5>Result #${i+1}</h5>`
-            + ("<strong>Segment</strong> <span class=\"text-muted\">#" + element.id + "</span><br>")
+            + ("<strong>Segment</strong> <span class=\"text-muted\">#" + element.id + "</span> <strong>[" + (element.model_num + 1) + "]</strong><br>")
             + "</div>"
             + "<div class=\"col-4\">"
-            + ("<a href=\"#\" class=\"btn btn-primary\" onclick='click_point(" + i + ");'>Select</a>")
+            + ("<a href=\"#\" class=\"btn btn-primary\" onclick='click_point(" + i + ", " + element.model_num + ");'>Select</a>")
             + "</div>"
             + "</div>"
             + "<p class=\"card-text\">"

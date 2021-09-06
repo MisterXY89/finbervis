@@ -64,7 +64,10 @@ class Interface:
 	
 	def read_dfs(self):
 		df_files = ["data_copy.csv", "drop_8_data.csv", "drop_from_3_data.csv"]
-		return [pd.read_csv(f"{DATA_DIR}/{file}") for file in df_files]
+		dfs = [pd.read_csv(f"{DATA_DIR}/{file}") for file in df_files]
+		for i, d in enumerate(dfs):
+			d["model_num"] = [i for x in range(len(d))]
+		return dfs
 		
 	def get_df_len(self):
 		return len(self.dfs_[model])
@@ -260,10 +263,12 @@ class Interface:
 		dists = self.dists[model].get_similar_sents_for(id=id, n=n, return_sents=return_sents)
 		return dists
 
-	def search(self, seg_id=None, q=None, model=0):
+	def search(self, seg_id=None, q=None, model=0, exclude=2):
 		if model == -1:
-			df = self.dfs_[0].concat(self.dfs_[1], ignore_index=True).concat(self.dfs_[2], ignore_index=True)
-		df = self.dfs_[model]
+			idx = [x for x in [*range(3)] if x != exclude]		 			
+			df = self.dfs_[idx[0]].append(self.dfs_[idx[1]], ignore_index=True)
+		else:
+			df = self.dfs_[model]
 		if seg_id:
 			return df.query(f"id == {seg_id}")
 		if q == "=all":

@@ -1,4 +1,4 @@
-function click_point(d: any, clicked_index:any) {
+function click_point(d: any, model_num:any) {
 	
 	$("#self-attention-heatmap svg").remove();
 	document.getElementById("show-similar").disabled = false;
@@ -10,7 +10,8 @@ function click_point(d: any, clicked_index:any) {
 		window.last_matrix_row.style.filter = "sepia(0%)";
 	}
 	
-	console.log(d, clicked_index);
+	console.log(d, model_num);
+	// include model_num
 
 	let current_target;
 	if (typeof d == "number" || d3.event == null) {

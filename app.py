@@ -235,14 +235,16 @@ def search():
 	else:		
 		seg_id = int(req_data["seg_id"]) if ("seg_id" in req_data) else None
 		model = int(req_data["model"]) if "model" in req_data else -1
+		exclude = int(req_data["exclude"]) if "exclude" in req_data else 2
 		q = req_data["q"] if ("q" in req_data) else None
 		# if q == "=all":
 		# 	return render_template("includes/all_search.html")
-		result = interface.search(seg_id=seg_id, q=q, model=model)
+		result = interface.search(seg_id=seg_id, q=q, model=model, exclude=exclude)
 		status = True
 
 	result_l = []
 	for index, row in result.iterrows():
+		# print(row)
 		result_l.append({
 			"id": int(row.id),
 			"segment": str(row.segment),
@@ -253,13 +255,15 @@ def search():
 			"props": str(row.props),
 			"tokens": row.tokens,
 			"saliency_score": row.saliency_score,
-			"mean_attention": row.mean_attention,
-			"deRoseAttention": row.deRoseAttention,
+			# "mean_attention": row.mean_attention,
+			# "deRoseAttention": row.deRoseAttention,
 			"one_hot": row.one_hot,
 			"one_hot_cluster": row.one_hot_cluster,
 			"pos_tags": row.pos_tags,
+			"model_num": row.model_num
 			# "embeddings": row.embeddings,,
 		})
+	print(result_l)
 	return jsonify({
 		"status": status,
 		"result": result_l,

@@ -1,5 +1,5 @@
 "use strict";
-function click_point(d, clicked_index) {
+function click_point(d, model_num) {
     $("#self-attention-heatmap svg").remove();
     document.getElementById("show-similar").disabled = false;
     document.getElementById("self-attention-collapse-btn").disabled = false;
@@ -9,7 +9,8 @@ function click_point(d, clicked_index) {
     if (window.last_matrix_row != undefined) {
         window.last_matrix_row.style.filter = "sepia(0%)";
     }
-    console.log(d, clicked_index);
+    console.log(d, model_num);
+    // include model_num
     var current_target;
     if (typeof d == "number" || d3.event == null) {
         if (window.search_result_data[d] != undefined) {
