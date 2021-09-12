@@ -109,6 +109,7 @@ def evaluate(exclude_tag = False, file=None):
 			results["results"].append({
 				# "vecs": vecs,
 				"threshold": round(t, 2),
+				"total": total,
 				"with_one": num_with_one,
 				"anti_num": anti_num, 
 				"closed_class": closed_class,
@@ -131,6 +132,7 @@ def evaluate(exclude_tag = False, file=None):
 			
 			
 def get_accuracy(acc, x):
+	print(acc, x)
 	if isinstance(acc, int):
 		val = str(acc)
 	else:
@@ -152,28 +154,16 @@ def get_header(tag):
 %% """ + tag + """ results%%
 \\begin{table}[t]
 \\centering
-\\begin{tabular}{lllllll} % l
+\\begin{tabular}{lllllll}
 \\hline
-
-\\multicolumn{1}{c}{}& 
-\\multicolumn{1}{c}{\\texttt{first-3}} & \\multicolumn{1}{l|}{60.05\\%} 
-& \\multicolumn{1}{l}{\\texttt{drop-8}} & \\multicolumn{1}{l|}{73.00\\%}
-& \\multicolumn{1}{l}{\\texttt{full-layer}} & 73.64\\%
-\\\\ \\hline
-\\multicolumn{1}{l|}{\\textbf{t}} &
-\\multicolumn{1}{l|}{\\textbf{frequency}} & 
-\\multicolumn{1}{l|}{\\textbf{accuracy}} & 
-\\multicolumn{1}{l|}{\\textbf{frequency}} & 
-\\multicolumn{1}{l|}{\\textbf{accuracy}} & 
-\\multicolumn{1}{l|}{\\textbf{frequency}} & 
-\\multicolumn{1}{l|}{\\textbf{accuracy}} \\\\ \\hline
-	"""
+\\multicolumn{1}{c}{} & \\multicolumn{1}{c}{first-3} & \\multicolumn{1}{l|}{60.05\\%} & drop-8 & \\multicolumn{1}{l|}{73.00\\%} & full-layer & 73.64\\% \\\\ \\hline
+\\multicolumn{1}{l|}{\\textbf{t}} & \\textbf{frequency} & \\multicolumn{1}{l|}{\\textbf{accuracy}} & \\textbf{frequency} & \\multicolumn{1}{l|}{\\textbf{accuracy}} & \\textbf{frequency} & \\textbf{accuracy} \\\\ \\hline	"""
 	
 def get_end(tag):
 	return """
 %% end content
 
-\\\\ \\hline
+\\hline
 \\end{tabular}
 \\caption[Model Evaluation for only \\texttt{""" + tag + """} tokens]{Results for systematic evaluation of one-hot-vector patterns (\\textbf{only \\texttt{""" + tag + """} tokens}) for multiple integrated gradient thresholds $t$.}
 \\label{tab:evalResults""" + tag + """}
@@ -191,6 +181,7 @@ def gen_latex(file, tag, short=True):
 		latex_rows += "\\multicolumn{1}{l|}{" + str(row['threshold']) +  "}& " 
 		for x in range(0, 3):
 			# latex_rows += get_long_data(res, short, 0, i) + f"{res[x]['results'][i]['closed_class']} & {res[x]['results'][i]['open_class']} & {res[x]['results'][i]['ratio']} & " + get_accuracy(res[x]['results'][i]['accuracy'], x)
+			# {res[x]['results'][i]['total']}
 			latex_rows += get_long_data(res, short, 0, i) + f"{res[x]['results'][i]['frequency']} & " + get_accuracy(res[x]['results'][i]['accuracy'], x)
 		latex_rows += "\\\\ \n"
 	
