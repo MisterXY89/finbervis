@@ -161,7 +161,7 @@ trio==0.17.0
 typer==0.3.2
 typing-extensions==3.7.4.3
 umap-learn==0.5.1
-urllib3==1.26.2
+urllib3==1.26.5
 wandb==0.10.25
 wasabi==0.8.2
 wcwidth==0.2.5
