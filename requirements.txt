@@ -144,7 +144,7 @@ subprocess32==3.5.4
 tensorboard==2.4.0
 tensorboard-plugin-wit==1.7.0
 tensorboardX==2.2
-tensorflow==2.4.1
+tensorflow==2.5.2
 tensorflow-estimator==2.4.0
 termcolor==1.1.0
 thinc==8.0.2
