@@ -119,7 +119,7 @@ requests==2.25.0
 requests-oauthlib==1.3.0
 retrying==1.3.3
 rfc3986==1.4.0
-rsa==4.6
+rsa==4.7
 s3transfer==0.3.6
 sacremoses==0.0.43
 scikit-image==0.18.1
