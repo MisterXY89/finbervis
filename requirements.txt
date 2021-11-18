@@ -73,7 +73,7 @@ mccabe==0.6.1
 more-itertools==8.7.0
 murmurhash==1.0.4
 networkx==2.5.1
-nltk==3.6
+nltk==3.6.5
 numba==0.52.0
 numpy==1.18.5
 oauthlib==3.1.0
